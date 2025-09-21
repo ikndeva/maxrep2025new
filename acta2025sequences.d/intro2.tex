@@ -1,0 +1,82 @@
+%% intro2a.tex
+%% intro2 => shorten to 300 word
+\section{Introduction}
+
+\subsection{Background}
+\textit{Full-text search}, the process of finding all occurrences of a given pattern within a text, is a fundamental problem in information retrieval and sequence analysis. To accelerate search operations, texts are often preprocessed into specialized data structures known as text indexes. The \textit{suffix tree}, a prominent \textit{graph-based text index}, represents all suffixes of a text in a compact, linear-space structure and can be constructed in linear time. This enables efficient solutions for a wide range of text search and analysis problems. However, graph-based indexes, including the suffix tree, suffer from limitations such as high memory consumption and poor cache locality due to their complex, pointer-based representations.
+
+%In response to 
+To cope with 
+these limitations, \textit{array-based text indexes}, such as the \textit{suffix array} (SA)~\cite{manber:myers1993suffixarrays} and the \textit{Burrows-Wheeler Transform} (BWT) array~\cite{burrows:wheeler1994blocksorting,Ferragina05:FM}, have emerged as space-efficient alternatives. While maintaining the same asymptotic space complexity as graph-based indexes, array-based indexes offer simpler structures, typically represented as arrays of integers or characters. These simpler structures, when combined with appropriate auxiliary data structures, retain sufficient information for efficient pattern searching. Due to their \textit{simplicity} and \textit{efficiency}, array-based indexes have gained significant popularity in large-scale text applications, particularly in domains like gene sequence analysis.
+
+However, array-based indexes inherently lose a significant amount of the structural information present in the suffix tree. This loss of structural information poses challenges in efficiently solving complex sequence analysis problems. To overcome this limitation, extensive research~\cite{kasai:lee2001lcp:linear,abouelhoda2004replacing,narisawa2007efficient,beller:berger2012space:efficient:bbo,belazzougui:cunial2017representing,belazzougui2020linear,nishimoto:cpm2021enum} has been conducted to develop efficient algorithms for solving various string analysis problems using array-based text indexes. 
+However, for many problems, existing array-based algorithms have not yet achieved 
+the same time complexity to those of graph-based text indexes. 
+%using graph-based text indexes, where e represents the number of edges in the corresponding graph structure.
+
+\subsection{Research Goal}
+
+This study focuses on developing efficient methods for enumerating maximal repeats (MRs) within a text using array-based text indexes. MRs are fundamental string features, characterizing many other important string properties. The number $\mu\le n$ of all maximal repeats in a text of length $n$ is one of the most fundamental compression parameters that reflects the repetitiveness of the text~\cite{navarro2021indexing:i}. 
+Hence, the efficient enumeration of MRs is therefore a critical problem in string analysis. We consider a scenario where the text is preprocessed into an index data structure in advance. This preprocessing step allows for efficient operations during subsequent analyses, minimizing the impact of construction time, especially when performing multiple analyses on the same text.
+
+All of $\mu$ maximal repeats in a text can be represented by a Graph-based indexes, called the \textit{Compact Directed Acyclic Word Graph} (CDAWG)~\cite{blumer1987complete}, as the set of nodes~\cite{raffinot2001maximal}. 
+%The CDAWG stores all of $\mu$ MRs in $O(e_R + e_L)$ space, where $e_R$ and $e_L$ represent the number of \textit{forward edges} (goto links) and \textit{backward edges} (\textit{Weiner links}) in the CDAWG, respectively. 
+%The CDAWG can be used to solve a number of string analysis problems~\cite{}. 
+Especially, this compact representation enables the enumeration of all MRs in the time proportional to the numbers $O(e_R)$ or $O(e_L)$ of \textit{forward edges} (goto links) and \textit{backward edges} (\textit{Weiner links}) in the CDAWG, representing the fastest known result for MR enumeration.  
+
+In contrast, existing array-based enumeration algorithms for maximal repeats~\cite{narisawa2007efficient,okanohara2009linear,beller:berger2012space:efficient:bbo,belazzougui2020linear,nishimoto:cpm2021enum} can be classified into two categories based on the type of graph index traversed, namely the suffix tree ($+$) or Weiner tree ($-$) and the direction of traversal, namely bottom-up (BU) or top-down (TD) as follows:
+\begin{itemize}
+\item Type-1 algorithms~\cite{narisawa2007efficient,okanohara2009linear}: These algorithms rely on \textit{bottom-up traversal} (BU) of the \textit{suffix tree} ($+$). Thus, categorized as $\idrm{BU}^+$. 
+\item Type-2 algorithms \cite{beller:berger2012space:efficient:bbo,belazzougui2020linear,nishimoto:cpm2021enum}: These algorithms utilize \textit{top-down traversal} (TD) of the \textit{Weiner tree} ($-$). Thus, categorized as $\idrm{TD}^-$. 
+\end{itemize}
+
+See Ohlebusch~\cite{ohlebusch2013bookbioinfo} for details of their definitions. 
+It is shown that both types of algorithms require $O(n)$ time, where $n$ is the length of the text. Hence, no previously known array-based algorithm achieves the $O(e_R)$-time complexity attainable with graph-based indexes.
+
+%%%%%%%%%%%
+%% basic text indexing structures : array-based 
+\begin{table}[t]\centering\tabcolsep=.25em 
+  \input{tab/table2} %% static indexes
+\end{table}
+%%%%%%%%%%%
+
+\subsection{Main Results}
+To address this challenge, we propose two novel array-based algorithms, Algorithms A and B, that achieve the same $O(e_R)$ time complexity for MR enumeration as the fastest graph-based index structure, the CDAWG, after preprocessing of the associated indexing arrays from a text. 
+The proposed algorithms are designed to be simple and efficient. They utilize only standard array indexes and auxiliary data structures commonly employed in text search, making them relatively easy to implement. 
+
+By adapting the underlying arrays to various text index implementations, including \textit{uncompressed}~\cite{manber:myers1993suffixarrays,Ferragina05:FM}, \textit{entropically compressed}~\cite{belazzougui:cunial:gagie:prezza:raffinot2015composite,belazzougui2020linear}, and \textit{repetition-aware compressed}~\cite{gagie:navarro:prezza2020fully,kempa:kociumaka2023collapsing} versions, we achieve a wide range of time-space trade-offs for MR enumeration.  
+Moreover, since they rely on indexing arrays as black boxes, it allows them to readily benefit from future advancements in array index implementation techniques, such as compressed~\cite{gagie:navarro:prezza2020fully,kempa:kociumaka2023collapsing}, online~\cite{kopelowitz2012online}, dynamic~\cite{kempa2022dynamic,liptak2024textbooksolution}, and persistent~\cite{driscoll:sarnak:sleator:tarjan1986makingpersistent} index structures. 
+
+In \cref{table:summary}, we show the summary of a comparison of existing methods with our results with varying underlying array index structures. 
+
+\clearpage
+\subsection{Techniques}
+%%%% 
+To obtain the main results, we devise the following techniques. These results represent significant advancements in MR enumeration using array-based text indexes, achieving $O(e_R)$-time complexity, matching the performance of the fastest graph-based methods.
+
+\textbf{Algorithm A}: 
+For maximal repeat enumeration, the proposed algorithm introduces a new paradigm, which we term Type-3 algorithms. Departing from the traditional top-down traversal of the Weiner tree ($\idrm{TD}^-$), as employed by Type-2 algorithms, this algorithm adopts a novel approach based on top-down traversal of the suffix tree (abbreviated as $\idrm{TD}^+$). 
+This approach differs significantly from the conventional Type-2 algorithms that utilize the top-down traversal of the Weiner tree.
+Unlike the case of the Weiner tree, we can show a characterization that in the suffix tree, all MRs reside in the upper connected region, and the rest of the region can be pruned by $O(1)$-time left-branching test using the SA, ISA, and LCE structures building on the work of Narisawa et al.~\cite{narisawa2007efficient} with a slight modification. It performs top-down traversal of the virtual suffix tree, using the simulation method of Abouelhoda et al.~\cite{abouelhoda2004replacing} with SA and LCE structures. 
+
+% A key innovation is the introduction of a new characterization of the region of MRs within the suffix tree.
+% This characterization, combined with the top-down traversal strategy, enables the effective pruning of unnecessary branches using an O(1)-time left-branching test that leverages the suffix, inverse suffix, and LCP arrays, building on the work of Narisawa et al.~\cite{narisawa2007efficient}.
+% To the best of our knowledge, this combination of top-down suffix tree traversal and pruning with a left-branchingity test represents a novel approach for accelerating MR enumeration.}
+% \item Algorithm A: This algorithm introduces a novel approach to MR enumeration, departing from the traditional bottom-up traversal of Type-1 algorithms.
+% It performs top-down traversal of the virtual suffix tree, utilizing the simulation method of Abouelhoda et al.~\cite{abouelhoda2004replacing} in conjunction with the suffix and longest common prefix (LCP) arrays.
+% A key innovation is the introduction of a new characterization of the region of MRs within the suffix tree.
+% This characterization, combined with the top-down traversal strategy, enables the effective pruning of unnecessary branches using an O(1)-time left-branching test that leverages the suffix, inverse suffix, and LCP arrays, building on the work of Narisawa et al.~\cite{narisawa2007efficient}.
+% To the best of our knowledge, this combination of top-down suffix tree traversal and pruning with a left-branchingity test represents a novel approach for accelerating MR enumeration.
+
+\textbf{Algorithm B}: 
+This algorithm builds upon existing Type-2 algorithms, 
+which perform top-down traversal of the virtual Weiner tree. 
+It simulates Weiner link traversal using LF mapping, as described by Ferragina et al.~\cite{Ferragina05:FM}.
+The algorithm incorporates a range-distinct operation implemented on the BWT to efficiently determine whether a string is a maximal repeat in amortized constant time.
+To overcome the limitation of traditional Type-2 algorithms that traverse all O(n) Weiner links, we introduce an efficient procedure to directly jump to other MRs. This procedure effectively skips non-branching nodes between MRs by utilizing internal substring matching (or weighted ancestor queries).
+Furthermore, Algorithm B employs a bidirectional index, consisting of text indexes for both the text and its reverse, to enhance efficiency.
+By integrating this efficient jumping procedure with standard Type-2 algorithms, we achieve $O(e_R)$-time MR enumeration using two copies of the suffix, inverse suffix, and LCP arrays: one for the text and one for its reverse, each equipped with internal substring matching capabilities.
+
+
+\subsection{Conclusion}
+This research presents significant advancements in MR enumeration using array-based text indexes. The proposed algorithms, Algorithm A and Algorithm B, achieve $O(e_R)$-time complexity, matching the performance of the fastest graph-based methods. These results have important implications for various applications in string analysis and bioinformatics.

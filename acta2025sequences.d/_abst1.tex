@@ -1,0 +1,12 @@
+% \bigskip
+% This paper studies the problem of enumerating maximal repeats, one of the most widely used classes of substring features, in a text $T$ using an array-based text index, such as the suffix array (SA) or the Burrows-Wheeler transform (BWT) with auxiliary data structures.
+%
+% Raffinot~(Information Processing Letters, Vol.90, No.3, 2001) showed that all distinct maximal repeats in a text of length $n$ can be enumerated in $O(e_R)$ time based on a graph-based index, called the compact directed acyclic word graph of the text (CDAWG), of size $O(e_R)$, where $e_R$ denotes the number of right-extensions in $T$.
+% %% , and can be much smaller than $n$ for repetitive texts. 
+% Since then, it has been open whether there exists an array-based algorithm with the same time complexity as the CDAWG-based one. 
+%
+% In this paper, we present a simple and efficient array-based algorithm that enumerates all maximal repeats contained in the text $T$ in $O(e_R\cdot t_\fn{acc}(n))$ time and $O(\sigma^2 \log e_R)$ words of working space using as oracles the SA, inverse the SA, and longest common prefix array (LCP) with range minima query. The proposed algorithm uses a novel search strategy of the virtual suffix tree that is different from any of the previous algorithms. Technically, to obtain the output-sensitive time complexity, we combine the top-down simulation method for traversal of the suffix tree by Abouelhoda, Kurtz, and Ohlebusch (Journal of Discrete Algorithms, Vol.2, No.1, 2004) and constant time left-maxiamlity test by Narisawa et al. (Combinatorial Pattern Matching, London, Canada, 2007) in a novel way. 
+%
+% Due to the modular structure of the proposed algorithm, we obtain various algorithms with different time and space trade-offs by plugging existing text indexing arrays into the oracles.
+% For instance, using the classic SA and LCP arrays as oracles, we obtain an $O(e_R)$-time algorithm based on an $O(n)$ words of space index, solving the aforementioned open question positively. On the other hand, using the latest $\delta$-spaced SA-index by \cite{kociumaka:navarro:olivares2024near:delta:optimal}, we obtain an $O(e_R \polylog(n))$ time algorithm using $O(\delta \polylog(n))$ words of space, whose  time and space complexities can be sublinear for classes repetitive texts. 
+% %To the best of our knowledge, these results gives the first array-based algorithm with sublinear time and linear space for the maximal repeat enumeration problem. 

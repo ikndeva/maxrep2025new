@@ -1,0 +1,414 @@
+%% ewaacbody.tex
+\renewcommand{\abstractname}{Abstract}
+\newcommand{\rev}{^\mathrm{R}}
+\newcommand{\op}[1]{\texttt{#1}}
+\newcommand{\rext}[1]{\overrightarrow{#1}}
+\newcommand{\lext}[1]{\overleftarrow{#1}}
+\newcommand{\mext}[1]{\overleftrightarrow{#1}}
+\newcommand{\sete}[1]{\{\: #1 \:\}}
+\begin{abstract}
+\noindent 
+In this paper, we consider the problem of identifying all maximal repeats within a text. 
+%It is known that any text of length $n$ contains 
+In 2012, Beller, Berger, and Ohlenbusch  proposed an algorithm for finding all $\mu$ maximal repeats in a text $T$ of length $n$ over an alphabet of $\sigma$ characters in $O(n \log \sigma)$ time using the BWT for $T$ on the Wavelet tree in $O(n \log \sigma)$ bits of space, where $\mu$ is the number of all maximal repeats in $T$. 
+Assuming a preprocessing step that constructs a bidirectional index for a text $T$, consisting of 
+the BWT array in $O(n\log\sigma)$ bits of space, 
+the suffix array (SA), 
+the inversed suffix array (ISA), and 
+the longest common suffix array (LCP) 
+in $O(n\log n)$ bits of space 
+for a text $T$ and its reversal $T^\idrm{R}$, 
+we propose an efficient algorithm that enumerates all maximal repeats in the text using these preprocessed index arrays. Our algorithm operates in $O(e_L \log n)$ time and requires $O(\sigma\log^2 n)$ bits of working space based on the data structure with $O(n \log n)$ bits of space, where 
+$e_L$ is the number of all the left-extensions of all the maximal repeats in a text of length $n$ such that $\mu\le e_L\le n$, and can be as small as $\Theta(\log n)$. In summary, our algorithm significantly improves the time complexity for highly-repetitive texts with slightly increased space complexity.
+\end{abstract}
+
+%%%%%%
+\section{Introduction}
+\label{sec:backgrounds}
+
+%%%% macros 
+\newcommand{\lexleq}{\preccurlyeq_\idrm{lex}}%override
+\newcommand{\lexless}{\preccurly_\idrm{lex}}%override
+
+
+%%\subsection{Background:maximal repeats}
+\subsection{Our problem: Enumerating maximal repeats}
+In the field of string processing and computational biology, much research has been done to enumerate characteristic substrings. 
+%%, such as \textit{maximal repeats}.
+Throughout, let $\Sigma$ be an alphabet of $\sigma \ge 2$ characters, and  $T[1..n]$ be a text of length $n$ over $\Sigma$, where $T[1]=\#$ and $T[n]=\$$ are special start and endmarkers that do not appear elsewhere, and are smaller than any other characters. For any integers $i, j\;(i\le j)$, we define intervals $[i]=\set{1,\dots,i}$ and $[i..j] = i..j=\set{i, i+1, \dots, j}$. 
+A \textit{maximal repeat} (see Raffinot~\cite{raffinot2001maximal}) is a substring $W_*$ of $T$ that appears at least twice in $T$, and for any character $c$, if $c$ is attached to either the left or right side, the number of occurrences in $T$ strictly decreases. 
+A \textit{left-extension} (resp.~\textit{right-extension}) of a maximal repeat $W_*$ is any substring $a W_*$ (resp.~$W_* b$) of $T$ for some symbol $a \in \Sigma$ (resp.~$b \in \Sigma$).
+Let $\mathcal M = \mathcal M(T)$ denote the \textit{set of all maximal repeats}. 
+We let $\mu = \mu(T) = |\mathcal{M}(T)|$, 
+$e_L = e_L(T)$, and $e_R = e_R(T)$ denote the numbers of all maximal repeats, all left-extensions, and all right-extensions in the text $T$, respectively. 
+Clearly, $\mu \le e_L, e_R$ hold. 
+It is known that the numbers $\mu, e_L$, and $e_R$ of maximal repeats, left- and right-extensions are upper-bounded by $O(n)$ for all texts, and moreover, can be $O(\log n)$ for some morphic words such as Fibonacci words and Thue-Morse words (see, e.g., Radoszewski and Rytter~\cite{radoszewski:rytter2012structure:cdawg:thuemorse}). 
+
+Given an input text $T = T[1]\cdots T[n]$, the \textit{reversed text} is the string $T^\idrm{R} = T[n]\cdots T[1]$ obtained by reading $T$ from right to left. 
+We assume the following index structures for both of a text $T$  and its reversal $T^\idrm{R}$ as inputs to our algorithm:
+\begin{itemize}
+\item The \textit{suffix array} (SA) and the \textit{inverse suffix array} (ISA) for $T$ are the permutations defined as follows (see Manber and Myers~\cite{manber1993suffixarrays:new:method}). 
+The suffix array $SA: [n]\to [n]$ is the rank-sorted integer array that represents the lexicographically-sorted suffixes $T[SA[1]..n] \lexleq \cdots \lexleq T[SA[n]..n]$ in all suffixes of $T$. 
+The inverse suffix array is the position-sorted integer array that represents the inverse mapping of $SA$, namely, $ISA: [n]\to [n]$ such that $ISA[p] = k \iff SA[k] = p$ for all ranks $k \in [n]$ and all positions $p\in [n]$. 
+
+\item 
+  The \textit{BWT array} (BWT), or the \textit{Burrows-Wheeler Transformation}, is the rank-sorted character array that represents a permutation of the text $T$, $\BWT: [n]\to \Sigma$, defined as: for all $k \in [n]$, $\BWT[k] = T[SA[k] - 1]$ if $SA[i] > 1$, and $\BWT[i] = T[n]$ if $SA[i] = 1$ (see Burrows and Wheeler~\cite{burrows1994block}). We assume that the BWT array is stored in the Wavelet tree with $O(n\log\sigma)$ bits of space, and equipped with the array $C[1..\sigma]$ of cumulative character counts% 
+%%%%
+\footnote{$C[c]$ stores the occurrences of all characters $c'$ appearing in $BWT$ strictly smaller than a character $c$.}
+%%%%  
+to form the \textit{FM-index} for $T$  (see Grossi, Gupta, and Vitter~\cite{grossi2003high}).
+
+
+\item The \textit{LCP array} (LCP), or the \textit{longest common prefix array}, is the rank-sorted integer array $LCP: [n]\to [n]$ defined as: for all $k \in 1..n$, 
+if $k = 1$, $LCP[k]$ is $0$; 
+otherwise, $k>1$, and $LCP[k]$ is the length of the longest common prefix between two suffixes $T[SA[k]..n]$ and $T[SA[k-1]..n]$  (see Manber and Myers~\cite{manber1993suffixarrays:new:method}; Kasai, Lee, Arimura, Arikawa, and Park~\cite{kasai:lee2001lcp:linear}
+). We assume that the LCP array is stored in the RMQ structure (see Bender and Farach-Colton~\cite{Bender2000RMQ}).
+\end{itemize}
+
+All of the above indexing arrays, namely $SA, ISA, BWT$, and $LCP$, can be constructed from a text $T$  in linear time in the length $n$ of a text (see K{\"a}rkk{\"a}inen, Sanders, and Burkhardt~\cite{karkkainen2006linear} for $SA$; Okanohara and Sadakane~\cite{okanohara2009linear} for $BWT$; Grossi, Gupta, and Vitter~\cite{grossi2003high} for the Wavelet Tree; Kasai, Lee, Arimura, Arikawa, and Park~\cite{kasai:lee2001lcp:linear} for $LCP$). 
+The unidirectional text index for a text $T$ considered in this paper is the tuple $\sig I(T) = (BWT, SA, ISA, LCP)$ of the indexing arrays above for the text $T$, which occupies $O(n\log n)$ bits of space in total. Our bidirectional text index is the pair $\sig B(T, T\rev) := (\sig I(T), \sig I(T\rev))$ indices for $T$ and $T\rev$.
+
+In this paper, we consider the following problem.
+
+\begin{trivlist}\item[]
+\textit{Problem~1}\; \textbf{(Maximal Repeats Enumeration (MR-ENUM)).}
+Given an alphabet $\Sigma$ of $\sigma$ characters, and a bidirectional index $\sig B(T, T\rev) $ for a text $T$ and its reversal $T^\idrm{R}$ of length $n$ over $\Sigma$, the task is enumerating all distinct maximal repeats of $\mathcal M(T)$ occuring in the text. 
+\end{trivlist}
+%%$n$ (\textit{MR-ENUM problem}). 
+
+Assuming an alphabet $\Sigma = \{1, ..., \sigma\}$, we can easily observe that the \text{Maximal Repeats Enumeration} problem can be solved in $O(n^3\sigma)$ time and $O(n\log n) $ bits of space using the straightforward generation-and-test method that enumerates all of $O(n^2)$ substrings of a text $T$, and checks if each enumerated substring is maximal by using a pattern matching algorithm such as the KMP algorithm~\cite{crochemore2002jewels}. 
+However, the naive algorithm is impractical for large values of $n$.
+
+
+% can be solved by a naive algorithm based on the generate and test method in $O(n^3\sigma)$ time and $O(n)$ word space. The goal is to give a more efficient algorithm in terms of computation time and space complexity.
+
+% can be solved in O(n^3σ) time and O(n log n) bit space using a naive algorithm that applies the generation inspection method to all O(n^2) substrings using the KMP pattern matching algorithm as a subroutine. However, the naive algorithm is impractical for large values of n.
+
+\subsubsection*{Beller, Berger, and Ohlebusch's  algorithm.}
+In 2012, Beller, Berger, and Ohlebusch~\cite{BBO12} proposed a more efficient algorithm, abbreviated as \textit{BBO}, in terms of both computational time and space. The BBO algorithm finds all distinct maximal repeats in a text $T$ of length $n$ in $O(n \log \sigma)$ time and $O(n \log \sigma)$ bits of space. The basic idea is to consider the suffix tree of text $T$, and characterize the set $\mathcal M$ of all maximal repeats as the set of all branching nodes of the Weiner tree $\mathcal W$, a rooted tree formed from the suffix links of $T$, such that each branching node corresponds to a unique maximal repeat in $T$. Utilizing this characterization, the BBO algorithm enumerates all maximal repeats in $\mathcal M$ without overlap by mimicking the traversal of the Weiner tree using a text index. To achieve this, the BBO algorithm represents the nodes of the Weiner tree as subintervals (SA intervals) of the SA array, and realizes the traversal of the Weiner tree using the LF mapping, a suffix rank conversion mapping, utilizing the BWT array expressed as Wavelet tree.
+
+%\subsection{Problems with previous methods}
+
+% In this paper, we consider accelerating the BBO algorithm by using an index structure for both the text $T = T[1]\cdots T[n]$ and its reverse text $T^\idrm{R} = T[n]\cdots T[1]$.
+
+\subsubsection*{Goal of our research.} 
+Our goal is to accelerate the BBO algorithm by combining the careful design of search strategy and efficient implementation of the operation $\mext{\cdot}$, called the \textit{maximal extension}. 
+As explained in the previous subsection, the BBO algorithm enumerates all maximal repeats represented by branching nodes in the Weiner tree $\mathcal W$ by starting from the root using the index structure $\mathcal I(T)$. 
+However, the problem is that the tree $\mathcal W$ needs to spend $O(\log \sigma)$ time for each of $O(n)$ non-branching nodes that have only one child. 
+This causes total time of $O(n\log \sigma)$. Therefore, it is a natural question whether it is possible to efficiently visit only the branching nodes below the current node, without traversing the long chain of non-branching nodes; If this is possible, the entire algorithm can be accelerated. However, it seems difficult to skip this long chain of non-branching nodes, regardless of its length, using only the BWT array of the forward text stored in the Wavelet tree, as in the BBO algorithm.
+
+\subsection{Related work}
+Beller, Berger, and Ohlebusch~\cite{BBO12} proposed in 2012 an algorithm (BBO algorithm) using the idea of traversing a Weiner-link tree with the BWT array for forward texts with $O(n \log \sigma)$ time and $O(n \log \sigma)$ bits of space .
+In 2016, Belazzougui and Cunial~\cite{BC12} proposed an algorithm with $O(n)$ time and $(n \log \sigma)$ bits of space, improving the computation time.
+In 2021, Nishimoto and Tabei~\cite{nishomoto:cpm2021renum} gave an algorithm, \textit{R-enum}, to enumerate all maximal repeats in $O(n \log \log(n/r))$ time and $O(r \log n)$ bits of space using a run-length compressed BWT array of size $O(r)$. Here, $r$ is a compression parameter of the text called the run number of the BWT array, and it is known to be much smaller than the text length~$n$. The parameter $r$ satisfies that $r \le e\le n$ for all texts, and it is possible that $r=O(1)$ and $e=\Theta(\log n)$ for some texts, e.g., Fibonacci words (see Radoszewski and Rytter~\cite{radoszewski:rytter2012structure:cdawg:thuemorse} and Frosini, Mancini, Rinaldi, Romana,  and Sciortino~\cite{frosini2022logarithmic}). 
+On the other hand, $e$ can be polynomial of the text length $n$ (see Inenaga~\cite{inenaga2024linear}). 
+
+
+%%%%%
+
+\section{Main result}
+
+In this paper, we propose an efficient algorithm for  enumerating all maximal repeats in a text. 
+This algorithm simulates the traversal of the Weiner tree of a text $T$ as the BBO algorithm. Unlike the BBO algorithm, our algorithm uses the \textit{bidirectional index} for 
+both of an input text $T = T[1]\cdots T[n]$ and the reversed text $T^\idrm{R} = T[n]\cdots T[1]$
+to speed-up the search by avoiding traverse of long chains of non-branch nodes. 
+Throughout, we use the following bidirectional index for the text $T$ and its  reversed text $T\rev$.
+Let $\sig I(T) = (BWT, SA, ISA, LCP)$ be the \textit{unidirectional index} consisting of the BWT on the Wavelet tree, the suffix, the inverse suffix, and the longest common prefix arrays for $T$. 
+Our \textit{bidirectional index} is the pair $\sig B(T, T\rev) := (\sig I(T), \sig I(T\rev))$ of the unidirectional indices for $T$ and $T\rev$. We use these index arrays in both directions to speed-up various operations on maximal extensions of a substring in both directions necessary to non-redundant search for maximal repeats. 
+
+\subsection{Basic idea}
+
+We introduce a characterization of maximal repeats in a text $T$ as follows (for details, see, e.g., Raffinot~\cite{raffinot2001maximal} and Inenaga \textit{et al.}~\cite{inenaga2005line}). 
+A \textit{repeat} in $T$ is any subword of $T$ that occurs at least twice in $T$. 
+For any substring $W$ occurring in a text $T$, we define the \textit{maximal right-extension} (resp.~\textit{maximal left-extension}) of $W$, denoted by $\rext{W}$ (resp.~$\lext{W}$), as the longest superstring obtained from $W$ by appending (resp.~prepending) letters as long as all of its start (resp.~end) positions in $T$ do not change. 
+We can show that if we apply two operators $\rext\cdot$ and $\lext\cdot$ to any subword $W$ of $T$ in different order, this results the same substring $\lext{(\rext{W})} = \rext{(\lext{W})}$, denoted by $\mext W$.  Moreover, $\mext\cdot$ is \textit{idempotent}, that is, $\mext{(\mext W)} = \mext W$ holds. We call $\mext W$ the  \textit{maximal extension} of $W$. 
+If $W$ is a repeat of $T$, then $\mext W$ is the unique maximal repeats containing $W$ as its substring. Conversely, any maximal repeat in $T$ has the form $\mext{W}$ for some substring $W$ of $T$. $W$ is \textit{right-branching} in $T$ if there exist at least two mutually distinct characters $b, b'\;(b\not=b')$ such that both of $W b$ and $W b'$ occur in $T$. By symmetry, we define the \textit{left-branching} substring in $T$ as well. Alternatively, any subword $W$ of a text $T$ is a maximal repeat if and only if it is both right-branching and left-branching in $T$. 
+
+Now, we explain how to enumerate all maximal repeats in $T$ without duplicates. 
+Following the idea of the \textit{reverse search} proposed by Avis and Fukuda~\cite{avis1996reverse}, we introduce a tree-shaped search route for $\sig M$. 
+Firstly, the \textit{root} $r$ is the maximal extension $\mext\eps$ of the empty string $\eps$, called the \textit{empty} maximal repeat, which equals $\eps$ by assumption $|\Sigma|\ge 2$. 
+Next, we consider any non-empty maximal repeat $W_* = W_*[1..m] \not= \mext\eps$ with length $m > 0$. We define the parent $\sig P(W_*)$ of $W_*$ as the unique maximal repeat $U_*$ defined as follows. 
+We let $0\le i_* \le m$ be the largest integer such that the condition $\mext{W_*[i_*..m]} = W_*$ (*) holds. By assumption, it must hold that $W_*[m+1..m]=\eps$. 
+We define the \textit{parent} $\sig P(W_*)$ to be the the maximal extension $U_* := \mext{W_*[i_*+1..m]}$. Then, $W_*$ is called a \textit{child} of $U_*$. 
+%By the property of the maximal extension $\mext\cdot$, 
+
+\newcommand{\subleq}{\sqsubseteq_\idrm{sub}}
+
+\begin{lemma}[existence of the parent]
+\label{lem:parent}
+Let $T$ be any text. For any non-empty maximal repeat $W_* \in \sig M$ such that $W_* \not= \mext\eps$, 
+(1) the parent $\sig P(W_*) = U_*$ always exists, 
+(2) $U_*$ is unique, 
+(3) $U_*$ is strictly shorter suffix of $W_*$, i.e., $|U_*| < |W_*|$, and 
+(4) $U_*$ is a maximal repeat of $\sig M$. 
+\end{lemma}
+
+\begin{proof}
+First, we show that given any $W_* \in \sig M$, there exists  such an index $1\le i_*\le m$ that satisfies condition (*).
+Consider $W_*[i..m]$ for $1\le i\le m+1$. If $i_* = 1$, we see that $\mext{W_*[1..m]} = \mext{W_*} = W_*$ since $W_* \in \sig M$. On the other hand, if $i_* = m+1$, we have that $\mext{W_*[m+1..m]} = \mext\eps = \eps$. We remark that (i) the subword relation $\subleq$ is transitive, and (ii) $\mext\cdot$ is monotone w.r.t.~$\subleq$. 
+%namely, for any subwords $X, Y$ of $T$, if $X$ is a subword of $Y$ ($X\subleq Y$) then $\mext X$ is also a subword of $\mext Y$ ($\mext X\subleq  \mext Y$). 
+Therefore, we have an increasing chain 
+\begin{math}
+W_*
+= \mext{W_*[1..m]} 
+\subleq 
+\cdots 
+\subleq \mext{W_*[m+1..m]}
+= \mext\eps
+\end{math}
+of subwords of $T$ w.r.t.~$\subleq$ (**). 
+(1) Consequently, we see that there exists the largest index $1\le i_*\le m+1$ such that $\mext{W_*[i_*..m]} = W_*$. Since such $i_*$ is unique, the parent $U_* = \mext{W_*[i_*+1..m]}$ is also unique. 
+(2) Since $i_*$ is the largest index satisfying (*), $U_* = \mext{W_*[i_* + 1..m]}$ must be different from $W_* = \mext{W_*[1..m]}= \mext{W_*[i_*..m]}$, and is uniquely determined.
+(3) Next, from the chain (**), we see that $U_*$ is a strict subword of $W_*$, and thus, $|U_*| < |W_*|$. Furthermore, if $W_*$ is right-branching, then so is its suffix $W_*[i_*+1..m]$ since the latter has the same right context as the former. Therefore, the operation $\mext\cdot$ cannot extend $W_*[i_*+1..m]$ rightwards, and thus, $W_*$ remains right-branching. This shows condition (3). 
+(4) Finally, since any maximal extension of a repeat is a maximal repeat, we conclude that $U_*$ must be a maximal repeat of $\sig M$. Combining the above arguments, the lemma is proved. 
+\end{proof}
+
+Based on Lemma~\ref{lem:parent}, we now define the DAG $\sig T = (\sig M, \sig E, r)$ for $\sig M$, where 
+\begin{itemize}
+\item $\sig M$ is the vertex set  of $\sig T$ that consists of all maximal repeats in $T$.
+
+\item $\sig E$ is the set of reversed edges of $\sig T$ such that $\sig E$ contains the reversed edge $(W_*, U_*)$ from the child $W_*$ to the parent $\sig P(W_*) = U_*$ for any non-empty maximal repeat $W_*$ with length $m > 0$. 
+
+\item $r = \mext\eps$ is the root of $\sig T$. 
+\end{itemize}
+
+From Lemma~\ref{lem:parent}, we observe that the DAG $\sig T$ forms a spanning tree over all maximal repeats of $\sig M$ as intended. The remaining thing is to show how to make the depth-first search of $\sig T$ by traversing the reversed edges in $\sig E$ from the root to leaves. For this purpose, it is sufficient to enumerate all children $W_* \in \sig M$ of a given non-empty maximal repeat $U_* \in \sig M$ such that $\sig P(W_*) = U_*$. 
+We give the following key lemma. 
+
+\begin{lemma}[enumeration of children]\label{lemma:characterization:child}
+For any possibly empty maximal repeat $U_* \in \sig M$ and any symbol $a \in \Sigma$, 
+(a) $W_* := \mext{a U_*}$ is a maximal repeat in $T$ such that $\sig P(W_*) = U_*$ if and only if (b.i) $a U_*$ occurs in $T$ as a substring, and (b.ii) $a U_*$ is {right-branching} in $T$. 
+\end{lemma}
+
+\begin{proof}
+The only-if direction. Suppose that condition (a) holds. Since $a U_*$ is a substring of $W_*$, it is easy to observe that if $W_*$ occurs in $T$ then so does $aU_*$ (b.i); If $U_*$ is a maximal repeat, then it is also right-branching (b.ii). Conversely, suppose that $aU_*$ satisfies conditions (b.i) and (b.ii). Clearly, $W_* := \mext{a U_*}$ is a maximal repeat by property of $\mext{\cdot}$. By the maximality of $U_*$, we have $\mext{U_*} = U_*$ and $\mext{a U_*}$  is properly longer than $U_*$, and thus, $\mext{a U_*}\not= U_*$. 
+Consider the parent $V_* := \mext{W_*[i_*+1..|W_*|]}$ of $W_*$. By definition of $i_*$, the index $i_*$ is the maximum $i_*\ge 1$ such that  $\mext{W_*[i_*..|W_*|]} = W_*$. 
+In addition, if $aU_*$ is right-branching by (b.ii), $U_*$ must be a suffix of $W_* := \mext{a U_*}$.
+Combining $\mext{a U_*} = W_*$, $\mext{U_*} = U_*$, and $W_*\not= U_*$, we conclude that $W_*[i_*] = a$ and $V_* = W_*[i_*+1..|W_*|] = U_*$, and hence the if direction is proved. This shows the claim. 
+\end{proof}
+
+Based on Lemma~\ref{lemma:characterization:child}, we enumerate all maximal repeats using the depth-first search over $\sig M$ as follows: 
+We start from the root $\mext{\eps} \in \sig M$; 
+At each iteration with a parent maximal repeat $U_* \in \sig M$, for each symbol $a \in \Sigma$, we check if $a U_*$ is a right-branching substring of $T$, and if so, we generate a child $W_* := \mext{a U_*} \in \sig M$ by first prepending $a$ to $U_*$, applying maximal extension $\mext{\cdot}$ to it, and then recursively visit all descendants of $W_*$. 
+
+%%%%%%%%%%%%%%%%%
+\begin{algorithm}[t]
+\caption{The main routine for enumerating maximal repeats
+in a text $T[1..n]$ of length $n$ over an alphabet $\Sigma$ of $\sigma$ characters terminated with the unique startmarker $T[1] = \#$ and  endmarker $T[n]=\$$ over alphabet $\Sigma$, where $\sigma \ge 2$.
+It recursively outputs all distinct maximal repeats invoked
+%as $\textsc{MaxRepeats}(1,n,0)$ 
+with $L = 1, R=n$, and $\ell = 0$
+given the bidirectional index $\sig B(T, T\rev) = (\sig I, \sig I\rev)$ for $T$.
+}\label{algo:MaxRepeats} 
+  \begin{algorithmic}
+% \Proc{MaxRepeats}$()$
+%    % \Require{テキスト長$n$}
+%     \Ensure{テキスト中に存在する全ての極大反復文字列を重複なく格納した集合$MRs(T)$}
+%     \State $MRs = \set{}$ 
+%     \State $\textsc{MaxRepeats}(1,n,0)$
+%     \State \textbf{return} $MRs$;  
+% \Statex    
+  \Proc{\textsc{MaxRepeats}}$(L,R,\ell)$
+    \Require{The triple representation $\op{repr}(W) = (L, R, \ell)$ for a substring $W$, where $[L,R]$ is the SA-range of $W$, and $\ell$ is the length of $W$.}
+    \If{$(L,R, \ell)$ is not right-branching}
+       \State \textbf{return};
+       \Comment{Prune all descendants}
+    \EndIf            
+    \State $(L_*,R_*,\ell_*) \gets \textsc{ExtendBoth}(L,R,\ell)$
+    \Comment{Notes: $(L_*,R_*,\ell_*) = \op{repr}(W_*)$ for a max.~repeat $W_*$}
+    \State \textbf{output} $(L_*,R_*,\ell_*)$;
+    %%\For  {$c \in \textsc{WideRangeDistinctQuery}
+    \For  {$c \in \textsc{RangeDistinctQuery}(L_*,R_*)$} 
+    \Comment{For each branching character $c$ of a Weiner link}
+        \State $[L',R'] \gets \textsc{LeftExtendByChar}(L_*,R_*, c)$
+        %\Comment{Notes: $R - L + 1 > R'-L'+1 \ge 2$}
+        %\Comment{Weinerリンクを文字$c$で伸ばす}        
+        \If{$R'-L'+1 \ge 2$}
+        \Comment{Notes: the associated subword must be a repeat}
+        \State $\textsc{MaxRepeats}(L',R',\ell+1)$;
+        \EndIf
+    \EndFor
+    \State \textbf{return};
+  \end{algorithmic}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%
+
+
+
+\subsection{The proposed algorithm}
+
+Now, we introduce our algorithm for enumerating all maximal repeats based on a bidirectional index.
+In Algorithm~\ref{algo:MaxRepeats}, we show the pseudocode of the main routine of our algorithm for enumerating all maximal repeats based on the bidirectional index $\mathcal B(T,T\rev)$ explained above. 
+This procedure enumerates all descendant branch nodes of the currently visited branch node in the Weiner tree $\mathcal W$ by skipping long non-branching chains using a bidirectional index constructed in linear time from the input text of length $n$. This allows us to visit only the $\mu$ branch nodes by following $O(e_L)$ Weiner links, each with an amortized time of $O(\log n)$.
+
+In the algorithm, we represent a substring $W$ of $T$ by a triple $\op{repr}(W) = (L,R,\ell) $, where $[L .. R]$ is the SA-interval of $W$ in $SA[1..n]$ and $\ell = |W|$ is the length of $W$.
+Procedure \textsc{MaxRepeats} use following subprocedures: 
+\begin{itemize}
+\item $\textsc{ExtendBoth}_{\mathcal{I},\mathcal{I}\rev}(L_*,R_*,\ell)$: Given a triple representation $\op{repr}(W) = (L,R,\ell)$ of a repeated substring $W$, it returns triple representation $(L_*,R_*,\ell_*)$ of the unique maximal repeat $\mext W$ containing $W$ (called the maximal extension operation). 
+This can be supported to run in $O(\log n)$ operation time (see Algorithm~\ref{algo:ExtendBoth}). 
+
+\item $\textsc{RangeDistinctQuery}_{BWT}(L,R)$: Given the range $\op{range}(W) = [L, R]$, it returns the set of distinct characters which contained in the range $[L,R]$ for the $BWT$, such that 
+\begin{math}
+RD(L, R) = \{\: c = BWT[k] : k \in [L, R], |BWT[L..R]|_c \ge 1 \:\}  
+\end{math}
+This can be supported to run in $O(\log\sigma)$ operation time on the BWT array with the Wavelet tree (see Beller, Berger, Ohlebusch~\cite{BBO12}). 
+
+% \item $\textsc{WideRangeDistinctQuery}_{BWT}(L,R)$: Given the range $\op{range}(W) = [L, R]$, it returns the set of distinct characters which contained in the range $[L,R]$ for the $BWT$, such that 
+% \begin{math}
+% WRD(L, R) = \{\: c = BWT[k] : k \in [L, R], |BWT[L..R]|_c \ge 2 \:\}  
+% \end{math}
+
+
+\item $\textsc{LeftExtendByChar}_{BWT}(L, R, c)$: Given a range of a substring $W$ $\op{range}(W) = [L, R]$, it returns the range $\op{range}(cW) = [L', R']$ if $cW$ is a substring of T, return empty range $[L+1, L]$ otherwise.
+This operation is exactly the \textit{LF-mapping} of the FM-index, and can be supported to run in $O(\log\sigma)$ operation time on the BWT array with the Wavelet tree and the $C$ array (see Ferragina and Manzini~\cite{Ferragina05:FM}). 
+\end{itemize}
+
+We remark that the test for right-maximality in the first if-sentence can be checked in constant time by the range distinct query for the reverse direction. 
+In Algorithm \ref{algo:ExtendBoth}, we show the subprocedures \textsc{MaximallyExtendToEnd} and \textsc{MoveToOpposite}. These routines use the following operations on the LCP arrays in both directions.
+\begin{itemize}
+    \item $RMQ_{LCP}(L,R)$: returns the minimum value $\ell = min\{LCP[k] | k \in [L..R]\}$ in the subarray of the LCP array $LCP[L,R]$.
+    It is the range-minima query over the LCP array, and can be supported in $O(1)$ operation time and $O(n)$ words of space (see Bender and Farach-Colton~\cite{Bender2000RMQ}).
+    
+    \item $\textsc{StringLevelAncestor}(k,\ell,n,LCP)$: returns the representation $(L,R,\ell)$ of the highest node $v$ whose depth is no less than $\ell$ in the suffix tree for $T$ with the shape determined by the LCP array (see~\cite{belazzougui2020linear}). This can be supported in $O(\log n)$ operation time and $O(n)$ words of space on the LCP array with the RMQ structure by using binary search.
+\end{itemize}
+
+
+\def\Procedure{\Statex\hspace-1.0\leftmargin\textbf{Procedure}}
+\begin{algorithm}[t]
+  \caption{The subroutine $\textsc{ExtendBoth}(L,R,\ell)$. 
+  It receives the triple representation $(L,R, \ell)$ of a substring $W$ of $T$, and returns the unique maximal repeat $\lrc{W}$ containing $W$ using indexing arrays $LCP$ and $LCP\rev$ for $T$ and $T\rev$, respectively.
+  }\label{algo:ExtendBoth}
+  \begin{algorithmic}[1]
+    \Proc{\textsc{ExtendBoth}}$(L, R, \ell, (\sig I, \sig I\rev))$
+    \Require{The triple representation $\op{repr}(W) = (L, R, \ell)$ for a substring $W$, where $[L,R]$ is the SA-range of $W$.}
+    \Ensure{The triple representation $\op{repr}(W) = (L_*, R_*, \ell_*)$ of the unique maximal repeat $\lrc{W}$ in $T$ containing $W$ as a substring.}
+    \If{$L\geq R$} \textbf{return} $\perp$;
+    \Else
+    \Comment{Starting in the forward side}
+    %\State $\ell' \gets RMQ_{LCP}(L+1,R)$    
+    \State $(L, R, \ell') \gets \textsc{MaximallyExtendToEnd}((L, R, \ell), LCP)$  
+      \Comment{Applying maximal right-extension}
+    \State $(L\rev,R\rev,\ell') \gets \textsc{MoveToOpposite}((L, R, \ell'), SA, ISA\rev, LCP\rev)$
+    \Comment{Moving to the reverse side}  
+    \State $(L\rev, R\rev, \ell_*) \gets \textsc{MaximallyExtendToEnd}((L\rev, R\rev, \ell'), LCP\rev)$  
+    %\State $\ell_* \gets RMQ_{LCP\rev}(L\rev+1,R\rev)$
+      \Comment{Applying maximal left-extension}
+    \State $(L_*,R_*,\ell_*) \gets \textsc{MoveToOpposite}((L\rev, R\rev, \ell_*), SA\rev, ISA, LCP)$   
+      \Comment{Moving to the forward side}
+    \State \textbf{return} $(L_*,R_*,\ell_*)$
+    \Comment{the maximal extension $(L_*, R_*, \ell_*) = \op{repr}(\mext{W}) = \op{repr}(\lext{(\rext{W})})$}
+    \EndIf
+  %%%% Procedure convert %%%%%%%%%%%%%%%%%%%%%
+  \Statex\Proc{\textsc{MaximallyExtendToEnd}}$((L, R, \ell), LCP)$  
+    \Require{The triple representation $\op{repr}(W) = (L, R, \ell)$ of $W$, the longest common prefix array $LCP$}
+    \Ensure{The triple representation $\op{repr}(\rext W) = (L, R, \ell')$ of the one-sided maximal extension $\rext W$ specified by the array $LCP$}
+  \State $\ell' \gets RMQ_{LCP}(L+1,R)$
+  \Comment{The range maximum query}
+  \State \textbf{return} $(L, R, \ell')$
+
+
+  \Statex\Proc{\textsc{MoveToOpposite}}$((L_+, R_+, \ell), SA_+, ISA_-, LCP_-)$
+    \Require{The triple representation $\op{repr}_+(W) = (L_+, R_+, \ell)$ of $W$ and the suffix array $SA_+$ in one direction, and the inverse suffix array $ISA_-$ and the longest common prefix array $LCP_-$ in the opposite direction.}
+    \Ensure{The triple representation $\op{repr}_-(W_-) = (L_-, R_-, \ell)$ of the reversed substring $W_-$ in the reverse suffix array $SA\rev$.}
+    \State $k_+ \gets \text{arbitrary rank in } [L, R]$
+    \State $p_+ \gets \id{SA_+}[k_+]$
+    \State $p_- \gets n - p_+ - \ell +\,1$
+      \Comment{the end position of $\rext{W}$ in $T_-$}
+    \State $k_- \gets \id{ISA}_-[p_-]$      
+      \Comment{the rank of the reverse suffix $T_-{p_-}$ in $SA_-$}    
+    \State $[L_-, R_-] \gets \textsc{StringLevelAncestor}(k_-,\ell, n, LCP_-)$
+      \Comment{$\op{repr}(\rext{W}) = (L_-, R_-, \ell)$}
+    \State \textbf{return} $(L_-, R_-, \ell)$
+  \end{algorithmic}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%
+
+\begin{lemma}\label{lem:oper:movetoopposite}
+For any subword $W$ of $T$, 
+the procedure  $\textsc{MoveToOpposite}$  of Algorithm~\ref{algo:ExtendBoth} transforms
+the rich-representation of $X$ on $SA$ in the forward direction into 
+the rich-representation of $X\rev$ on $SA\rev$ in the reverse direction. 
+\end{lemma}
+
+\begin{proof}
+We can see the correctness of the procedure as follows. Suppose that we are given the triple $\tau = (L, R, \ell)$ for a subword $W$. Then, $W$ is the common prefix of all suffixes in the range $[L,R]$ having the length $\ell$. 
+Therefore, it selects an arbitrary suffix $S$ of the text $T$ whose rank $k_+$ in $SA$ belongs to the given range $[L,R]$ at Line~11, and converts it to the starting position $p_+ = SA[k_+]$ of the suffix $S$. Since $W$ is the length-$\ell$ prefix of the suffix $S$, $p_+$ is also the starting position of $W$ in $T$, and $q_+ := p_+ + \ell - 1$ is the end position of $W$ in $T$. 
+
+Now, Line~13 converts the end position $q_+$ into the associated position $p_- = n - p_+ - \ell + 1$ in the reversed text $T\rev$. We observe that the end position $q_+$ of $W$ in $T$ corresponds to the start position $p_-$ of $W\rev$ in the reversed text $T\rev$, and $p_-$ is also the start position of the reversed suffix $S_- = T\rev[p_-..n]$ (or the prefix $T[1..q_+]$ of $T$) . 
+Thus, Line~14 computes the rank of $S_-$ in $SA\rev$. 
+By construction, the reversed subword $W\rev$ must be the prefix of $S_-$ with length $\ell$. Hence, we can compute the $SA\rev$-range of $W\rev$ by computing the widest range that cotains the reversed suffix $S_-$ and whose lcp length is at least $\ell$. This can be done by \textsc{StringLevelAncestor} operation. Combining the above arguments, the correctness of  $\textsc{MoveToOpposite}$ follows. 
+\end{proof}
+
+\begin{lemma}\label{lem:oper:extendboth}
+The procedure  $\textsc{ExtendBoth}_{\sig{I},\sig{I}\rev}(L_*,R_*,\ell)$ of Algorithm~\ref{algo:ExtendBoth} 
+can be supported on the bidirectional index $\sig B(T, T\rev)$ to run in $O(\log n)$ operation time using $O(n\log n)$ bits of space. 
+\end{lemma}
+
+\begin{proof}
+Given a rich-representation triple $\tau = (L, R, \ell)$ of any subword $W$ of $T$, let $\tau' = (L, R, \ell')$ be the triple returned by the call $\textsc{MaximallyExtendToEnd}(\tau, LCP)$ at Line~3. Then, we observe that $\ell'$ is the length of the longest common prefix of all suffixes in the SA-range $[L, R]$. This implies that the triple $\tau'$ represents the right-extension $U = \rext{W}$ of $W$. 
+%%% 
+Next, we let $\pi = (L\rev,R\rev,\ell')$ be the triple computed by the call $\textsc{MoveToOpposite}((L, R, \ell'), SA, ISA\rev, LCP\rev)$  at Line~4. This gives that $\pi$ is the rich-representation of $\rext{W}$ in the form of the $SA\rev$-range in the reverse direction using the unidirectional index $\sig I(T\rev)$. 
+%%% 
+By symmetry, the successive applications of Line~5 and Line~6 to $\pi$ yield the left-extension of $V = \rext W$, namely, the maximal extension $\mext{W} = \lext{V}$ of $W$. Hence, the lemma is proved. 
+\end{proof}
+
+By Lemmas~\ref{lemma:characterization:child}, \ref{lem:oper:movetoopposite}, and \ref{lem:oper:extendboth}, and the above discussions, we have the following theorem. 
+% Let $\sig I(T) = (BWT_T, SA_T, ISA_T, LCP_T)$ be the unidirectional index consisting of the BWT on the top of the Wavelet tree, the suffix, the inverse suffix, and the longest common prefix arrays for a text $T$. Our bidirectional index is a pair $\sig B(T, T\rev) := (\sig I(T), \sig I(T\rev))$ of the unidirectional indices for the text $T$ and its  reversed text $T\rev$. 
+%We denote by $A_{T}$
+
+\begin{theorem}
+Let $T[1..n]$ be any text of length $n$ over alphabet $\Sigma$ of size $\sigma\ge 2$, and $\sig B(T, T\rev) := (\sig I(T), \sig I(T\rev))$ be the bidirectional indices for $T$ that occupies $O(n\log n)$ bits of space and requires $O(n)$ preprocessing time, where $\sig I(T) = (BWT, SA, ISA, LCP)$ is the tuple of the associated uni-directional text index arrays.
+Based on $\sig B(T, T\rev)$, Algorithm~\ref{algo:MaxRepeats} then enumerates  
+the triple representations of all of $\mu$ distinct maximal repeats in a text $T$ in  $O(e_L\log n)$ time and $O(\sigma\log^2 n)$ bits of working space, where $e_L \;(\mu \le e_L = O(n))$ is the number of  the left-extensions of maximal repeats. 
+\end{theorem}
+
+\begin{proof}
+The correctness and the time complexity immediately follow from Lemmas~\ref{lemma:characterization:child}, \ref{lem:oper:movetoopposite}, and \ref{lem:oper:extendboth}, and the construction of Algorithm~\ref{algo:MaxRepeats}. 
+%%%
+For the space complexity, if we implement the recursive procedure \textsc{MaxRepeats} by the standard DFS procedure with a stack $S$ of triples $(L, R, \ell)$, the stack can contain $O(e_L)$ triples in the worst case since the algorithm may search $O(\mu)$ maximal repeats examining $O(e_L)$ Weiner links. Thus, we reduce the space complexity using the \textit{heavy leaf decomposition technique} by Belazzougui, Cunial, K{\"{a}}rkk{\"{a}}inen, and M{\"{a}}kinen~\cite{belazzougui2020linear} as follows (see also Bille and Gortz~\cite{bille:gort:TALG:2011:treeinclusion}). At each iteration with a parent triple $\tau$ with $1\le k\ge \sigma$ children $\tau_1, \dots, \tau_k$, we first push the widest triple $\tau_i = (L_i, R_i, \ell_i)$ having the widest range $[L_i,R_i]$ as a \textit{heavy node} to the stack $S$, and then push the remaining children (as light nodes). Since the width of any light child does not exceed the half of that of its parent, any path from the root to a node can contain at most $\log_2 n$ light nodes, and only light nodes can have at most $\sigma$ younger siblings in the stack, the length of the stack $S$ is upperbounded by $(\sigma-1)\log_2 n = O(\sigma\log n)$. Since each triple requires $O(\log n)$ bits, the working space is bounded by $O(\sigma\log^2 n)$ bits.
+\end{proof}
+
+% In the above theorem, we note that the factor $e_L$, instead of $\mu$, comes from possible failures of the test for non-right-branching strings after $e_L$ left-extensions. 
+% Further, we remark that the parameter $e$ satisfies that $\mu \le e = O(n)$, $r \le e$, $z \le e$, and $e \le \mu\sigma$, where $e = e_L + e_R$, and $r$ and $z$ are the number of the equi-letter runs in the BWT and the number of LZ77 phrases for $T$, respectively. 
+% Moreover, $e$ can be polynomial of the text length $n$, while it can be as small as $O(\log n)$ for some family of highly repetitive texts, such as Fibonacci words and Thue-Morse words 
+% (See Radoszewski and Rytter~\cite{radoszewski:rytter2012structure:cdawg:thuemorse} and \cite{frosini2022logarithmic}).
+
+
+%% old result
+% The main result is an algorithm that constructs a bidirectional index in linear time for an input text of length $n$ and enumerates all SA interval representations of $\mu$ maximal repetitive strings using the constructed bidirectional index, each with a delay of $O(\log n)$. This allows all $\mu \le n$ maximal repetitive strings to be output in $O(\mu \log n)$ time and $O(n \log n)$ bits of space using O(n) time for preprocessing.
+
+% \subsection{Research Objectives and Results}
+
+% Thispaper aims to accelerate the BBO algorithm by employing indexing structures for both a text $T = T[1] . . . T[n]$ and its reverse text $T^\idrm{R} = T[n] . . . T[1]$.
+
+% As described in the previous subsection, the BBO algorithm enumerates all maximal repeats represented by branching nodes in Weiner tree $\\mathcal W$ by mimicking the traversal of nodes in $\\mathcal M$'s indexing structure $\mathcal I(T)$. However, the problem lies in the fact that the tree $\mathcal W$ requires $O(\log \sigma)$ time for each of the $O(n)$ non-branching nodes with only one child, which is the source of unnecessary computations.
+
+
+\subsection{Discussion: Relation to the Weiner tree of a text}
+Consider the \textit{suffix tree} $\sig S_T$ of $T$ and the \textit{Weiner tree} $\sig W_T$ of $T$, where $\sig W$ is the rooted tree formed by the reverse suffix links and extension links  of $\sig S_T$. An \textit{extension link} is a link $Ext[U, a] = aU$ with label $a \in \Sigma$ from a branching node $U$ to a locus $aU$ of a substring of $T$. The link is said to be \textit{hard} if $aU$ is a branching node, while it is \textit{soft} if it is a virtual node on an edge in $\sig S_T$.
+We see that the hard link $Ext[U, a] = aU$ is the reverse of the well-known  \textit{suffix link} $Suf[a U_*] = U_*$. (See Crochemore and Rytter~\cite{crochemore2002jewels} and Gusfield~\cite{gusfield1997algorithms} for precise definitions.) 
+%%% 
+We remark that our search route introduced above exactly corresponds to the Weiner tree $\sig W_T$ of $T$. Each of left extension of a parent maximal repeat $U_*$ by a single symbol $a$ leading to its single symbol left-extension $a U_*$ contained in $T$, which is associated to the \textit{Weiner link} $W[U_*, a] = a U_*$. Let $e$  be the Weiner link from $W[U_*, a]$ to $a U_*$. If $a U_*$ is a branching (i.e., real) node of the suffix tree $\sig S$, we see that $e$ is the \textit{hard} Weiner link, and then we can continue the search. Otherwise, $e$ is a \textit{soft} Weiner link, and thus, it is not right-branching, and $a U_*$ is a locus on an edge $e$ ends at a node $W_*$. In this case, we backtrack the search at $aU_*$ by pruning all of its descendants. Actually, in this case, if we take the maximal extension, we get the lower end $W_* := \mext{a U_*}$ of $e$. If it is not a leaf, this node is also reachable from some branching node, say $U_*'$,  via the reverse of the suffix link from $Suf[W_*'] = U_*'$. Hence, the pruning is sound for all maximal repeats. 
+
+\section{Conclusion}
+
+We presented an efficent algorithm for enumerating   
+all maximal repeats in a text $T$ in the triple representation in  $O(e_L\log n)$ total time using $O(n)$ preprocessing time and words of space. 
+Immediate future work will be to improve the time and working space from $O(e_L\log n)$ bits to $O(\mu\log n)$ bits of space since $\mu \le e_L\le \mu\sigma$. Furthermore, it is also an interesting future work to replace the present bidirectional index in $O(n\log n)$ bits with either a purely compressed  index in $O(n\log\sigma)$ bits, or a  compressed indices in $O(\mu \;\mathrm{polylog}\;n)$ bits tailored for highly-repetitive texts, retaining the same time complexity.  
+We will discuss these issues elsewhere. 
+
+%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+The authors express sincere thanks  to anonymous reviewers for their valuable comments, 
+which significantly improved the quality of this paper.
+The authors would like to thank
+Norihito Yasuda, 
+Yasuaki Kobayashi, 
+Takuya Mieno, Yuto Nakashima, and Dominik K{\"o}ppl 
+of AFSA project 
+for fruitful discussions and helpful comments.
+
+
+%%%%%%%%%%%%%%%%%%%%
+
+%%% EOF

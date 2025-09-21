@@ -1,0 +1,112 @@
+%% ewaacmain.tex
+%% 
+\documentclass{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{newtxtext}
+\usepackage{textcomp}
+\usepackage[sc]{mathpazo}
+\usepackage{amsmath,amssymb,arydshln, amsthm}
+\usepackage[scaled]{helvet}
+%%% \usepackage{otf}
+\usepackage[dvipdfmx]{graphicx,xcolor}
+\usepackage{tikz}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{verbatim}
+\usepackage{ascmac}
+\usepackage{algorithm, algpseudocode}
+%% \usepackage{listings,jlisting}
+\usepackage{listings}
+\usepackage{bm}
+\usepackage[inline,shortlabels]{enumitem}
+\usepackage{cite}
+
+%%% macro
+
+\input{macros}
+\input{tectermname}
+
+%%%
+\lstset{%
+	language={C},
+	basicstyle={\small},%
+	identifierstyle={\small},%
+	commentstyle={\small\itshape},%
+	keywordstyle={\small\bfseries},%
+	ndkeywordstyle={\small},%
+	stringstyle={\small\ttfamily},
+	frame={tb},
+	breaklines=true,
+	columns=[l]{fullflexible},%
+	numbers=left,%
+	xrightmargin=0zw,%
+	xleftmargin=3zw,%
+	numberstyle={\scriptsize},%
+	stepnumber=1,
+	numbersep=1zw,%
+	lineskip=-0.5ex%
+}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}
+%\newtheorem*{theorem*}{Theorem}
+\newtheorem{definition}[theorem]{Definition}
+%\newtheorem*{definition*}{Defintion}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem{Proof}{Proof}
+%\newtheorem*{Proof*}{証明}
+
+\newcommand{\argmax}{\mathop{\rm arg~max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\title{
+Enumerating Maximal Repeats in a Text Based on Bidirectional Indices\thanks{%
+%Hiroki Arimura
+This work is partly supported by JSPS KAKENHI Grant Numbers JP20H00595,
+JP20H05963, and JST CREST Grant Number JPMJCR18K2.}
+}
+\newcommand{\myemail}[1]{e-mail:#1}
+\author{%
+Yuta Tsuruzono\thanks{
+Graduate School of IST, Hokkaido University, Japan, 
+\myemail{turuzono.yuta.y9@elms.hokudai.ac.jp}}
+\and 
+Hiroki Arimura\thanks{
+Faculty of IST, Hokkaido University, Japan, 
+\myemail{arim@ist.hokudai.ac.jp}}
+\and 
+Shunsuke Inenaga\thanks{
+Department of Informatics, Kyushu University, Japan, 
+\myemail{inenaga@inf.kyushu-u.ac.jp}}
+}
+%\author{鶴園 悠太\\ Yuta Tsuruzono}
+
+\date{
+% turuzono.yuta.y9@elms.hokudai.ac.jp
+% \\arim@ist.hokudai.ac.jp
+% \\inenaga@inf.kyushu-u.ac.jp
+}
+
+\begin{document}
+\maketitle
+
+% \end{abstract}
+% \newpage
+% \tableofcontents
+
+%%%%%%%%論文本体%%%%%%%%
+\input{ewaacbody}
+%%\input{ewaacbody2} 
+
+%%%%%%%%%%%%%%%%%%%% 参考文献 
+\bibliographystyle{abbrv}
+\bibliography{ref}
+
+% \newpage
+% \input{./appendix}
+
+\end{document}

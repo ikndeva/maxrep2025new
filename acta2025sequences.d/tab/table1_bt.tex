@@ -1,0 +1,27 @@
+%% size: n=12
+\begin{table}[t]
+\caption{
+  The set of suffixes of a text $abcadabcabc\daller$ of length $n=12$ ordered in the lexicographic order under $\daller < a < b < c < d$. 
+}
+\ttfamily
+%% \sffamily
+\begin{tabular}{rr{2cm}rrl}
+\toprule
+rnk	& SA	& BWT	& LCP	& suff \\
+\midrule
+0	& 11	& c	& 0	& \daller \\
+1	& 8	& c	& 0	& abc\daller \\
+2	& 5	& d	& 3	& abcabc\daller \\
+3	& 0	& \daller	& 4	& abcadabcabc\daller \\
+4	& 3	& c	& 1	& adabcabc\daller \\
+5	& 9	& a	& 0	& bc\daller \\
+6	& 6	& a	& 2	& bcabc\daller \\
+7	& 1	& a	& 3	& bcadabcabc\daller \\
+8	& 10	& b	& 0	& c\daller \\
+9	& 7	& b	& 1	& cabc\daller \\
+10	& 2	& b	& 2	& cadabcabc\daller \\
+11	& 4	& a	& 0	& dabcabc\daller \\
+\bottomrule
+\end{tabular}
+\end{table}
+

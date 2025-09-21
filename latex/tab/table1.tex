@@ -1,0 +1,29 @@
+%% size: n=12
+\begin{table}[t]
+\caption{
+  The set of lexicographically ordered suffixes of a text \texttt{abcadabcabc\daller} of length $n=13$, where $\# < \daller < a < b < c < d$ and the index starts from $0$. 
+}
+\ttfamily
+\centering 
+\begin{tabular}{wc{2.5em}wc{2.5em}wc{2.5em}wc{2.5em}lcccc}
+%% \hline
+\toprule
+rank	& SA	& BWT	& LCP		& suffix	\\
+\midrule
+0	& 0	& \$	& 0		& \#abcadabcabc\$	\\
+1	& 12	& c	& 0		& \$	\\
+2	& 9	& c	& 0		& abc\$	\\
+3	& 6	& d	& 3		& abcabc\$	\\
+4	& 1	& \#	& 4		& abcadabcabc\$	\\
+5	& 4	& c	& 1		& adabcabc\$	\\
+6	& 10	& a	& 0		& bc\$	\\
+7	& 7	& a	& 2		& bcabc\$	\\
+8	& 2	& a	& 3		& bcadabcabc\$	\\
+9	& 11	& b	& 0		& c\$	\\
+10	& 8	& b	& 1		& cabc\$	\\
+11	& 3	& b	& 2		& cadabcabc\$	\\
+12	& 5	& a	& 0		& dabcabc\$	\\
+\bottomrule
+\end{tabular}
+\end{table}
+

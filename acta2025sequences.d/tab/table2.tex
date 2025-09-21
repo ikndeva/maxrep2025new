@@ -1,0 +1,71 @@
+%% table2.tex
+  \caption{Results on the maximal repeats enumeration problem. In the table, parameters $r, e_R$, and $e_L$ denote the numbers of BWT-runs, the forward and backward edges of the CDAWG of a text $T$ satisfying the relation $r\le e_R \le n$ and $e_L \le n$. The space is measured in words. 
+  The column \textit{Type} shows the type of traversal, where $\idrm{BU}$, $\idrm{TD}^{+}$, and  $\idrm{TD}^{+}$ indicate the \textit{bottom-up}, \textit{forward top-down}, and \textit{backward top-down} traversals, respectively, on the virtual suffix tree. 
+    % For the $r$-sized index (r-index)  \cite{gagie:navarro:prezza2020fully} and $\delta$-sized index ($\delta$-index)~\cite{kempa:kociumaka2023collapsing}, we denote their construction time and space by $t_x(n)$ and $s_x(n)$, respectively, for all $x \in \set{r, \delta}$. 
+  }\label{table:summary}
+%%%% 
+\medskip
+\newcommand{\mywspace}[1][R]{O(\sigma^2\log e_{#1})}
+%%\newcommand{\mywspace}[1][R]{\min\set{e_{#1},O(\sigma^2\!\log e_{#1})}}
+\begin{minipage}{\textwidth}
+\hspace{-1.2em}
+\begin{tabular}{p{.5em}lp{7.8em}lc>{\centering}p{5em}c>{}p{5.9em}ll}\toprule
+& Algorithm	& Underlying \break Structure	& Type
+%& enumeration 	& working space	
+&\multicolumn{2}{c}{Enumeration}
+%& index space	& construction
+&\multicolumn{2}{c}{Indexing} \\
+\cmidrule(l{1.0em}r){5-6}\cmidrule{7-8}
+%%%
+& & & 
+ & Time & Work space (words)
+ & Time & Space (words)
+\\
+%%%%
+\midrule 
+\multicolumn{7}{l}{Graph-based methods} \\
+& Gusfield~\cite{gusfield1997algorithms}	& Suffix tree	& m$\idrm{TD}^{+}$ & $O(n)$	& $O(n)$	& $O(n)$	& $O(n)$	 \\
+& Raffinot~\cite{raffinot2001maximal}	& CDAWG~\cite{blumer1987complete} 	& $\idrm{TD}^{+}$ & $O(e_R)$	& $O(e_R)$	& $O(n)$	& $O(n)$	 \\
+%%& Raffinot~\cite{raffinot2001maximal}	& CDAWG 	& $\idrm{TD}^{+}$ & $O(e_\fn{min})$	& $O(e_\fn{min})$	& $O(n)$	& $O(n)$	 \\ %%%\cref{thm:raffinot:mr:enum}
+& Takagi+~\cite{takagi2017linear}  	& L-CDAWG 	& $\idrm{TD}^{+}$ & $O(e_R)$	& $O(e_R)$	& $O(e_R)$	& $O(e_R+e_L)$	 \\
+%%%%
+\midrule 
+\multicolumn{7}{l}{Array-based methods} \\
+& Narisawa~\cite{narisawa2007efficient}	& MM\cite{manber:myers1993suffixarrays} & BU & $O(n)$	& $O(e_R)$	& $O(n)$	& $O(n)$	 \\
+& Okanohara+~\cite{okanohara2009text}	& MM\cite{manber:myers1993suffixarrays}\&FM\cite{Ferragina05:FM} & BU & $O(n\log\sigma)$	& $O(e_R)$	& $O(n)$	& $O(n)$	 \\
+& Beller+~\cite{bellergogohlebusch2013computing} 	& FM~\cite{Ferragina05:FM} & $\idrm{TD}^{-}$ & $O(n\log\sigma)$	& $O(e_R)$	& $O(n)$	& $O(n)$	 \\
+& Belazzougui+\cite{belazzougui2020linear} 	& Belazzougui+\cite{belazzougui2020linear} & $\idrm{TD}^{-}$ & $O(n)$	& $O(e_R)$	& $O(n)$	& $s_\sigma(n)$	 \\
+& Nishimoto+~\cite{nishimoto:cpm2021enum} 	& Gagie+~\cite{gagie:navarro:prezza2020fully} & $\idrm{TD}^{-}$ & $O(n\polylog n)$?	& $O(e_R)$	& -- ?	& $s_r(n)$	 \\
+%%%%%
+\midrule 
+& Algo.~A [This]	& MM~\cite{manber:myers1993suffixarrays} & $\idrm{TD}^{+}$ & $O(e_R)$	& $\mywspace $	& $O(n)$	& $O(n)$	 \\
+& Algo.~A [This]   	& Gagie+~\cite{gagie:navarro:prezza2020fully}	& $\idrm{TD}^{+}$ & $O(e_R \log(n/r))$	& $\mywspace $	
+& $t_r(n)$  & $s_r(n)$ 	 
+\\
+& Algo.~A [This]   	& $\delta$-SA~\cite{kempa:kociumaka2023collapsing} & $\idrm{TD}^{+}$ & $O(e_R \log^{4+\eps} n)$	& $\mywspace $	
+& ---    & $s_\delta(n)$	
+\\
+%%%%%
+\midrule 
+& Algo.~B [This]	& MM\cite{manber:myers1993suffixarrays}\&FM\cite{Ferragina05:FM} & $\idrm{TD}^{-}$ & $O(e_L\log n)$	& $\mywspace[L] $	& $O(n)$	& $O(n)$	 \\
+& Algo.~B [This]   	& Gagie+~\cite{gagie:navarro:prezza2020fully}	& $\idrm{TD}^{-}$ & $O(e_L \log n)?$	& $\mywspace[L] $	
+& $t_r(n)$  & $s_r(n)$ 	 \\
+& Algo.~B [This]   	& $\delta$-SA~\cite{kempa:kociumaka2023collapsing} & $\idrm{TD}^{-}$ & $O(e_L \log^{4+\eps} n)$?	& $\mywspace[L] $   & ---    & $s_\delta(n)$ \\
+%%
+\midrule 
+\multicolumn{8}{l}{The index space $s_x(n)$ and construction time $t_x(n)$ of the $x$-spaced index structures: } \\
+& Belazzougui+~\cite{belazzougui2020linear}: & \multicolumn{6}{l}{
+$s_\sigma(n) = O(n\log n\log\sigma)$, 
+$t_\sigma(n) = O(n)$ } \\ 
+& Gagie+~\cite{gagie:navarro:prezza2020fully}: & \multicolumn{6}{l}{
+$s_r(n) = O(r\log(n/r)\log n)$,  
+$t_r(n) = O(n(\log r + \log\log_w(n/r)))$ } \\ 
+& $\delta$-SA~\cite{kempa:kociumaka2023collapsing}: & \multicolumn{6}{l}{
+$s_\delta(n) = O(\delta \log\frac{n\log\sigma}{\delta\log n} \log n)$ }\\
+%%%%%
+\bottomrule
+\end{tabular}
+\end{minipage}
+%% EOF
+
+

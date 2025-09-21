@@ -1,0 +1,558 @@
+%%%% algo.tex
+
+%%% algo.text
+
+
+%%%%%%%%%%%%%%%%
+\section{The Proposed Algorithm}
+\label{sec:algo}
+
+In this section, we present the first algorithm that enumerates all maximal repeats in a text $T$ of length $n$ in $O(e_R)$ time
+%and $O(\sigma^2 \log e_\fn{min})$ words of working space
+using precomputed arrays, namely, the suffix, inverse suffix, and LCP arrays, namely $SA[1,n], ISA[1,n]$, and $LCP[1,n]$, occupying $O(n)$ words space. It traverses the DFS over the virtual suffix tree for $T$ using the above arrays. 
+
+In what follows, we assume any data structure for storing $SA[1,n], ISA[1,n]$, and $LCP[1,n]$, where $LCP$ is equipped with $RMQ$~\cite{bender:colton2000thelcaproblem}, using $s(n)$ words of space, after $p(n)$ preprocessing of $T$, supporting 
+access to the arrays in $t_\fn{acc}(n)$ time in the worst-case. 
+
+In Algorithm~\ref{algo:maxrep:tdfw}, we show the $O(e_R)$-time algorithm for enumerating the rich representations of all maximal repeats in a string $T$ of length $n$, when invoked with $L_0=1, R_0=n, \ell_0= RMQ_{LCP}(L_0+1, R_0)$.
+It uses the SA[1..n], ISA[1..n], and RMQ structure on $LCP[1..n]$ of a text $T[1..n] \in \Sigma^n$ as underlying data structures. 
+
+%%%%%%%%%%%%%%%%%
+\begin{algorithm}[h]
+  \caption{Enumerating all distinct maximal repeats in a string}\label{algo:maxrep:tdfw}
+  \textbf{Procedure} \textsc{MaxRepTD}$(\tau = (L_0, R_0, \ell_0))$:\\
+  %%\KwGiven{}
+  \KwIn{The triple $\tau_0 = (L_0, R_0, \ell_0)$ for a right-branching substring $X$ of a text.}
+  %% \KwOut{}
+  \Begin{
+      \textbf{output} $\tau$
+      \Comment*{A maximal repeat is found}
+      $C \gets \emptyset$\; 
+      $\proc{BranchRepeats}(\tau_0, C)$\; 
+        \For (\CM{$R - L \ge 1$ must hold}) {$(L, R)\in C$}{
+          $\tau \gets (L, R, \ell)$ with $\ell \gets RMQ_{LCP}(L+1, R)$
+          \Comment*{$\tau$ is right-branching}
+          Decide if $\tau$ is left-branching by SA and ISA (\cref{lemold:leftmaximal:character})\; 
+          \If {$\tau$ is left-branching}{          
+            \textsc{MaxRepTD}$(\tau)$\; 
+          }
+        }
+  }
+\end{algorithm}
+%%%%%%%%%%%%%%%%%
+
+% %%%%%%%%%%%%%%%%%
+% \begin{algorithm}[t]
+%   \caption{The algorithm for enumerating the rich representations of all maximal repeats in an input text $T[1,n]$ of length $n$ in $O(e_R)$ time by traversing the virtual suffix tree for $T$ using the suffix, inverse suffix, and longest common prefix arrays, $SA, ISA$, and $LCP$ of~$T$. In the top-level, the procedure is invoked with the rich representation $(1, n, 0)$ with the empty string $\eps$. 
+%   }\label{algo:maxrep:tdfw}
+%   \textbf{Procedure} \textsc{MaxRepTD}$(L, R, \ell)$:\\
+%   \KwIn{A rich-representation $(L, R, \ell)$ consisting of an SA-interval $[L, R]$ and an $\ell\ge 0$ for a right-branching substring $U$ of $T$}
+%   %% \KwOut{}
+%   \Begin{
+%       \textbf{output} $(L, R, \ell)$
+%       \Comment*{$(L, R, \ell) = repr(U)$}
+%       $\ell_* \gets \LCE(SA[L], SA[R])$\; 
+%       %%$\ell_* \gets \lcpmin(L, R)$\;       
+%         \For{$(L_c, R_c, \ell_c, c)\in \proc{BranchRepeats}(L, R, \ell_*)$}{
+%           %\Comment{Notes: $\exists c \in \Sigma, \forall k \in [L',R'], T[SA[k]+\ell_*] = c$}
+%           $\ell' \gets \LCE(SA[L_c], SA[R_c])$
+%           %%$\ell' \gets \lcpmin(L_c, R_c)$          
+%           \Comment*{$(L_c, R_c, \ell_c) = repr(\rext{(Uc)})$}
+%           \uIf{$|[L_c, R_c]| = 1$}{
+%             continue; \Comment{Skip $(L_c, R_c, \ell_c, c)$}
+%           }
+%           \uElseIf (\Commentblock{\cref{lemold:leftmaximal:character}}) {$(L_c, R_c, \ell_c)$ is left-branching }{          
+%             \textsc{MaxRepTD}$(L_c, R_c, \ell_c)$\; 
+%           }
+%           \Else{
+%             \Comment{Pruning descendants of non-left maximal substrings}
+%           }
+%         }
+%   }
+% \end{algorithm}
+% %%%%%%%%%%%%%%%%%
+
+%% \subsection{Outline of the Algorithm}
+%% %%%%%
+  %% The key idea of our algorithm is to combine the virtual \textit{top-down traversal} of the suffix tree of $T$ with the suffix and LCP arrays of $T$, proposed by Abouelhoda, Kurtz, and Ohlebusch~\cite{abouelhoda2004replacing}, and the $O(1)$-time left-branching test by Narisawa \textit{et al.}~\cite{narisawa2007efficient}.
+
+For any text $T$, the suffix tree of $T$, denoted by $\stree(T)$, is an edge-labeled tree $C = (V, E, F)$. 
+By \cref{def:stree}, we observe the following facts: 
+\begin{itemize}
+\item The node set $V$ of the suffix tree corresponds to the set of right-branching substrings in $T$. 
+  
+\item The nodes of $V$ are classified into two subsets: (i) all branching nodes, $W$, correspond to all right-branching repeats in $T$ such that $\occ(W)\ge 2$, and (ii) all leaves, $W$, correspond to all suffixes of $T$ such that $\occ(W) = 1$. 
+  
+\end{itemize}
+
+
+Thus, a natural strategy to enumerate $\M(T)$ is visiting all branching nodes $W$ of $V$, which correspond right-branching repeats in $\RM(T)$, by the depth-first search of $\stree(T)$. (See appendix)
+
+\begin{toappendix}    
+Thus, a natural strategy to enumerate $\M(T)$ is visiting all branching nodes $W$ of $V$, which correspond right-branching repeats in $\RM(T)$, by the depth-first search of $\stree(T)$ are described as follows:
+\begin{enumerate}[(1)]
+\item Initially, we start with $\rext{\eps} = \eps$ as the root. Surely, it belongs to $\RM(T)$ because we assumed that $|\Sigma|\ge 2$. 
+\item At each iteration with a visited node $U\in \RM(T)$, we enumerate chiledren $W$ of $U$ as follows: for each character $b \in \Sigma$ such that $\occ(Ub) \ge 1$, we compute the right-branching extension $W = \rext{Ub}$ of $U$ as a child. 
+
+\item Then, we perform the following process with each child $W$:
+  \begin{enumerate}[(a)]
+\item When it reaches a non-repeat $W$ such that $\occ(W) = 1$, we backtrack.
+\item Otherwise, it reaches a repeat $W$. In this case, $W \in \RM(T)$ is ensured.
+  Then, we check if it is left-branching, namely, if $W \in \LM(T)$ holds.
+  (3.b.i) If so, $W$ belongs to $\M(T) = \LM(T)\cap \RM(T)$, and thus, output it as an answer.
+  (3.b.ii) Otherwise, at this moment, we are not sure if we should continue the search of the descendants of $W$, or we should stop the search. Below, we discuss this case. 
+  \end{enumerate}
+\end{enumerate}
+\end{toappendix}
+
+
+%%%%%%
+\begin{figure}[t]
+\centering  
+  \includegraphics[width=0.85\textwidth]{fig/exp1/fwdstree.pdf}
+  \caption{The suffix tree for a text $T = \mathtt{\#abcadabcabc\$}$.}\label{fig:fwdstree}
+\end{figure}
+%%%%%%
+
+Now, the remaining problems are summarized as follows:
+\begin{enumerate}[(i)]
+\item How to prune non-maximal descendants. 
+
+\item How to make top-down traversal following forward edges in $O(1)$ time per edge. 
+
+\item How to efficiently test the left-branching in $O(1)$ time per node. 
+\end{enumerate}
+
+In what follows, we will show how to efficiently solve these problems using arrays $SA, ISA$, and $LCP$ with auxliary data structures. 
+
+\subsection{How to prune non-maximal descendants}
+%%% \subsection{Subproblem A.1: how to prune non-maximal descendants of a node}
+%%%%%
+
+Recall that all nodes of the suffix tree of a text $T$ correspoind to right-branching substrings of $T$, namely, the elements of $\RM(T)$. 
+For the choice in the case (3.b.ii) above, we have the next lemma. 
+
+\begin{lemma}[Weiner link property]
+\label{lemold:weiner:property}
+Let $U$ and $W$ be any substrings of $T$ associated with nodes of the suffix tree. If $U$ is a prefix of $W$, then $W \in \LM(T)$ implies $U \in \LM(T)$. 
+\end{lemma}
+
+\begin{proof}
+Suppose that $W \in \LM(T)$. It folows that there exist some distinct positions $p, q \in \spos(W)$ with $p\not= q$ such that the characters at the preceding positions are mutually distinct, i.e., $T[p-1]\not = T[q-1]$. By assumption, $U$ is a prefix of $W$. Combining this assumption and \cref{lemold:occ:monotonicity}, it follows  that $p,q \in \spos(W) \subseteq \spos(U)$. Hence, the claim is proved. 
+\qed
+\end{proof}
+
+From \cref{lemold:weiner:property} above, we know that we can safely prune the search of descendants when the case of (3.b.ii)  happens.
+For example, in \cref{fig:fwdstree}, we observe that every left-branching node (indicated by red circles) has at least two outgoing Weiner links (indicated by red lines). Then, we can examine that the Weiner link property in \cref{lemold:weiner:property} holds for all ancestors of any left-branching nodes. 
+%% that is, if a node has at least two red outgoing edges. so are all ancestors of it. 
+
+\subsection{How to make top-down traversal following forward edges}
+%%\subsection{Subproblem A.2: how to compute the children by right-branching extension}
+%%%%%
+
+
+% %From \cref{lemold:lcpmin:rm}, 
+% To obtain a child of a given $\tau = (L, R, \ell)$ for a substring $W$, we compute the SA-interval $[L_c, R_c]$ for the substring $Wc$ obtained from $W$ by appending a character $a \in \Sigma$ to $W$, and finds its length by computing $\ell = \LCE(SA[L], SA[R])$. Then, we can show that the substring represeted by the triple $(L_c, R_c, \ell)$ is right-branching in $T$. 
+
+From now on, we explain how to list child intervals from the parent interval in the followings. 
+We inductively suppose that a parent maximal repeat $U$. This means that the rich representation $(L,R,\ell)$ of $U$ satisfies the conditions: (i) $|[L,R]| = R - L + 1 \ge 2$ and (ii) $\LCE(SA[L], SA[R]) = \ell$, where the value $\LCE(SA[L], SA[R])$ can be computed by the range-minima of $LCP$ on the range $[L+1,R]$.
+We let $\op{Follow}(L, R, \ell) := \set{SA[k]+\ell \mid k \in [L, R]} \subseteq \Sigma$ to be 
+the set of distinct characters that occur in $T$ at positions following the end positions of $W$.
+
+\begin{definition}[forward range distinct query~\cite{abouelhoda2004replacing}]
+Given the rich representation $(L,R,\ell) = \repr(U)$ for a maximal repeat $U = \rext U$, we define the \textit{forward range distinct query} with $(L,R,\ell)$, denoted by $\op{BranchRepeats}(L, R, \ell)$, as the query to return the list $\op{BranchRepeats}(L, R, \ell)$ of all triples $(L_c, R_c, c)$ such that
+\begin{enumerate*}[(i)]
+\item $c \in \op{Follow}(L, R, \ell)$, 
+\item $[L_c, R_c] = \intr(Uc)$, and 
+%%\item $\ell = \op{lcpmin}(L_c, R_c)$. 
+\end{enumerate*}
+\end{definition}
+
+%%%Based on \cref{lemold:child:interval:chara},
+In Algorithm~\ref{algo:BranchRepeats}, we present the recursive procedure that lists $k\ge 0$ child ranges $(L_1, R_1, \ell_1), \dots, (L_k, R_k, \ell_k)$ of a given range with width at least two when invoked with an input range $[L, R]$, $\ell_* = RMQ_{LCP}(L+1, R)$, and $C = \emptyset$.
+
+%%%%%%%%%%%%%%%%%
+\begin{algorithm}[h]
+  \caption{
+    The recursive procedure for listing $k\ge 0$ child ranges with width at least two given the triple for a right-branching substring. 
+  }\label{algo:BranchRepeats}
+  \textbf{Procedure} \proc{BranchRepeats}$(L, R, \ell_*, C)$:\\  
+  \KwGiven{RMQ structure on the LCP array of a text}
+   \KwIn{Integers $1\le L\le R\le n$, $\ell_*\ge 0$, and the pointer $C$ to a set of triples}
+  %% \KwOut{}
+  \Begin{
+      \If {$R - L \ge 1$}
+      {
+        $(M, \ell) \gets RMQ_{LCP}(L+1, R)$
+        \Comment*{$\ell = LCP[M]$}
+        \iIf {$\ell_* < \ell$}{
+          $C \gets C \cup \set{(L, R, \ell)}$
+          \Comment*{$[L,R]$ is monotone}
+        }
+        \Else  (\CM{$\ell_* = \ell$} and $[L,R]$ is diverse) 
+        {
+          $\proc{BranchRepeats}(L, M-1, \ell_*, C)$\; 
+          $\proc{BranchRepeats}(M, R, \ell_*, C)$\;
+        }
+      }
+      \Return $C$\; 
+  }
+\end{algorithm}
+%%%%%%%%%%%%%%%%%
+
+  \begin{lemma}
+For a right-branching substring $U$ and a $c\in \Sigma$, if a triple $\tau = (L_c, R_c, c)$ satisfies the conditions (i)--(ii) and $\occ(Uc)\ge 1$ and if $\ell_c := \lcpmin(L_c, R_c)$, then $(L_c, R_c, \ell_c)$ is the rich representation for the maximal repeat $W = \rext{(Uc)}$. 
+\end{lemma}
+
+% To list appropriate child SA-intervals from a the parent interval, we use a data structure for forward range distinct query, denoted by $\op{BranchRepeats}(L, R, \ell)$, proposed by Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing} as follows.
+
+
+
+
+% %%%%%%%%%%%%%%%%%
+% \begin{algorithm}[t]
+%   \caption{The algorithm for answering the forward range distinct queries for a text $T$ with  the suffix, inverse suffix, and LCP arrays and the LCE structure. It runs in $O(1)$ time per child range to output. 
+%   }\label{algo:BranchRepeats}
+%   \textbf{Procedure} \proc{BranchRepeats}$(L, R, \ell_*; LCP)$:\\  
+%    \KwIn{A rich representation $(L, R, \ell_*)$ with SA-interval $[L, R]$ and length $\ell_*$ such that $\ell_* = \LCE(SA[L], SA[R])$}
+%   %% \KwOut{}
+%   \Begin{
+%       \uIf (\CM{Case~1: $|[L,R]| = 1$}) {$R - L + 1 = 1$}{
+%         \Return $([L, R], c)$ with $c \gets T[SA[L]+\ell_*]$\; 
+%       }
+%       \Else (\CM{Case~2: $|[L,R]| \ge 2$}) {
+%         $M \gets \LCE(SA[L], SA[R])$\; 
+%         %\Comment*{Notes: $LCP[M] = \min LCP[L, R]$}
+%         \uIf (\CM{Case~2.a: $[L,R]$ is monotone}) {$LCP[M] > \ell_*$}{
+%           \Return $([L, R], c)$ with $c \gets T[SA[L]+\ell_*]$\;
+%         }
+%         \uElseIf  (\CM{Case~2.b: $[L,R]$ is diverse}) {$LCP[M] = \ell_*$}{
+%           $D_0 \gets \proc{BranchRepeats}(L, M-1, \ell_*; LCP)$\; 
+%           $D_1 \gets \proc{BranchRepeats}(M, R, \ell_*; LCP)$\;
+%           \Return the list $D$ obtained by concatenating $D_0$ and $D_1$\; 
+%         }
+%         \Else ({$\rhd$ $LCP[M] < \ell_*$}) {
+%           \Comment{This case never occur}
+%         }
+%       }
+%   }
+% \end{algorithm}
+% %%%%%%%%%%%%%%%%%
+
+  To compute $\op{Follow}(L, R, \ell)$, we use the LCP array to shift the positions in $\set{SA[k] \mid k \in [L, R]}$ by the displacement $\ell = |U|$  with the LCP array using the technique following~\cite{abouelhoda2004replacing,ohlebusch2013bookbioinfo}.
+Assume that $\repr(U) = (L, R, \ell)$ satisfies the above conditions. Clearly, it holds that $LCP[k] \ge \ell = \lcpmin(L, R)$ for any rank $L+1 \le k\le R$. The lemma below describes when the equality holds. 
+
+\begin{lemmarep}[Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing}]
+\label{lemold:child:interval:chara}
+Assume that $\repr(W) = (L, R, \ell)$ satisfies the above conditions.
+For any subinterval $[L', R']$ of $[L,R]$, 
+the condition $|\op{Follow}(L', R', \ell)| \ge 2$ holds if and only if 
+there exists a rank $k \in [L+1, R]$ such that $LCP[k] = \ell$. 
+\end{lemmarep}
+
+\begin{proof}
+Suppose that $LCP[k] > \ell$ for all $k \in (L, R]$.
+If we let $\ell_* := \min\sete{ LCP[k] \mid k \in (L',R'] }$, the set of suffixes have the common prefix $P$ of length $\ell_*$. Since $\ell_* > \ell$, they have a common character $c := P[\ell] \in \Sigma$ at the position following $\epos(U)$, and thus, the if-direction is proved. The only-if direction is also shown by similar discussion. For detalis, please see \cite[Lemma~4.3.5]{ohlebusch2013bookbioinfo}.
+\qed
+\end{proof}
+
+Based on \cref{lemold:child:interval:chara}, we show the correctness of Algorithm~\ref{algo:BranchRepeats}. 
+%% we show Algorithm~\ref{algo:BranchRepeats} for implementing the forward range distinct query $\op{BranchRepeats}(L, R, \ell)$. 
+
+
+
+\begin{lemma}[Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing,ohlebusch2013bookbioinfo}]
+\label{lemold:algofst:BranchRepeats}
+Algorithm~\ref{algo:BranchRepeats} correctly implements the forward range distinct query $\op{BranchRepeats}(L, R, \ell)$ in $O(h\cdot t_\fn{acc})$ time, where $t_\fn{acc}$ denotes the operation time for accessing to $SA, ISA$, and a text $T$ of length $n$. 
+\end{lemma}
+
+The above lemma says that we can enumerate all children of a given parent node in the suffix tree for $T$ in $O(1)$ amortised time per child in rich representations.    
+
+% %%%%%%%%%%%%%%%%%
+% \begin{algorithm}[t]
+%   \caption{The algorithm for deciding if a given SA-interval $[L,R]$ is left-branching with respect to an input text $T[1,n]$ in $O(1)$ time with the suffix and the inverse suffix arrays, where $1\le L\le R \le n$.
+%   }\label{algo:MaxRepeats}
+%   \textbf{Procedure} \textsc{IsLeftMaximal}$(L, R; SA, ISA, T)$:\\  
+%    %% \KwIn{}
+%   %% \KwOut{}
+%   \Begin{
+%       $(p, q) \gets (SA[L], SA[R])$\;
+%       \iIf{$(p=1)\lor (q=1)$}{
+%         \Return $\op{True}$\; 
+%       }
+%       \iElseIf{$T[p-1]\not= T[q-1]$}{
+%         \Return $\op{True}$\; 
+%       }
+%       \iElseIf{$(R - L) = (ISA[p-1] - ISA[q-1])$}{
+%         \Return $\op{True}$\; 
+%       }
+%       \iElse{
+%         \Return $\op{False}$\; 
+%       }
+%   }
+% \end{algorithm}
+% %%%%%%%%%%%%%%%%%
+
+%%%% \subsection{Subproblem A.3: how to check if a child is left-branching}
+
+\subsection{How to test if a given triple is left-branching in constant time}
+%% \subsection{Testing the left-branching of substrings with the suffix, inverse suffix, and lcp arrays}
+%%%%%
+
+The second task is to decide the left-branching of a child in the rich representation. 
+% Related to this problem, Narisawa, Inenaga, Bannai, and Takeda~\cite{narisawa2007efficient} presented an efficient procedure to decide the left-branching of a substring $T[p,q]$ represented by a pair $p, q$ of positions using $SA, ISA$, and $LCP$.
+
+\begin{itemize}\item[] 
+\textsc{Left-Branching Test}:  
+Given the triple $\tau$ for a substring $W$, 
+if $R - L \not= ISA[SA[L]-1] - ISA[SA[R]-1]$ holds, then $W$ is left-branching, and otherwise, it is not. 
+\end{itemize}
+
+
+The following lemma is an extension of the characterization of the left-branching by Narisawa \textit{et al.}~\cite[Lemma~10]{narisawa2007efficient}. 
+
+\begin{lemma}[left-branching test]\label{lemold:leftmaximal:character}
+Let $(L,R, \ell)$ be the rich representation of any substring $W$ of $T$. 
+%We let $(p, q) = (SA[L], SA[R])$. 
+Then, the following conditions (1)--(3) are equivalent each other: 
+\begin{enumerate}[(1)]
+\item $W$ is not left-branching in $T$. 
+\item $BWT[L, R]$ is monotone. 
+\item $(R - L + 1) = (ISA[SA[L]-1] - ISA[SA[R]-1] + 1)$. 
+\end{enumerate}
+\end{lemma}
+
+\begin{proof} 
+We let $p = SA[L], q = SA[R]$. 
+$(1)\Implies (2)$: Suppose that $W$ is not left-branching in $T$. Then, we see that all occurrences of $W$ in $T$ have the same character, say $c$, in the previous positions in $\spos(W)$. Thus, the claim (2) immediately follows. 
+%%% 
+$(2) \Implies (3)$: We can easily observe that the function $f(k) := ISA[SA[k]]$ realizes the LF-mapping~\cite{Ferragina05:FM} by definition. Hence, claim (3) immediately follows from (2). 
+%%% 
+$(3) \Implies (1)$: 
+%We show the contraposition $\neg (1) \Implies \neg (3)$. 
+Suppose that $W$ is left-branching in $T$. Then, it follows that $c = T[p-1]\not= T[q-1] = d$ for some $p, q \in\spos(W)$ of $W$. 
+%It follows that the subarray $BWT[L,R]$ contains mutually distinct $c$ and $d$. Since $[L,R]$ is the SA-interval of $W$, 
+Therefore, the substring $W$ has a pair of distinct characters $c = T[p-1]$ and $d = T[q-1]$ at the previous positions of its start positions. By contraposition, $W$ is left-branching. 
+Combining the above arguments, the lemma is proved. 
+\qed   
+\end{proof}
+
+
+From \cref{lemold:leftmaximal:character}, the next lemma immediately follows. 
+
+%can check the left-branching using $SA$ and $ISA$. 
+%such that $W$ is left-branching in $T$ if and only if $(R - L + 1) \not= (ISA[p-1] - ISA[q-1] + 1)$. 
+% Therefore, we have the next lemma. 
+
+\begin{lemma}
+\label{lemold:algofst:leftmaximal:algo}  
+Given  the rich representation~$\tau = (L, R, \ell)$ of a substring, we can decide if
+  $\tau$ represents a left-branching substring in $O(t_\fn{acc}(n))$ time and $O(1)$ working space, where $t_\fn{acc}(n)$ denotes the access time to arrays $SA, ISA$ and $T$. 
+\end{lemma}
+
+
+
+\subsection{Correctness and time complexity}
+%%%%%
+Combining \cref{lemold:weiner:property}, \cref{lemold:algofst:BranchRepeats}, and \cref{lemold:algofst:leftmaximal:algo} shown in this section, we prove \cref{thmold:algo:maxrep:main}, the main result of this paper.  
+  
+
+% \begin{theorem}[correctness and complexities of Algorithm~\ref{algo:maxrep:tdfw}]\label{thmold:algo:maxrep:main}
+%   The set $\M(T)$ of all maximal repeats in a text $T$ of length $n$ can be enumerated 
+%   in $O(e_R\cdot t_\fn{acc}(n))$ time and $O(\sigma^2 \log e_R)$ words of working space
+%   using the suffix, inverse suffix, and LCP arrays for $T$ 
+%   occupying $O(s(n))$ words of space after $O(p(n))$ preprocessing, where $t_\fn{acc}$, $p(n)$, and $s(n)$ denote the access time, preprocessing, and space of the data structure implementing arrays $SA, ISA$, and $LCP$ with $RMQ$ of a text $T$. 
+% \end{theorem}
+
+\begin{proof}
+  The correctness and time complexities follows from \cref{lemold:weiner:property}, \cref{lemold:algofst:BranchRepeats}, and \cref{lemold:algofst:leftmaximal:algo}. To bound the working space by $O(\sigma^2 \log e_R)$, we apply the heavy-leaf decomposition to computation tree of the DFS by  \textsc{RecMaxRepeatsFwd} following Belazzougui and Cunial~\cite[Lemma~4.2]{belazzougui2020linear} (see also \cite{hoare1962computj:quicksort}). 
+  At each iteration, we select the child with the widest range first, which has the largest number of leaves.
+  (Although $\CDAWG(T)$ has fewer  nodes than $\stree(T)$ by merging isomorphic subtrees, this does not matter in our analysis.) Consequently, this modified DFS yields at most $O(\log n)$ levels with $O(\sigma)$ side information per level, each has $O(1)$ size (i.e., bidirectional rich representations) in the DFS. This leads to the working space is $O(\min\set{e_R, \sigma\log n}) = O(\sigma\log n)$ words. This completes the proof. \qed 
+\end{proof}
+
+
+From \cref{thmold:algo:maxrep:main}, we can immediately show \cref{thmold:algo:maxrep:classic} and \cref{thmold:algo:maxrep:derived} 
+by substituting different SA implementations for the $SA$- and $LCP$-oracles~\cite{gagie:navarro:prezza2020fully,kempa:kociumaka2023collapsing}. 
+%%% 
+By simulating a \textit{bidirectional index} for $T$ and its reversal $T\rev$ with of a pair of the SA- and LCP-indices for them, we can obtain enumeration of $\M(T)$ in $O(\min\set{e_L, e_R})$ time close to one by Raffinot~\cite{raffinot2001maximal}. 
+Let $e_\fn{min} = \min\set{e_L, e_R}$ is the minimum of the sizes of $\CDAWG(T)$ and $\CDAWG(T\rev)$. 
+We remark that it is shown by Inenaga and Kosolobov~\cite{inenaga:kosolobov2024relating:left:right} that $e_R$ is at most $\sqrt{n}$ times larger than $e_L$, and vice versa. 
+% On the relationship between $e_R$ and $e_L$, we remark that it is recently shown by Inenaga and Kosolobov~\cite{inenaga:kosolobov2024relating:left:right} that the ratio $\frac{e_L}{e_R}=\Theta(\sqrt n)$ hold for all texts. 
+
+% \begin{theorem} \label{thmold:algo:maxrep:bidirect}
+% An $O(\min\set{e_L, e_R})$-time and $O(n)$-space algorithm based on a two copies of the classical suffix and LCP arrays (Manber and Myers~\cite{manber:myers1993suffixarrays}) with the RMQ structure (e.g.~\cite{bender:colton2000thelcaproblem}), one for $T$ and the other for $T\rev$. 
+% % 
+% The set $\M(T)$ can be enumerated in $O(e_\fn{min})$ time and $O(\sigma^2\log e_\fn{min})$ words of working space using the bidirectional index consisting of 
+% $SA, ISA$, and $LCP$ for a text $T$ and $SA\rev, ISA\rev$, and $LCP\rev$ for $T\rev$ with total space $O(n)$ words, where $e_\fn{min} = \min\set{e_L, e_R}$ is the minimum of the sizes of $\CDAWG(T)$ and $\CDAWG(T\rev)$. 
+%% \end{theorem}
+
+% \begin{proof}
+% From \cref{cor:fst:enum:arrays} and the proof of \cref{thmold:raffinot:mr:cdawg}, the claim follows. \qed. 
+% \end{proof}
+
+
+
+
+
+%%%%%%
+\begin{figure}[t]
+\centering  
+  \includegraphics[width=0.75\textwidth]{fig/turu/figturu2.pdf}
+  \caption{An example run of Algorithm~\ref{algo:maxrep:tdfw} for a text $T = \mathtt{\#aabaababb\$}$.
+    %% Circles and solid black arrows, indicate the nodes and forward of the suffix tree of $T$.
+    %% Gray and white nodes are left-branching and non-left-braning nodes. To each node, its string label $W$ and the rich representation $([L, R], \ell)$ of $W$ are attached. Solid red arrows designate the search path of the algorithm which follows reverse edges as long as they are left-branching.
+}\label{fig:run:example}
+\end{figure}
+%%%%%%
+
+\subsection{Execution example}
+
+In \cref{fig:run:example}, we show an example run of Algorithm~\ref{algo:maxrep:tdfw} for a text $T = \mathtt{\#aabaababb\$}$. Circles and solid black arrows, indicate the nodes and forward of the suffix tree of $T$.
+    Gray and white nodes are left-branching and non-left-braning nodes. To each node, its string label $W$ and the rich representation $([L, R], \ell)$ of $W$ are attached. Solid red arrows designate the search path of the algorithm which follows reverse edges as long as they are left-branching.
+
+
+
+% \subsection{Applications}
+% We remark that \cref{thmold:algo:maxrep:main} provides a general time and space bound parameterized with the implementation of $SA, ISA$, and $LCP$. Hence, we obtain different time and space bounds from \cref{thmold:algo:maxrep:main} by substituting a particular implementation of these arrays into Algorithm~\ref{algo:maxrep:tdfw}. 
+
+% First, we consider the case of the standard array representation of $SA, ISA$ ,and $LCP$ with $t_\fn{acc} = O(1)$ and $s = n$ (Manber and Myers~\cite{ManberM93:SA}). In this case, we have the next result. 
+
+% \begin{corollary}[standard array indexes]\label{cor:fst:enum:arrays}
+% The set $\M(T)$ of all maximal repeats in an input text of length $n$ can be enumerated in $O(e_R)$ time and $O(\sigma^2\log e_R)$ words of working space with the arrays $SA, ISA$, and $LCP$ for $T$ using total space $O(n)$, after $O(n)$ time of preprocessing on $T$. 
+% \end{corollary}
+
+% This is the first array-based algorithm that enumerates all maximal repeats with the running time same the algoritm by Raffinot~\cite{raffinot2001maximal} based on the CDAWG, whose running time is linear in the size of the CDAWG for the same text. 
+
+% Next, we consider the case for compressed indexes for highly repetitive data~\cite{navarro2021indexing:ii}. 
+% Gagie, Navarro, Prezza~\cite{GagieNP20:RLBWT} proposed a compressed text indexing data structure based on the run-length BWT for a text $T$, called the \textit{r-index}. In this case, we have the following result. 
+
+% \begin{corollary}[compressed index for repetitive texts]\label{cor:fst:enum:arrays}
+% The set $\M(T)$ of all maximal repeats in an input text of length $n$ can be enumerated in $O(e_R \log(n/r))$ time and $O(\sigma^2\log e_R)$ words of working space with the r-index\cite{GagieNP20:RLBWT} for $T$ using total space $O(r\log n)$, after $O(n(\log r + \log\log_w(n/r)))$ preprocessing of $T$. 
+% \end{corollary}
+
+% \begin{proof}
+% When $BWT$ has $r$ runs with $r \le n$, for any constant $s > 0$, the data structure support access operation to $SA, ISA$ ,and $LCP$ in  $t_\fn{acc} = O(\log(n/r))$ time using $s = O(rs)$ words of space and $O(n(\log r + \log\log_w(n/r)))$ construction time (Gagie \textit{et al.}~\cite[Appendix]{GagieNP20:RLBWT}), where $w = \floor{\log n}$ is the machine word size.  By selecting $s = \log n$, we have the claimed complexities. 
+% \qed 
+% \end{proof}
+
+% Considering enumeration of $\M(T)$ in $O(\min\set{e_L, e_R})$ time close to one by Raffinot~\cite{raffinot2001maximal} (\cref{thmold:raffinot:mr:enum}), it is natural to use a \textit{bidirectional index}, which is merely a pair of the copies of standard indexing arrays $SA, ISA$, and $LCP$ for $T$ and $T\rev$. Then, we have the following results. 
+
+% \begin{theorem} \label{thmold:algo:maxrep:bidirect}
+% The set $\M(T)$ can be enumerated in $O(e_\fn{min})$ time and $O(\sigma^2\log e_\fn{min})$ words of working space using the bidirectional index consisting of 
+% $SA, ISA$, and $LCP$ for a text $T$ and $SA\rev, ISA\rev$, and $LCP\rev$ for $T\rev$ with total space $O(n)$ words, where $e_\fn{min} = \min\set{e_L, e_R}$ is the minimum of the sizes of $\CDAWG(T)$ and $\CDAWG(T\rev)$. 
+% \end{theorem}
+
+% \begin{proof}
+% From \cref{cor:fst:enum:arrays} and the proof of \cref{thmold:raffinot:mr:cdawg}, the claim follows. \qed. 
+% \end{proof}
+
+% On the relationship between $e_R$ and $e_L$, we remark that it is recently shown by Inenaga and Kosolobov~\cite{inenaga:kosolobov2024relating:left:right} that the ratio $\frac{e_L}{e_R}=\Theta(\sqrt n)$ hold for all texts. 
+
+
+  
+
+
+%%using precomputed array-like index structures occupying $O(n)$ words space. 
+
+
+%% %%% debug 
+%% %%%%%%%%%%%%%%%%%
+%% \def\Procedure{\Statex\hspace-1.0\leftmargin\textbf{Procedure}}
+%% \begin{algorithm}[t]
+%%   \caption{The algorithm $\textsc{ExtendBoth}(L,R,\ell)$ that, given the rich representation $(L,R, \ell)$ of a substring $W$ such that $R - L + 1 \ge 1$, returns the rich representation $(L_*,R_*,\ell_*)$ of the unique maximal repeat $\mext{W}$ containing $W$ using the forward arrays $(SA, ISA, LCP)$ for $T$ and the reverse arrays $(SA\rev, ISA\rev, LCP\rev)$ for $T\rev$. 
+%%   }\label{algo:ExtendBoth}
+%%   %% \begin{algorithmic}[1]
+%%   \textbf{Procedure} \textsc{ExtendBoth}$(L, R, \ell; \sig I, \sig I\rev)$
+%%   \Comment*{input: $repr(W) = (L, R, \ell)$}
+%%   $\ell' \gets \lcpmin(L+1, R)$ \Comment*{maximally extending rightwards}
+%%   $(L\rev,R\rev) \gets \textsc{ReverseInt}((L, R, \ell'), SA, ISA\rev, LCP\rev)$
+%%   \Comment*{reverse side}  
+%%   $\ell_* \gets RMQ_{LCP\rev}(L+1, R)$ \Comment*{maximally extending leftwards}
+%%   $(L_*,R_*) \gets \textsc{ReverseInt}((L\rev, R\rev, \ell_*); SA\rev, ISA, LCP)$
+%%   \Comment*{forward side}
+%%   \textbf{return} $(L_*,R_*,\ell_*)$ 
+%%   \Comment*{output: $repr(\mext{W}) = (L_*, R_*, \ell_*)$}
+%% \end{algorithm}
+%% %%%%%%%%%%%%%%%%%%%
+
+%% %%%%%%%%%%%%%%%%%
+%% \begin{algorithm}[t]
+%%   \caption{
+%%     The algorithm \textsc{ReverseInt} for converting
+%%     a given forward SA-interval $[L_+, R_+]$ of a substring $W$ in $SA_+$
+%%     into the reverse SA-interval $[L_-, R_-]$ of $W\rev$ in $SA_-$. 
+%%     using the $SA_+$, $ISA_{-}$, and $LCP_{-}$. 
+%%   }\label{algo:ExtendBoth}
+%%   \textbf{Procedure} \textsc{ReverseInt}$((L_+, R_+), SA_+, ISA_-, LCP_-)$:\\
+%%     %% \KwIn{The forward triple representation $(L_+, R_+, \ell)$ of $W$ and the suffix array $SA_+$ in one direction, and the inverse suffix array $ISA_-$ and the longest common prefix array $LCP_-$ in the opposite direction.}
+%%   %% \KwOut{The triple representation $\op{repr}_-(W_-) = (L_-, R_-, \ell)$ of the reversed substring $W_-$ in the reverse suffix array $SA\rev$.}
+%%   \Begin{
+%%     %% $k_+ \gets \text{arbitrary rank in } [L, R]$\; 
+%%     %% $p_+ \gets \SA_+[k_+]$ 
+%%     %%   \Comment*{the start position of $\rext{W}$ in $T_+$}
+%%     %% $p_- \gets n - p_+ - \ell +\,1$
+%%     %%   \Comment*{the end position of $\rext{W}$ in $T_-$}
+%%     %% $k_- \gets \ISA_-[p_-]$ 
+%%     %% \medskip  
+%%     %% $k_+ \gets \text{arbitrary rank in } [L, R]$\; 
+%%     Select arbitrary rank $k_+$ in $[L, R]$\; 
+%%     Compute the reversed rank $k_- \gets \ISA_{-}[ q ]$ of the end position $q := n - (\SA_+[k_+]) - \ell +\,1$ of $W\rev$\;  
+%%     $L_- \gets \min\set{ L_- \mid (L_- \le k_-) \land (\ell \le LCP_-[L_-]) }$\;
+%%     $R_- \gets \max\set{ R_- \mid (k_- \le R_-) \land (\ell \le LCP_-[R_-]) }$\;
+%%     \textbf{return} $[L_-, R_-]$ 
+%%   }
+%%     %% \Comment*{$\op{repr}(\rext{W}) = (L_-, R_-)$}
+%% \end{algorithm}
+%% %%%%%%%%%%%%%%%%%
+
+  %% In Algorithm~\ref{algo:outline:forward:maxrep}, we show an abstract scheme of our first algorithm in terms of substring representation of maximal repeats, using the maximal right-extension operaton $\rext{\cdot}$ over substrings. Later, we will see the implementation of this scheme in SA-interval representation of substrings. 
+
+%% In the following, we will proceed with first showing that the call 
+%% $\textsc{RecMaxRepeats}(\rext{\eps})$
+%% of the scheme correctly enumerates all maximal repeats contained an input text $T[1,n]$ in $O(e_R)$ time, and then, with giving  efficient implementation of all parts of the scheme using the suffix, inverse suffix, and lcp arrays. 
+  
+
+%% Let us consider the suffix tree $Stree(T)$ for $T$. It is well-known that the vertice set of $Stree(T)$ coincides the set $\sig R$ of all right-branching substrings in $T$. Thus, we can apply \cref{lemold:weiner:property} to all branching nodes of the suffix tree. Precisely, the subset $\sig M$ of $\sig R$ consisting of all left-branching nodes are closed under taking prefixes. In other words, the set $\sig M$ of all maximal repeats is monotone w.r.t.~the prefix order over right-maximal substrings in $T$. 
+
+%% From the above observation, we adopt that the following \textit{search strategy} over all nodes of the suffix tree, which is sound for the set $\sig M$ of all maximal repeats. 
+%% \begin{itemize}
+%% \item (a) Initially, we start from the root node of $STree(T)$. 
+%% \item (b) At any iteration with a node $u$ with the string label $U = str(u)$, we test if $U$ is left-branching. (b.1) If so, we print $U$ as a maximal repeats, and then continue the search for all children $w$ of $u$; (b.2) Otherwise, we prune the subtree below $u$, and backtrack to the parent of $u$. 
+%% \end{itemize}
+
+%% \cref{lemold:weiner:property} ensures that the above strategy does not miss any maximal repeats since the parent of a maximal repeat in $STree(T)$ is also a maximal repeat. 
+
+  %% %%%%%%%%%%%%%%%%%
+%% \medskip
+%% \begin{algorithm}[h]
+%% \caption{An algorithm scheme for maximal repeat enumeration.
+%% }\label{algo:outline:forward:maxrep}
+%%   % \caption{An algorithm scheme for enumerating all maximal repeats contained an input text $T[1,n]$ in $O(e_R)$ time with the suffix, inverse suffix, and longest common prefix arrays.
+%%   % }\label{algo:outline:forward:maxrep}
+%%   \textbf{Procedure} \textsc{RecMaxRepeats}$(W)$:\\
+%%   \KwIn{a right-maximal substring $W$ of $T$ such that $\rext W = W$}
+%%   %% \KwOut{}
+%%   \Begin{
+%%       \textbf{output} $W$\;
+%%         \For{$c \in \proc{BranchRepeats}(W)$}{
+%%           %% $y \gets \rext{(Wc)}$\;
+%%           \uIf{$\rext{(Wc)}$ is left-branching}{
+%%             \textsc{RecMaxRepeats}$(\rext{(Wc)})$\; 
+%%           }
+%%           \Else{
+%%             \textbf{continue}; \Comment{Prune this branch with $c$}
+%%           }
+%%         }
+%%   }
+%% \end{algorithm}
+%% %%%%%%%%%%%%%%%%%
+
+  
+
+%% The first task is the computation of the forward range distinct queries with a substring $W$, which asks if the set of unique characters The above query is not the reversed version of the standard range distinct queries. This is because the SA-interval $[L,R]$ holds the set $SPos_T(W) := \set{SA[L], SA[L+1], \dots, SA[R]}$ of the starting positions of all occurrences of $W$. However, we want to have the set $BranchRepeats(L, R)$ of distinct characters occuring at the positions following the end positions, namely, the set $EPos_T(W)+1 := \set{SA[L]+\ell+1, SA[L+1]+\ell+1, \dots, SA[R]+\ell+1}$ of the end positions of $W$. 
+%% If we are given the SA-interval for this set $EPos_T(W)+1$, then the set $BranchRepeats(L, R)$ can be easily computed. However, it is not easy to compute $BranchRepeats(L, R)$ directly from the SA-interval $[L,R]$. 
+
+
+
+
+%%%% EOF

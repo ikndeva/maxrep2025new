@@ -1,0 +1,48 @@
+%%% abst.tex: old
+
+%% abst.tex 
+  %% The abstract should briefly summarize the contents of the paper in 15--250 words.
+\begin{abstract}\parindent=1pc
+%%%%
+This paper presents a new algorithm for enumerating maximal repeats in a text using the suffix array and its auxiliary data structures. Unlike previous array-based methods, our algorithm guarantees enumeration in time proportional to the size of the CDAWG, a fundamental graph-based data structure that represents all maximal repeats. By combining novel characterizations of maximal repeats with top-down traversal of the suffix tree using the suffix arrays, we efficiently identify and skip non-maximal repeats during traversal. This approach provides a simpler and faster alternative to existing methods, making it suitable for various sequence analysis tasks.
+%%%%
+  Maximal repeats are one of the fundamental string features, used in a wide range of sequence analysis as the basis of various string features.
+  %%such as MAW, MUS, and MRW. 
+In this paper, we consider enumeration of maximal repeats in an input text. 
+It is well-known that the complete set of maximal repeats can be enumerated using a graph-based data structure, called the CDAWG (compacted directed acyclic word graph) in time proportional to the size $e_R$ or $e_L$ of the CDAWG, where $e_R$ and $e_L$ are the numbers of its forward or reverse edges, respectively. 
+
+Dispite this fact, the CDAWG has too large memory footprint to apply itself to real-world applications. Hence, extensive efforts have been paid for the last decades to develope simpler array-based algorithms that runs in $O(n)$ time and $O(n)$ space using the array-like structure, namely, the suffix array or the Burrows–Wheeler transform (BWT). 
+%respectively, to traverse the suffix tree with its forward edges (goto edges) or reverse edges (suffix links).
+However, none of these algorithms can not enumerate all maximal repeats in time proportional to the size of the CDAWG for a text. 
+
+In this paper, we present an array-based algorithm that enumerates all maximal repeats in a text of length $n$ in time proportinal to the size of the CDAWG for the same text; The algorithm runs in $O(e_R)$ time using the suffix array to traverse the virtual suffix tree for a text. It uses auxiliary data structures, namely, the inverse suffix and longest common prefix (LCP) arrays.
+%% but in different manners.
+%% while the second one runs in $O(e_L\log n)$ time using the BWT array to traverse the virtual Weiner tree for a text; Both algorithms use auxiliary data structures, namely, the inverse suffix and longest common prefix (LCP) arrays, but in different manners.
+
+Technically, the key to efficient enumeration is how to skip non-maximal repeats encontered in the traversal. To do this, the proposed algorithm uses a structual property of the locations of maximal repeats in the suffix tree. It also efficiently solves a key subproblem of checking left-branchingity in constant time in combination with the suffix, inverse suffix, and LCP arrays by extending the previous result by Narisawa \textit{et al.} (CPM 2007). 
+
+Overall, we presented the first output-sensitive array-based algorithms for enumerating all maximal repeats in a text in time proportinal to the size of the corresponding CDAWG. An advantage of our algorithm is its simplicy, and extensivility since it uses the indexing arrays as black box. Using this, we also show the different time-space bounds when implementd on compressed data structures. 
+
+%% in output-sensitive manner. 
+% We also explain how to construct the CDAWG for a text in $O(e_R + e_L)$ expected time from such array-like index structures.  Finally, we show experimental results comparing our algorithm and the previous $O(n)$ time algorithms on synthetic and real data sets.
+%%%% 
+%% In this paper, we present two array-based algorithms that enumerate all maximal repeats in a text of length $n$ in time proportinal to the size of the CDAWG for the same text; 
+%% The first one runs in $O(e_R)$ time using the suffix array to traverse the virtual suffix tree for a text, 
+%% while the second one runs in $O(e_L\log n)$ time using the BWT array to traverse the virtual Weiner tree for a text; Both algorithms use auxiliary data structures, namely, the inverse suffix and longest common prefix (LCP) arrays, but in different manners.
+
+%% Technically, the key to efficient enumeration is how to skip non-maximal repeats encontered in the traversal. To do this, the first algorithm uses a structual property of the locations of maximal repeats in the suffix tree; for the second algorithm, we devise an efficient procedure for computing the unique maximal repeats from a given shoter repeats in combination with the suffix, inverse suffix, and LCP arrays. 
+%% Overall, we presented the first output-sensitive algorithms for enumerating all maximal repeats in a text in time proportinal to the size of the corresponding CDAWG. 
+%% %% in output-sensitive manner. 
+%% % We also explain how to construct the CDAWG for a text in $O(e_R + e_L)$ expected time from such array-like index structures.  Finally, we show experimental results comparing our algorithm and the previous $O(n)$ time algorithms on synthetic and real data sets.
+%% %%%% 
+\keywords{
+maximal repeats
+\and suffix array
+\and BWT array
+\and longest common prefix array 
+\and text indexing data structure 
+}
+\end{abstract}
+
+%%% EOF
+

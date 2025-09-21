@@ -1,0 +1,104 @@
+\documentclass{jarticle}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{newtxtext}
+\usepackage{textcomp}
+\usepackage[sc]{mathpazo}
+\usepackage{amsmath,amssymb,arydshln, amsthm}
+\usepackage[scaled]{helvet}
+\usepackage{otf}
+\usepackage[dvipdfmx]{graphicx,xcolor}
+\usepackage{tikz}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{verbatim}
+\usepackage{ascmac}
+\usepackage{algorithm, algpseudocode}
+\usepackage{listings,jlisting}
+\usepackage{bm}
+\usepackage[inline,shortlabels]{enumitem}
+\usepackage{cite}
+
+%%% macro
+
+\input{macros}
+\input{tectermname}
+
+%%%
+\lstset{%
+	language={C},
+	basicstyle={\small},%
+	identifierstyle={\small},%
+	commentstyle={\small\itshape},%
+	keywordstyle={\small\bfseries},%
+	ndkeywordstyle={\small},%
+	stringstyle={\small\ttfamily},
+	frame={tb},
+	breaklines=true,
+	columns=[l]{fullflexible},%
+	numbers=left,%
+	xrightmargin=0zw,%
+	xleftmargin=3zw,%
+	numberstyle={\scriptsize},%
+	stepnumber=1,
+	numbersep=1zw,%
+	lineskip=-0.5ex%
+}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{定理}
+\newtheorem*{theorem*}{定理}
+\newtheorem{definition}[theorem]{定義}
+\newtheorem*{definition*}{定義}
+\newtheorem{lemma}[theorem]{補題}
+\newtheorem*{lemma*}{補題}
+\newtheorem{Proof}{証明}
+\newtheorem*{Proof*}{証明}
+
+\newcommand{\argmax}{\mathop{\rm arg~max}\limits}
+\newcommand{\argmin}{\mathop{\rm arg~min}\limits}
+% RequireとEnsureをInputとOutputにする
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+\title{
+%Efficiently 
+Enumerating Maximal Repeats in a Text Based on Bidirectional Indices
+%双方向索引に基づくテキスト中の極大反復文字列の効率良い列挙\\
+%Efficient Algorithms for Enumerating Maximal Repeats in a Text
+}
+
+\author{%
+Yuta Tsuruzono\\
+Hokkaido University
+\and 
+Hiroki Arimura\\
+Hokkaido University
+\and 
+Shunsuke Inenaga\\
+Kyushu University
+}
+%\author{鶴園 悠太\\ Yuta Tsuruzono}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+% \begin{abstract}
+% 本論文では，双方向Burrows-Wheeler変換および双方向最長共通接頭辞配列を用いた極大反復文字列の列挙アルゴリズムについて考察する．初めに2章で，文字列とテキストにおける接尾辞配列，極大反復文字列などの概念と基本的な用語を準備する．本論文の基本的なアイディアとして，テキストに含まれる部分文字列を，接尾辞配列と呼ばれる整数配列上の区間(SA区間)を用いて表現する．この表現を用いることで，任意の部分文字列を，そのSA区間の両端を表すポインタを用いて，定数メモリで保持することができ，さらに定数時間または入力長の対数時間で操作することが可能となる．3章では，まず，長さ$n$のテキストにおける与えられた部分文字列のSA区間を，対応した逆方向部分文字列の逆方向テキストにおける逆方向SA区間に$O(\log n)$時間で変換するアルゴリズムを提案する．その後，この変換アルゴリズムを用いて，テキスト中で指定された任意の部分文字列のSA区間から，それを含む一意な極大反復文字列のSA区間を$O(\log n )$時間で高速に計算するアルゴリズムを提案する．次に4章では，3章で提案したアルゴリズムを用いて，テキスト中に存在する全ての極大反復文字列のSA区間を，1つあたり$O(\log n )$ならし遅延で列挙する効率良いアルゴリズムについて提案する．最後に，5章で，本稿をまとめ，今後の課題を述べる．
+% \end{abstract}
+% \newpage
+% \tableofcontents
+
+%%%%%%%%論文本体%%%%%%%%
+\input{jwaacbody}
+%\input{./chapter/intro}
+%%%%%%%%%%%%%%%%%%%% 参考文献 %%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{abbrv}
+\bibliography{ref}
+
+% \newpage
+% \input{./appendix}
+
+\end{document}

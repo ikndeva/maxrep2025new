@@ -1,0 +1,176 @@
+
+
+
+Shunsuke Inenaga
+  10:17
+IWOCA 残念でした...
+ですが、別の国際会議 (SPIRE？) またはジャーナルに通すことはできそうだと思いました。
+
+
+Hiroki Arimura
+  15:21
+IWOCAのリジェクト残念でした。私も週末に確認しました。
+そうですね。それも良さそうです。
+これまでの準備で、原稿はだいたい出来てきたので、方向性を再検討して、別分野の国際会議または雑誌を検討しようと思います
+15:24
+国際会議に再挑戦時のときは、投稿先と見せ方を大きく練り直して、5月中だと、次辺りがあるようです。
+次あたりかなと思っています
+バイオインフォマティクス, WABI？
+データベース分野, CIKM2025, IEEE BigData
+　WABIは、PCのある程度以上のメンバーがIWOCAやSPIREと同じなので、見せ方か結果をかなり改善する必要がありそうです
+
+
+Hiroki Arimura
+  15:55
+まだ考えているところで(方針は決まっていませんが、今のところ、こんな感じかと考えています。
+文字列寄りは2回挑戦したので、計算量的にシャープな見せ方は難しそうかなと。
+方向を変えて、データベース分野か列挙アルゴリズムで、出力依存計算量の達成の方向でまとめ直してみようかと検討しています
+データベース分野（大規模データ処理）だと、新しい枠組みが良いので、（線形または圧縮サイズの）索引上の出力依存計算量での列挙計算という枠組みを提案（でっち上げ）しようかと思います。
+ただし、その方向だと、極大反復だと\muとe_Rに差があるので、出力線形にはできないのが問題です、現在の結果だと、計算量的にはこの辺りが弱いと自己分析しています。
+現状では、対策として、基本アルゴリズムの応用とした出力サイズをe_Rの問題も考察しておく必要があります。
+これは、SAからのCDAWGの計算を出力線形の時間と作業領域で行う、という結果を追加しようかと思っています。応用としては、バイオインフォマティクスでしょうか。
+極大反復の列挙は、そのための重要な部分問題という位置付けです。
+個人的には、極大反復の方が基本的な結果だと思います。ただし(μとeのギャップがある（ありそうな）ので、出力線形列挙／計算の実現は難しそうです。
+これについて、極大反復の総数の論文のどれかで、ある著者が、μは反復全体の相互関係の構造を持っていないので、eが必要だと言っていたような気がします。
+著者は、Pape-Langeさんだったかもしれません。多数派の意見ではないですが
+
+
+Shunsuke Inenaga
+  10:40
+もしジャーナルを目指す場合ですが、毎年２月に LAW/LSD および Sequences in London という文字列系のワークショップ（査読なしトークのみ）が開催されていて、その参加者を中心とした特集号がそれぞれ TCS と Acta Informatica から企画されています。
+LAW/LSD は King's College in London (KCL) で以前から開催されていたもので、コロナ後はしばらく休止していましたが、KCL の文字列グループの中心人物だった Costas (Illiopoulos) が最近亡くなったことを受けて、tribute 的に 2025 年のワークショップが開催されました。
+Sequences in London は City, University of London の Golnaz (Badkobeh) が中心となって開催しているものです。
+私は上記の両方に参加しているので、どちらの特集号にも、共著論文を投稿する権利があります。
+:ありがとうございます:
+1
+
+10:41
+LAW/LSD 特集号 (TCS)
+All submissions must be made in PDF format to the submission portal:
+https://www.editorialmanager.com/tcs/default2.aspx
+All submissions must be made in PDF. Please select "VSI:LSD/LAW 2025" when they reach the “Article Type” step in the submission process.
+* Submission 30th June 2025.
+* Notification 15th November 2025.
+* Revised versions 15th January 2026.
+* Final versions 31st January 2026.
+
+editorialmanager.com
+Editorial Manager®
+Full-Function Web-Enabled Manuscript Submission and Tracking System for Peer Review
+
+
+Shunsuke Inenaga
+  10:48
+Sequences in London 特集号 (Acta Informatica) のほうは、まだあまり情報が出ていないですが、当初予定の〆切は 5/31 という通知がされていました（延びるかもしれません）。
+
+1 件の返信
+2日前スレッドを表示する
+
+
+Shunsuke Inenaga
+  10:52
+今回の査読で
+ The paper is well-written in general, though the first 8 pages are all survey of previous results and definitions.
+と指摘されていることが、国際会議向きではないと判定された理由の１つだと思いますので、ジャーナル投稿も手のひとつかと思案しているところです。
+なお、ジャーナルに直接投稿してしまうと発表（= 海外出張）の機会がなくなってしまうように見えますが、私はジャーナルに直接投稿した論文の内容を上記の LAW/LSD または Sequences in London のような国際査読なしワークショップで口頭発表するという手段を取っています。ご参考まで。
+:okサイン:
+1
+
+Shunsuke Inenaga
+  08:49
+このスレッドに返信しました :
+Sequences in London 特集号 (Acta Informatica) のほうは、まだあまり情報が出ていないですが、当初予定の〆切は 5/31 という通知がされていました（延びるかもしれません）。
+Sequences in London 特集号 (Acta Informatica)
+Submission: May 30, 205 (with some flexibility)
+https://link.springer.com/collections/ahdehjcged
+特集号の情報を得ましたので共有します。
+
+
+Shunsuke Inenaga
+  10:52
+今回の査読で
+ The paper is well-written in general, though the first 8 pages are all survey of previous results and definitions.
+と指摘されていることが、国際会議向きではないと判定された理由の１つだと思いますので、ジャーナル投稿も手のひとつかと思案しているところです。
+なお、ジャーナルに直接投稿してしまうと発表（= 海外出張）の機会がなくなってしまうように見えますが、私はジャーナルに直接投稿した論文の内容を上記の LAW/LSD または Sequences in London のような国際査読なしワークショップで口頭発表するという手段を取っています。ご参考まで。
+:okサイン:
+1
+
+
+
+Shunsuke Inenaga
+  08:49
+このスレッドに返信しました :
+Sequences in London 特集号 (Acta Informatica) のほうは、まだあまり情報が出ていないですが、当初予定の〆切は 5/31 という通知がされていました（延びるかもしれません）。
+Sequences in London 特集号 (Acta Informatica)
+Submission: May 30, 205 (with some flexibility)
+https://link.springer.com/collections/ahdehjcged
+特集号の情報を得ましたので共有します。
+
+
+Hiroki Arimura
+  08:30
+ありがとうございます．
+
+
+Hiroki Arimura
+  15:57
+再投稿案まとめ
+投稿先
+◎第1目標：Sequences Special Issue, Acta Infomatica, 5/30
+:白い丸:︎第2目標：LAW/LSD Special Issue, TCS, 6/30
+方針
+見せ方，Survey paper風に，過去ののMR列挙を位置付ける（解説）．Mssing pieceを提案
+内容はそのまま
+CDAWGは，見送り（考えても良い）
+16:00
+参考：成澤論文(J)
+成澤論文，MRだけでなく，CDAWGもできる点．（CDAWGはB4の学生さん）
+
+
+Shunsuke Inenaga
+  16:01
+タイトル案１：Enumerating Maximal Repeats: Taxonomy and New Algorithm （編集済み） 
+16:04
+タイトル案２：Taxonomy and New Algorithm on Enumerating Maximal Repeats
+:ありがとうございます:
+1
+
+
+
+Hiroki Arimura
+  16:05
+一番がインパクトがあると思います．(議論）では，一番で行きたいと思います．
+:+1:
+1
+:ありがとうございます:
+1
+
+
+
+Shunsuke Inenaga
+  16:57
+P. Baturo, M. Piatkowski, and W. Rytter.
+Usefulness of directed acyclic subword graphs in problems related to Standard Sturmian Words.
+Int. J. Found. Comput. Sci., 20(6):1005–1023, 2009.
+W. Rytter.
+The structure of subword graphs and suffix trees of Fibonacci words.
+Theor. Comput. Sci., 363(2):211–223, 2006.
+J. Radoszewski and W. Rytter.
+On the structure of compacted subword graphs of ThueMorse words and their applications.
+J. Discrete Algorithms, 11:15–24, 2012.
+Chiara Epifanio, Filippo Mignosi, Jeffrey Shallit, and Ilaria Venturini.
+On Sturmian graphs.
+Discrete Applied Mathematics, 155(8):1014–1030, 2007 （編集済み） 
+
+
+Hiroki Arimura
+  16:57
+メモ：muと eの比の下界
+Claim: e/mu = Omega(sqrt(n))
+下記の論文の下界の証明より
+下界：
+Theorem: Inenaga & Kosolobov, 2024 peperの TとT^Rで，e_R/e_L = Theta(sigma, n/sigma)
+次の文字列が証拠になっている: S = 1a^k$ 2a^k$ …. sigma a^k$．#Sigma = sigma + 2 = O(sigma). |S| = O(k sigma).
+k = sigma= sqrt(n)ととる．e_L = Theta(k sigma) = Theta(n), e_R = Theta(k + sigma) = Theta(sqrt(n))
+上界：
+上界の議論は，上の証明はそのまま適用できない．

@@ -1,0 +1,20 @@
+﻿%%% jsvmac.tex
+%%% macros from a subset of jsv1.sty 
+
+%%% from jsv1.sty
+
+% Write multichar identifier names using \id in either mathmode or text;
+% For ex, $\id{high}(x)$ is an expression using the \id{high} function.
+% Use ``\ '' if a space is desired, as in math mode.
+\def\id#1{\ensuremath{\mathit{#1}}}
+\let\idit=\id
+\def\idbf#1{\ensuremath{\mathbf{#1}}}
+\def\idrm#1{\ensuremath{\mathrm{#1}}}
+\def\idtt#1{\ensuremath{\mathtt{#1}}}
+\def\idsf#1{\ensuremath{\mathsf{#1}}}
+\def\idcal#1{\ensuremath{\mathcal{#1}}}  % Use with capital letter args only
+\def\idsc#1{\ensuremath{\textsc{#1}}} % added by arim
+
+%%% end jsv1.sty
+
+%%% EOF

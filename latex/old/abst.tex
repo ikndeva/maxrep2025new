@@ -1,0 +1,10 @@
+%%% abst.tex
+\begin{abstract}
+In this paper, we study the problem of enumerating all distinct maximal repeats in a given string using the suffix array (SA), focusing on a combinatorial parameter $e_R$ for measuring repetitiveness of strings, closely related to maximal repeats.  We start with a brief review of the previous approaches to observe that all the previous algorithms required linear time for the task regardless of the number $\mu$ of distinct maximal repeats.
+
+As a main result, we present a simple and faster algorithm that can enumerate all maximal repeats of a string $S$ in $O(e_R)$ time and $O(\sigma^2 \log n)$ working space using $O(n)$ space, where $e_R$ denotes the number of right extensions of maximal repeats satisfying $\mu\le e_R\le n$, which can be significantly smaller than the string length for highly repetitive strings. Our algorithm uses the SA with as auxiliary data structures, namely, the inverse SA, the input string $S$, and the range-minima query (RMQ) structure on the longest common prefix (LCP) array. 
+%%, which can be easily computed from the SA. 
+
+Moreover, we show that all maximal repeats can be enumerated in $O(e_R$ $\;\textrm{polylog}(n))$ time and space simultaneously using existing compressed text indexes. The key to the time complexity sensitive to $e_R$ is a simple and modular algorithm with a novel search strategy, which has not been used before for this problem. 
+Overall, this work presents a siginificant improvement in the field of sequence analysis offering the first sublinear, repetitiveness-aware algorithms for enumerating maximal repeats for highly repetitive strings.
+\end{abstract}

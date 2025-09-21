@@ -1,0 +1,24 @@
+Enumerating Maximal Repeats in a Text Based on Bidirectional
+Indices
+
+Yuta Tsuruzono 
+turuzono.yuta.y9@elms.hokudai.ac.jp
+
+Hiroki Arimura
+
+arim@ist.hokudai.ac.jp
+
+Shunsuke Inenaga
+e-mail: inenaga@inf.kyushu-u.ac.jp
+
+In this paper, we consider the problem of identifying all maximal repeats within a text. In 2012, Beller, Berger, and Ohlenbusch  proposed an algorithm for finding all $\mu$ maximal repeats using the BWT on Wavelet tree with $O(n \log \sigma)$ time and $O(n \log \sigma)$ bits of space. 
+Assuming a preprocessing step that constructs a bidirectional index, consisting of BWT array occupying $O(n\log\sigma)$ bits of space, an SA array, an ISA array, and an LCP array all occupying $O(n\log n)$ bits of space for a text $T$ and its reversal $T^R$, we propose an efficient algorithm that enumerates all maximal repeats in the text using these preprocessed index arrays. Our algorithm operates in $O(e_L \log n)$ time and requires $O(n \log n)$ bits of space, where $e_L$ ($\mu\le e_L\le n$) is the number of left-extensions of maximal repeats present in a text of length $n$.
+
+## keywords: 
+Bidirectional text index
+Burrows-Wheeler transform
+Longest common prefix array
+Maximal repeats
+Characteristic substrings
+
+

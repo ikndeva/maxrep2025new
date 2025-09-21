@@ -1,0 +1,66 @@
+%%% tabnew.tex
+%\centering
+\caption{%
+Comparison of the enumeration time and index space of the previous and the proposed enumeration algorithms for the maximal repeats, 
+where some complexity terms are simplified by assuming $\sigma \leq n$. 
+For each algorithm, the last column ``\textit{type of traversal}'' indicates its type of traversals on a graph index, where tokens $\td$ (``top-down'') and $\bu$ (``bottom-up'') indicate the direction, and tokens $\fw$ (``forward'') and $\bw$ (``backward'') indicate the types of edges. 
+}\label{table:summary}
+%%%% 
+\medskip
+\begin{minipage}{\textwidth}
+%\hspace{-1.2em}
+\begin{tabular}{%
+p{.5em}%1margin
+p{8em}%2algo
+p{7.5em}%3underlying
+>{\centering}p{7em}%5time
+%>{\centering}p{8.5em}%6indexspace
+>{\centering}p{8.5em}%%6indexspace
+p{2.0em}%4type
+%c%7dammy
+%>{}p{4.9em}%7dammy
+}\toprule
+& Algorithm	& Underlying\break Structure	
+& Index Space\break (words) 
+& Total \break Time 
+& Trav.\break Type \\
+%%%%
+\midrule 
+\multicolumn{5}{l}{Existing graph-based algorithms} \\
+& Gusfield~\cite{gusfield1997algorithms}	& Suffix tree	& $O(n)$	& $O(n)$ & $\tdfwd$ 	 \\
+& Raffinot~\cite{raffinot2001maximal} & CDAWG~\cite{blumer1987complete} 	& $O(n)$ & $O(e_R)$ & $\tdfwd$  \\
+& Takagi+~\cite{takagi2017linear}  	& L-CDAWG~\cite{takagi2017linear} 	 & $O(e_R+e_L)$ & $O(e_R)$	& $\tdfwd$ 	 \\
+%%%%
+%%\midrule 
+\\
+\multicolumn{6}{l}{Existing array-based algorithms} \\
+& Narisawa~\cite{narisawa2007efficient}	& SA\cite{manber:myers1993suffixarrays} & $O(n)$	& $O(n)$ & \bufwd 	 \\
+& Okanohara+~\cite{okanohara2009text}	& SA\cite{manber:myers1993suffixarrays}\&FM\cite{Ferragina05:FM} & $O(n)$& $O(n\log\sigma)$	 & \bufwd 	 \\
+& Beller+~\cite{bellergogohlebusch2013computing} 	& FM~\cite{Ferragina05:FM}  & $O(n)$ & $O(n\log\sigma)$	& $\tdbwd$  \\
+& Belazzougui+\cite{belazzougui2020linear} 	& Belazzougui+\cite{belazzougui2020linear} & $O(n\log n\log\sigma)$ & $O(n)$	& $\tdbwd$ 	 \\
+& Nishimoto+~\cite{nishimoto:cpm2021enum} 	& Gagie+~\cite{gagie:navarro:prezza2020fully} & $O(r\log({\frac n r})\log n)$ & $O(n\polylog n)$ & $\tdbwd$ 	 \\
+% %%%%%
+%%\midrule 
+\\
+\multicolumn{6}{l}{Proposed algorithms} \\
+& [This paper]	& SA\cite{manber:myers1993suffixarrays} & $O(n)$ & $O(e_R)$	& $\tdfwd$	 \\
+& [This paper]   	& Gagie+~\cite{gagie:navarro:prezza2020fully}	 	& $O(r\log({\frac n r})\log n)$ & $O(e_R \log({\frac n r}))$& $\tdfwd$ \\
+& [This paper]   	& $\delta$-SA~\cite{kempa:kociumaka2023collapsing}  & $O(\delta\log({\frac n \delta}) \log n)$	& $O(e_R \log^{4+\eps}(n))$	 & $\tdfwd$  \\
+% %%%%%
+% %%
+%% \midrule 
+% \multicolumn{7}{l}{The index space $s_x(n)$ and construction time $t_x(n)$ of the $x$-spaced index structures: } \\
+% & Belazzougui+~\cite{belazzougui2020linear}: & \multicolumn{6}{l}{
+% $s_\sigma(n) = O(n\log n\log\sigma)$, 
+% $t_\sigma(n) = O(n)$ } \\ 
+% & Gagie+~\cite{gagie:navarro:prezza2020fully}: & \multicolumn{6}{l}{
+% $s_r(n) = O(r\log({\frac n r})\log n)$,  
+% $t_r(n) = O(n(\log r + \log\log_w({\frac n r})))$ } \\ 
+% & $\delta$-SA~\cite{kempa:kociumaka2023collapsing}: & \multicolumn{6}{l}{
+% $s_\delta(n) = O(\delta \log\frac{n\log\sigma}{\delta\log n} \log n) = O(\delta \log({\frac n \delta})\log n)$ } (when $\sigma \leq n$)\\
+% %%%%%
+\bottomrule
+\end{tabular}
+\end{minipage}
+%% EOF
+

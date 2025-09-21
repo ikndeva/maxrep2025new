@@ -1,0 +1,664 @@
+% jwaacbody.tex
+% \chapter{はじめに}
+% \label{ch:intro}
+
+\begin{abstract}
+本稿では、テキスト中に含まれる極大反復文字列すべてを見つける問題を考察する。
+先行研究として，2012年にBeller と, Berger, Ohlebuschらは，Wavelet木として表現されたBWTを用いて，$O(n\log \sigma)$時間と$O(n\log \sigma)$ビットの領域を用いて，極大反復文字列すべてを見つけるアルゴリズムを提案した．このアルゴリズムは，
+テキストから、$O(n\log \sigma)$ビット領域を占める双方向のBWT配列と、SA配列、逆SA配列、LCP配列を、線形時間で構築するような前処理を仮定する。前処理で構築されたこれらの双方向の索引配列を受け取り、テキスト中に存在する$\mu$個の極大反復文字列全てを、%%$O(\mu\log n)$時間と$O(n\log n)$ビットの領域を用いて
+効率良く
+見つけるアルゴリズムを提案する．
+%ここに、$\mu\le n$は、長さ$n$のテキスト中に存在する極大反復文字列の総数である。
+\end{abstract}
+
+\newcommand{\rev}{^\mathrm{R}}
+\newcommand{\op}[1]{\texttt{#1}}
+\newcommand{\rext}[1]{\overrightarrow{#1}}
+\newcommand{\lext}[1]{\overleftarrow{#1}}
+\newcommand{\mext}[1]{\overleftrightarrow{#1}}
+\newcommand{\sete}[1]{\{\: #1 \:\}}
+
+\section{導入}
+\label{sec:backgrounds}
+%%%
+\subsection{背景: 極大反復文字列.}
+文字列アルゴリズムと生物情報学の分野では，与えられたテキストから，その出現に特徴的文字列を見つける研究が盛んに行われている．極大反復文字列(\textit{maximal repeat})は，そのような特徴的文字列の代表である．
+テキスト$T$中の極大反復文字列とは，$T$中に2回以上出現する$T$の部分文字列であり，任意の文字$c$に対して，$c$を左側と右側にどちらかにつけて延長すると，$T$における出現回数が真に減少する文字列をいう．極大反復文字列全体を$\mathcal M$で表し，それらの総数を$\mu = |\mathcal M|$で表す．長さ$n$のテキスト$T$は，高々$O(n)$個の極大反復文字列しか含まない．一方で，極大反復の総数が$\mu=O(\log n)$となるテキストのクラスが存在することが知られている．
+
+\subsection{極大反復文字列の列挙問題.}
+本研究では，長さ$n$のテキスト$T$が与えられたとき，$T$に出現する異なり極大反復文字列すべてを列挙する問題（\textsc{MR-ENUM}）を考察する．アルファベット$\Sigma = \{1,...,\sigma\}$を仮定すると，\textsc{MR-ENUM}問題は，KMPパターン照合アルゴリズムをサブルーチンに用いて，$O(n^2)$個ある部分文字列すべてに対して生成検査法を適用する素朴なアルゴリズムによって，
+$O(n^3\sigma)$時間と$O(n\log n)$ビット領域で解ける．ただし，素朴なアルゴリズムは大きな$n$に対しては，実用的でない．
+
+\subsection{先行研究: BBOアルゴリズム}
+これに対して，2012年にBeller と, Berger, Ohlebuschらは，計算時間と領域量の意味で，より効率のよいアルゴリズム{BBO}を与えた．{BBO}アルゴリズムは，長さ$n$のテキスト$T$に含まれる異なり極大反復文字列すべてを，$O(n\log \sigma)$時間と$O(n\log \sigma)$ビット領域を用いて見つけるアルゴリズムを提案した．基本的なアイディアとして，テキスト$T$の接尾辞木を考えたとき，極大反復文字列全体$\mathcal M$は，の接尾辞リンクからなるWeiner木とよばれる根つき木$\mathcal W$の分岐ノード全体が，$T$中の極大反復文字列と1対1に対応するという特徴づけを用いる．これを利用して，BBOアルゴリズムは，テキスト索引を用いてWeiner木のノードの巡回を模倣することで，$\mathcal M$の極大反復文字列全体を漏れなくかつ重複なく列挙する．
+
+このために，BBOアルゴリズムでは，Weiner木のノードをSA配列の部分区間（SA区間）で表し，Wavelet木として表現されたBWT配列を用いて，LF写像と呼ばれる接尾辞順位の変換写像を利用して，Weiner木の巡回を実現する．
+
+%ここでの目標は，計算時間と領域量の意味で，より効率のよいアルゴリズムを与えることである．
+
+\subsection{従来手法の問題点}
+本研究では，テキスト$T = T[1]\dots T[n]$とその反転テキスト$T\rev = T[n]\dots T[1]$の両方に対する索引構造を用いることで，\textsc{BBO}アルゴリズムを高速化することを考える．
+
+前小節で述べたように，BBOアルゴリズムは，テキスト$T$の索引構造$\mathcal I(T)$を用いてWeiner木$\mathcal W$のノードの巡回を模倣することで，$\mathcal W$の分岐ノードで表される極大反復文字列全体を列挙する．ここで，問題は，木$\mathcal W$は$O(n)$個のノードを
+ただ一つしか子をもたない非分岐ノードに対しても，ひとつあたり$O(\log\sigma)$時間をかける必要があり，これが無駄な計算の原因となっている．
+そこで，根ノードから出発して，非分岐ノードの鎖をたどることなく，現在のノードの子孫となる分岐ノードだけを効率よく訪問することができれば，アルゴリズム全体を高速化できると考えられる．しかし，BBOアルゴリズムのように，Wavelet木に格納されたテキストの順方向のBWT配列だけを用いて，この長い非分岐ノードの鎖を，その長さに関係なくスキップすることは難しいと思われる．
+
+\subsection{主結果}
+そこで，本研究では，より多くの演算を実行可能な強力なテキスト索引構造を用いることで，長い非分岐ノードの鎖をたどらずに，分岐ノードだけを効率よく巡回し，高速な列挙を実現することを考える．
+このために，テキスト$T$とその反転テキスト$T\rev$のそれぞれに対するWavelet木に格納されたBWT配列と、SA配列、逆SA配列、LCP配列からなる\textbf{双方向テキスト索引}を用いる．ここで，$e_L$で極大反復文字列の左拡張数を表すとする．これは，極大反復文字列から一文字左に延長して得られるような，テキストの部分文字列の総数として定められるテキストの圧縮パラメータであり，$\mu\le e \le n$を満たす．
+
+このとき，長さ$n$の入力テキストを線形時間で前処理して構築された双方向索引を用いて長い非分岐ノードの鎖をスキップすることで，Weiner木$\mathcal W$において，現在訪問している分岐ノードからその子孫である全ての分岐ノードを，一つあたり$O(\log n)$ならし時間で列挙可能なする手続きを与える．これにより，$\mu$個ある分岐ノードのみを訪問することができ，その際に分岐ノードたちがもつ総数$O(e_L)$個の出辺しか探索しないことが保証される．
+これより，本研究の主結果として，$\mu$個($\mu\le e_L\le n$)ある極大反復文字列全てを，区間表現として，$O(n)$時間のテキストの前処理を用いて、$O(e_L\log n)$時間と$O(n\log n)$ビットの領域で列挙可能であることを示す．
+
+%%%将来の目標
+% 主結果として，長さ$n$の入力テキストを線形時間で前処理して双方向索引を構築し，構築された双方向索引を用いて，$\mu$個の極大反復文字列のSA区間表現すべてを、1個あたり$O(\log n)$ならし遅延で列挙するアルゴリズムを与える．
+% これにより，$\mu\le n$個ある極大反復文字列全てを，$O(n)$時間のテキストの前処理を用いて、$O(\mu\log n)$時間と$O(n\log n)$ビットの領域で出力可能である．
+
+
+\subsection{関連研究}
+
+Bellerら~\cite{BBO12}は、Weiner-link tree上の巡回のアイディアに基づき、順方向テキストに対するBWT配列を用いて，$O(n\log \sigma)$時間と$O(n\log \sigma)$領域で計算するアルゴリズムを提案した．
+%%計算時間を改良して、Belazzouguiら~\cite{BC12}は、$O(n)$時間と$(n\log \sigma)$領域を用いるアルゴリズムを提案している。
+Belazzouguiら~\cite{BBO12}は，$O(n)$時間と$O(n\log\sigma)$領域のアルゴリズムを提案した．
+NishimotoとTabeiら~\cite{nishomoto:cpm2021renum}は，サイズが$O(r)$領域の連長圧縮BWT配列を用いて，全ての極大反復文字列を$O(n \log\log(n/r))$ 時間と$O(r \log n)$ビット領域を用いて列挙するアルゴリズム{R-enum}を与えた．ここに$r$は，BWT配列の連数と呼ばれるテキストの圧縮パラメータであり，テキスト長$n$よりも著しく小さいことが知られている．
+
+%したがって，本論文の提案手法は，$O(n\log n)$領域を使用して良い場合に，テキスト中の全ての極大反復文字列の計算時間を，解の時間に依存しない$O(n)$時間から，解の個数に比例した$O(\mu )$時間に高速化している．そのような場合に提案手法は，双方向のBWT配列とLCP配列を用いることで，従来手法よりも指数的に高速に極大反復文字列を列挙することができるといえる。
+
+
+\section{準備}
+
+$\Sigma = \set{1,\dots,\sigma}$を，サイズ$\sigma$のアルファベットとする．$\Sigma$上の文字列に対する辞書式順序を$<_\textrm{lex}$で表す．
+本稿では，$\Sigma$上の長さ$n$の\textbf{テキスト}は，
+$T[1,n] = T[1]\cdots T[n]\in \#\cdot (\Sigma\setminus\{\$,\#\})^{n-2}\cdot\$$
+をいう．ただし，任意の文字$c \in \Sigma\setminus\{\$, \#\}$に対して，$\$ < \# < c$と仮定する．
+
+任意の$1\le p\le n$に対して，$T_p = T[p,n]$で，開始位置$p$をもつ$T$の接尾辞を表す．
+$T$の\textbf{接尾辞配列}(\itl{suffix array})~\cite{ManberM93:SA}とは，
+$T_{SA[1]} <_\textrm{lex} \dots <_\textrm{lex} T_{SA[n]}$
+となる長さ$n$の整数配列$SA: [1,n]\to [1,n]$であり，
+%テキスト$T$の全ての接尾辞を辞書式順序の昇順でソートして，
+$SA[i] = p$は，全ての接尾辞の中で，辞書式順序による順位が$i$となる接尾辞の開始位置を格納する．
+$T$の\textbf{逆接尾辞配列}(\itl{inverse suffix array})とは，
+SA配列の逆関数を表す長さ$n$の整数配列$ISA: [1,n]\to [1,n]$である．任意の$p$に対して，$ISA[p] = SA^{-1}[p]$である．
+
+テキスト$T$の\ename{Burrows-Wheeler変換}{Burrows-Wheeler transform, BWT配列}~\cite{burrows1994block}は，次のように定義される文字配列 $\id{BWT}[1,n]$ である：
+$BWT[i]=T[SA[i]-1]$ ($SA[i] \neq 1$ のとき)
+かつ
+$BWT[i]=T[n]$ ($SA[i]=1$のとき)
+である．
+% \begin{align}
+% BWT[i] &= \left\{
+%     \begin{array}{ll}
+%         T[SA[i]-1] & (SA[i] \neq 1 のとき) \\
+%         T[n] & (SA[i] = 1 のとき)
+%     \end{array}
+% \right.
+% %%\\ &= xxxx
+% \end{align}
+テキスト$T$の\ename{最長共通接頭辞配列}{longest common prefix array, LCP}~\cite{ManberM93:SA}は，次のように定義される整数配列 $\id{LCP}[1,n]$ である：
+$LCP[i] = lcp(T [\id{SA}[i − 1], n], T [\id{SA}[i], n])$ ($i \neq 1$ のとき)，かつ， 
+$LCP[i] = 0$ ($i = 1$ のとき). 
+ここで，$lcp(P,P')$は文字列$P$と$P'$の共通最長接頭辞長を表わす．
+
+以下の図\ref{fig:indices}に，入力テキスト$T = abcadabcabc\$$を接尾辞配列：$\id{SA}[1,n]$とBWT：$BWT[1,n]$,LCP配列:$BWT[1,n]$に変換する例を示す．
+\begin{figure}[tbh]
+\centering
+\includegraphics[width=16cm]{figures/indices.png}
+\caption{Transform the input text}
+\label{fig:indices}
+\end{figure}
+
+
+%%\begin{align}
+% LCP[i] &= \left\{
+%     \begin{array}{ll}
+%         lcp(T [\id{SA}[i − 1], n], T [\id{SA}[i], n]) & (i \neq 1 のとき) \\
+%         0 &
+%     \end{array}
+% \right.
+%%\\ &= xxxx
+%\end{align}
+%と定義される．
+
+
+\subsection{LF写像}
+BWT配列とLF写像を説明する．
+LF写像とは，FerraginaとManziniら~\cite{Ferragina05:FM}らによって，BWT上での文字列検索アルゴリズムのために導入された関数$LF: [1,n]\to [1,n]$である．LF写像は，次の式で定義される写像$\Psi: [1,n]\to [1,n]$の逆関数である．
+\begin{align}
+    \Psi(i) = SA^{-1}[ (SA[i] \mod n) + 1 ]. 
+\end{align}
+すなわち，$LF(i) := \Psi^{-1}(i)$が成立する．
+これより，接尾辞配列の辞書順位$k \in [1,n]$に対して，テキスト中のそれが指す接尾辞$T_{SA[k]}$の先頭位置$p = SA[k]$を考えて，その一つ前の位置$p' = p-1$から開始する新しい接尾辞$T_{SA[k]-1} = $の辞書順位$k' = LF(k)\in [1,n]$を返す．ただし，$p=1$のときは，$p-1=n$として考える．
+
+%%%%%%%%%%%%%%%%%%
+\begin{algorithm}[t]
+  \caption{テキストからの双方向索引の前処理のアルゴリズム．
+  }  \label{algo:preprocess}
+  \begin{algorithmic}[1]
+    \Require{テキスト$T[1..n]$}
+    \Ensure{}
+    \State $T\rev[1..n] \gets $ the reversal of $T$
+    \State $\mathcal I = (SA[1..n], ISA[1..n], BWT[1..n], LCP[1..n]) \gets \op{BuildIndices}(T)$
+    \State $\mathcal I\rev = (SA\rev[1..n], ISA\rev[1..n], BWT\rev[1..n], LCP\rev[1..n]) \gets \op{BuildIndices}(T\rev)$    
+    \State\textsc{PreprocessingWideRangeDistinct}$(BWT[1..n])$
+    \State \textbf{return} $(\mathcal I, \mathcal I\rev)$
+  \end{algorithmic}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%
+
+
+\subsection{テキストと反転テキスト}
+
+与えられたテキスト$T = T[1..n]$に対して，その\textbf{反転テキスト}(reversed text)を$T\rev = T\rev[1..n]$と定める．ここに，$T$と$T\rev$について次の式が成り立つ：
+\begin{align}
+T\rev[i] &= T[n-i+1], \quad T[i] = T\rev[n-i+1], 
+& \forall i \in [1..n]
+\end{align}
+
+
+テキスト$T$の順方向索引$\mathcal I(T)$と，逆方向索引$\mathcal I(T\rev)$とは，$T$および反転したテキスト$T\rev$に対するWavelet木で表したBWT配列，SA配列と，逆SA配列，LCP配列の組
+\begin{align*}
+\mathcal I(T) &= (SA[1,n], ISA[1,n], BWT[1,n], LCP[1,n])
+\\\mathcal I(T\rev) &= (SA\rev[1,n], ISA\rev[1,n], BWT\rev[1,n], LCP\rev[1,n])
+\end{align*}
+である．ここに，$A\rev$で，反転したテキスト$T\rev$に対する配列$A$を表す．
+$T$の\textbf{双方向索引}（bidirectional index）で，順方向索引と逆方向索引の対
+$\mathcal B(T) = (\mathcal I(T), \mathcal I (T\rev))$
+である．
+\cref{algo:preprocess}に，テキストからの双方向索引の前処理のアルゴリズムを示す．
+
+\subsection{部分文字列の三つ組表現}
+
+テキスト$T$の接尾辞配列$SA[1,n]$と$BWT$配列$BWT[1,n]$を仮定する．
+接尾辞配列$SA[1..n]$の定義から，$T$の任意の部分文字列$W$に対して，$W$の出現位置
+%$I_W\substeq [1..n]$
+\begin{align*}
+I_W = \sete{ 1\le k\le n : \text{接尾辞$T[SA[k]..n]$は，$W$をその接頭辞
+として含む} }
+\subseteq [1..n]
+\end{align*}
+は，接尾辞配列SA中の連続区間を占めることが容易にわかる．そこで，この区間$I_W$を$\op{range}_{SA}(W) = [L, R]$と書き，$W$のSA区間，または，\textbf{区間表現}(range)と呼ぶ．
+$T$の部分文字列$W$の\textbf{三つ組表現}(triple representation)は，組$\op{repr}_{SA}(W) = (L, R, \ell)$である．ここに，$\op{range}_{SA}(W) = [L, R]$は$W$の区間表現であり，$\ell = |W|$は$W$の長さである．このとき，三つ組に対して上記を満たす部分文字列$W$は一意に決まるので，これを
+$W = \op{substr}_{SA}(\tau) = T[p..p+\ell-1]$
+で表し，\textbf{$\tau$ が表す部分文字列}(the substring represented by $\tau$)と呼ぶ．
+ここに，任意の順位$k\in [L..R]$に対して，$p = SA[k]$は対応する接尾辞の開始位置である．$\op{substr}_{SA}(\tau)$は，順位$k \in [L..R]$の取り方によらないことに注意されたい．
+
+反転テキスト$T\rev$の接尾辞配列$SA\rev$とBWT配列$BWT\rev$を仮定すると，$T\rev$中の任意の部分文字列$U = W\rev$に対して，$W\rev$の三つ組表現を$\op{repr}\rev(U) := \op{repr}_{SA\rev}(U)$と定める．同様に三つ組$\tau = (L, R, \ell)$に対して，$\op{substr}\rev(\tau) := \op{substr}_{SA\rev}(\tau)$と定める．
+
+
+
+
+%%%%
+\section{先行研究：Bellerらのアルゴリズム}
+
+本節では，Beller と, Berger, Ohlebuschらによる$O(n\log \sigma)$時間と$O(n\log \sigma)$ビット領域のアルゴリズムを紹介する．はじめに，最後に，Weiner木上の探索を用いた極大反復文字列の列挙方法を述べる．
+
+\subsection{区間のWeiner木.} 
+Bellerらのアルゴリズムは，次のアイディアに基づく．
+$T$のSA区間全体に対して，次のような根付き木$\mathcal W = (V, E, I_0)$を考える．
+\begin{itemize}
+\item ノード集合$V$は，$T$の部分区間の部分集合である．
+\item 有向辺の集合$E$は次で定めるられる： $V$の任意のノード$I, J$に対して，$\mathcal W$はノード$I$からノード$J$への有向辺をもつのは，BWTで定まるLF写像をSA区間$I$に適用するとSA区間$J$が得られるときである．
+\item 根は，空語を表す区間$I_0 = [1,n]$である．
+\end{itemize}
+
+以降では，$\mathcal W$を，$T$のWeiner木と呼ぶ．Weiner木 $\mathcal W$は，$T$の接尾辞木$Stree(T)$の接尾辞リンク全体のなす木と同型なことが知られている．ただし，リンクの向きを反転する．このことから，$\mathcal W$は，高々$O(n)$個の有向辺とノードをもつ．そのノードである区間$I$は，幅$|I|$が2以上ならば，$T$の反復部分文字列に対応し，接尾辞木の内部ノードに対応する．ただし一般には，$I$は極大反復文字列とは限らないことに注意されたい．
+
+\subsection{極大反復文字列の列挙.}
+Bellerらのアルゴリズムは，Weiner木 $\mathcal W$上で，最初に根となる区間$I_0 = [1,n]$から開始して，次のように全てのノードを探索する．現在訪問中のノードを$I = [spos, epos]$とし，$I$中の全ての接尾辞順位に対して，LF写像を適用したと考える．ここで，$I$に対応するBWTの要素$BWT[spos],BWT[spos+1], \dots, BWT[epos] \in \Sigma$が$k\ge 1$個の互いに異なる文字集合
+\begin{align}
+Distinct(I) = \{c_1, \dots, c_k\} \subseteq \Sigma\;(c_i\not= c_j, \forall i\not=j)
+\end{align}
+を含むと仮定する．すると，$I$に対するLF写像の適用により，$k$個のSA区間 $I_i = [spos_i, epos_i]\;(i=1,\dots,k)$ が得られる．アルゴリズムは，区間$I$の子として，これらの区間を訪問して，再帰的に探索を行う．
+
+\subsection{計算時間.} 次のように見積もることができる．訪問する各ノード$I$において，文字の集合$Distinct\{c_1, \dots, c_k\}$は，すなわち，異なり文字ひとつあたり$O(\log\sigma)$時間で求められる．これより，一つの子供あたりの時間は，り$O(\log\sigma)$時間である．
+LF写像の適用は,BWT配列を格納したWavelet木を用いて，一つの子供あたり$O(\log\sigma)$時間で求められる．全てのノードにおける子供の数の総和は，ノードの総数以下であるので，$O(n)$である．よって，計算時間の総和は$O(n\log\sigma)$で抑えられる．
+領域は，BWTを表すWavelet木が$O(n\log\sigma)$ビットの領域で格納できるので，同じ領域となる．
+以上から，Bellerらのアルゴリズムが，全ての極大反復文字列を$O(n\log\sigma)$時間と$O(n\log\sigma)$列挙可能なことが示された．
+
+
+% \subsection*{Old}
+% 効率の良いテキスト圧縮法として，1994年にM.~Burrows and D.~Wheelerら~\cite{burrows1994block}は、Burrows-Wheeler変換(\textit{burrows-wheeler transform}, BW変換、またはBWT)を提案した。
+% さらに，2005年にP.~Ferragina and G.~Manziniら~\cite{Ferragina05:FM}はBW変換に基づく効率良い圧縮テキスト索引であるFM索引を提案した。
+% %Burrows-Wheeler変換とは，テキストと呼ばれる与えられた$1$本の入力文字列の全ての接尾辞を辞書式順序の昇順にソートし，各順位の接尾辞のについて，その開始位置の直前の文字を格納した配列である．
+% また，U.~Manber and E.~W.~Myersら~\cite{ManberM93:SA}は、1993年にテキスト中の全ての接尾辞に対して，辞書式順序で隣接する接尾辞同士の最長な共通接頭辞の長さを格納した最長共通接頭辞配列(\textit{longest common prefix array}，LCP配列)を提案した。
+
+
+%%%%%%%%%%%%%%%%
+
+% まず，テキスト中の任意の部分文字列$W$のSA区間$I$を，双方向の接尾辞配列（すなわち、接尾辞配列$SA$と逆接尾辞配列$SA\rev$）を用いて、逆方向部分文字列$W\rev$の逆方向SA区間$I\rev$に変換する副手続きを与える．次に，これに双方向Burrows-Wheeler変換と，双方向最長共通接頭辞配列を組み合わせて，テキスト中の任意の部分文字列からそれを含む一意な極大反復文字列を計算する副手続きを提案する．最後に、Bellerら~\cite{BBO12}が提案したWeiner-link tree上の巡回のアイディアと、それらを組み合わせて、テキスト上に存在する全ての極大反復文字列を列挙するアルゴリズムを提案する．
+
+
+
+
+% \section{結果}
+% \label{sec:results}
+% 本研究では，
+% %テキスト中に存在する全ての極大反復文字列を，双方向BWT配列を用いて，1つあたり$O(\delta\log n)$ならし遅延で列挙する素朴なアルゴリズムを提案する．その後，このアルゴリズムの改良版として，
+% テキスト中に存在する全ての極大反復文字列を，双方向BWT配列と双方向LCP配列を用いることで，1つあたり$O(\log n)$ならし遅延で列挙する高速なアルゴリズムを提案する．
+
+%%%%%%%%%%%%%%%%%%%
+
+\section{提案アルゴリズム}
+
+本節では，長さ$n$のテキストの双方向索引を用いて，
+%線形時間でテキストを前処理した後で、双方向のBWT配列と、SA配列、逆SA配列、LCP配列を用いて、テキスト中に存在する全ての極大反復文字列を出力する手続きを与える．
+長さ$n$のテキスト中に存在する極大反復文字列の総数を$\mu\le n$としたとき，$O(n)$時間のテキストの前処理を用いて、それらの全てを$O(\mu\log n)$時間と$O(n\log n)$ビットの領域で出力するアルゴリズムを得る．
+
+
+%%\subsection{極大拡張演算の効率良い実現}
+
+
+%%%%%%%%%%%%%%%%%%%
+\begin{algorithm}[t]
+   \caption{極大反復文字列列挙のアルゴリズム．
+     アルファベット$\Sigma$上の長さ$n$のテキスト$T$に対して，$\textsc{MaxRepeats}(1,n,0)$と呼び出すと，$T$に含まれるすべての極大反復文字列を列挙する．
+   }\label{algo:MaxRepeats} 
+  \begin{algorithmic}
+% \Proc{MaxRepeats}$()$
+%    % \Require{テキスト長$n$}
+%     \Ensure{テキスト中に存在する全ての極大反復文字列を重複なく格納した集合$MRs(T)$}
+%     \State $MRs = \set{}$ 
+%     \State $\textsc{MaxRepeats}(1,n,0)$
+%     \State \textbf{return} $MRs$;  
+% \Statex    
+  \Proc{\textsc{MaxRepeats}}$(L,R,\ell, (\sig I, \sig I\rev))$
+    \Require{ある部分文字列$W$の三つ組表現$(L, R, \ell)$．ここに，$[L,R]$は$W$のSA区間であり，$\ell$はその長さである}
+    % \If{$L \geq R$}
+    %     \State \textbf{return} $\perp$;
+    %         \Comment{葉に到達したとき}
+    % \EndIf
+    \State $(L_*,R_*,\ell_*) \gets \textsc{ExtendBoth}(L,R,\ell, (\sig I, \sig I\rev))$
+    \Comment{Notes: $(L_*,R_*,\ell_*) = \op{repr}(W_*)$ for a max.~repeat $W_*$}
+    \State \textbf{output} $(L_*,R_*,\ell_*)$;
+    \For  {$c \in \textsc{WideRangeDistinctQuery}(L_*,R_*, BWT)$} 
+    \Comment{Assumption: $|BWT[L_*..R_*]|_c \ge 2$}
+    %\Comment{現在のノードのWeinerリンクの分岐文字$c$}
+        \State $[L',R'] \gets \textsc{LeftExtendByChar}(L_*,R_*, c, BWT)$
+        \Comment{Notes: $R - L + 1 > R'-L'+1 \ge 2$}
+        %\Comment{Weinerリンクを文字$c$で伸ばす}        
+        \State $\textsc{MaxRepeats}(L',R',\ell+1, (\sig I, \sig I\rev))$;
+    \EndFor
+    \State \textbf{return};
+  \end{algorithmic}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%
+
+
+
+
+
+\subsection{トップレベルの説明}
+
+先の手続きと，テキストに対する双方向LCP配列を用いることで部分文字列$X$から$X$を含む一意な極大反復文字列$\lrc{X}$を$O(\log n)$時間で求められることを示す。
+\cref{algo:MaxRepeats}に，手続き\textsc{MaxRepeats}を示す．
+この手続きでは，再帰手続き\textsc{MaxRepeats}を用いて，テキスト$T$中の全ての極大反復文字列を発見し，それらを重複なく格納した集合$MRs(T)$を作成する．ここで，\textsc{MaxRepeats}は，入力として部分文字列$W$のSA区間$[L,R]$と,$W$の長さ$\ell$を受け取り，予め作成した集合$MRs$に，$\lrc{W}$を格納する再帰手続きである．
+
+アルゴリズム\textsc{MaxRepeats}は，次の副手続きを用いる．
+\begin{itemize}
+\item $\textsc{ExtendBoth}_{\mathcal{I},\mathcal{I}\rev}(L_*,R_*,\ell)$: 反復部分文字列$W$の区間表現$\op{repr}(W) = (L,R,\ell)$を受け取り，それを含む一意な極大反復文字列$\mext W$の区間表現$(L_*,R_*,\ell_*)$を返す（極大拡張演算と呼ぶ）．
+
+\item $\textsc{WideRangeDistinctQuery}_{BWT}(L,R)$: 区間$\op{range}(W) = [L, R]$を受け取り，$BWT$上でその区間に2回以上含まれる異なる文字の集合 
+\begin{math}
+WRD(L, R) = 
+\{\: c = BWT[k] : 
+k \in [L, R], 
+|BWT[L..R]|_c \ge 2
+%\op{freq}_{BWT}(L, R, c) \ge 2
+\:\}  
+\end{math}
+を返す．
+\item $\textsc{LeftExtendByChar}_{BWT}(L, R, c)$: ある部分文字列$W$の区間$\op{range}(W) = [L, R]$を受け取り，文字列$cW$が$T$の部分文字列ならば$\op{range}(cW) = [L', R']$を返し，そうでないならば空区間$[L+1, L]$を返す．
+\end{itemize}
+
+これらの副手続きの詳しい説明は，以下の小節で与える．
+
+%%%%%%%%%%%%%%%%%%
+\def\Procedure{\Statex\hspace-1.0\leftmargin\textbf{Procedure}}
+\begin{algorithm}[pt]
+  \caption{$\textsc{ExtendBoth}(L,R,\ell)$のアルゴリズム．
+  このアルゴリズムは入力として，テキストの任意の部分文字列$W$のSA区間$[L,R]$を受け取り，補助配列$LCP,LCP\rev$上で，$W$を含む一意な極大反復文字列$\lrc{W}$を返す．
+  }\label{algo:ExtendBoth}
+  \begin{algorithmic}[1]
+    \Proc{\textsc{ExtendBoth}}$(L, R, \ell, (\sig I, \sig I\rev))$
+    \Require{部分文字列$W$の三つ組表現$\op{repr}(W) = (L, R, \ell)$．ここに，$[L,R]$}
+    \Ensure{$W$を含む一意な極大反復文字列$\lrc{W}$の三つ組表現$\op{repr}(W) = (L_*, R_*, \ell_*)$}
+    \If{$L\geq R$} \textbf{return} $\perp$;
+    \Else
+    \Comment{Starting in the forward side}
+    %\State $\ell' \gets RMQ_{LCP}(L+1,R)$    
+    \State $(L, R, \ell') \gets \textsc{MaximallyExtendToEnd}((L, R, \ell), LCP)$  
+      \Comment{Applying maximal right-extension}
+    \State $(L\rev,R\rev,\ell') \gets \textsc{MoveToOppsite}((L, R, \ell'), SA, ISA\rev, LCP\rev)$
+    \Comment{Moving to the reverse side}
+    % %%%%
+    % \State $m \gets \text{arbitrary rank in } [L, R]$
+    % \State $p\rev \gets n - \id{SA}[m] - \ell' +\,1$
+    %   \Comment{the end position of $\rext{W}$ in $T\rev$}
+    % \State $k \gets \id{ISA}\rev[p\rev]$      
+    %   \Comment{the rank of the reverse suffix $T\rev_{p\rev}$ in $SA\rev$}    
+    % \State $[L\rev, R\rev] \gets \textsc{StringLevelAncestor}\rev(k,\ell, n)$
+    %   \Comment{$\op{repr}(\rext{W}) = (L\rev, R\rev, \ell')$}
+    %%%
+    %%\State\Comment{Obtaining the maximal right-extension $\op{repr}\rev((\rext{W})\rev) = (L\rev, R\rev, \ell')$}    
+    \State $(L\rev, R\rev, \ell_*) \gets \textsc{MaximallyExtendToEnd}((L\rev, R\rev, \ell'), LCP\rev)$  
+    %\State $\ell_* \gets RMQ_{LCP\rev}(L\rev+1,R\rev)$
+      \Comment{Applying maximal left-extension}
+    \State $(L_*,R_*,\ell_*) \gets \textsc{MoveToOppsite}((L\rev, R\rev, \ell_*), SA\rev, ISA, LCP)$   
+      \Comment{Moving to the forward side}
+    %\State $[L,R]\gets \textsc{ReverseToForwardInterval}(L\rev_*,R\rev_*,\ell_*)$ 
+    % \State $m\rev \gets \text{arbitrary rank in } [L\rev, R\rev]$    
+    % \State $p_* = n - \id{SA}\rev[m\rev] - \ell_* +\,1$
+    %   \Comment{the start position of $\mext{W}$ in $T$}
+    % \State $k_* \gets \id{ISA}[p_*]$
+    %   \Comment{the rank of the suffix $T_{p_*}$ in $SA$}  
+    % \State $[L_*, R_*] \gets \textsc{StringLevelAncestor}(k_*,\ell_*, n)$
+    % \Comment{$\op{repr}(\mext{W}) = (L_*, R_*, \ell_*)$}
+    %%
+    %%\State\Comment{Returning the maximal extension     $\op{repr}(\mext{W}) = \op{repr}(\lext{(\rext{W})}) =     (L_*, R_*, \ell_*)$}
+    \State \textbf{return} $(L_*,R_*,\ell_*)$
+    \Comment{the maximal extension $(L_*, R_*, \ell_*) = \op{repr}(\mext{W}) = \op{repr}(\lext{(\rext{W})})$}
+    \EndIf
+  %%%% Procedure convert %%%%%%%%%%%%%%%%%%%%%
+  \Statex\Proc{\textsc{MaximallyExtendToEnd}}$((L, R, \ell), LCP)$  
+    \Require{部分文字列$W$の三つ組表現$\op{repr}(W) = (L, R, \ell)$，最長共通接頭辞配列$LCP$}
+    \Ensure{指定した方向拡張で得られる部分文字列$\rext W$の三つ組表現$\op{repr}(\rext W) = (L, R, \ell')$}
+  \State $\ell' \gets RMQ_{LCP}(L+1,R)$
+  \State \textbf{return} $(L, R, \ell')$
+  %% 
+  %%%% Procedure convert %%%%%%%%%%%%%%%%%%%%%
+  \Statex\Proc{\textsc{MoveToOppsite}}$((L_+, R_+, \ell), SA_+, ISA_-, LCP_-)$
+    \Require{ある方向の部分文字列$W$の三つ組表現$\op{repr}_+(W) = (L_+, R_+, \ell)$，同じ方向の接尾辞配列$SA_+$, 反対方向の逆接尾辞配列$ISA_-$と最長共通接頭辞配列$LCP_-$}
+    \Ensure{反転した部分文字列$W_-$の反対方向の三つ組表現$\op{repr}_-(W_-) = (L_-, R_-, \ell)$．}
+    \State $k_+ \gets \text{arbitrary rank in } [L, R]$
+    \State $p_+ \gets \id{SA_+}[k_+]$
+    \State $p_- \gets n - p_+ - \ell +\,1$
+      \Comment{the end position of $\rext{W}$ in $T_-$}
+    \State $k_- \gets \id{ISA}_-[p_-]$      
+      \Comment{the rank of the reverse suffix $T_-{p_-}$ in $SA_-$}    
+    \State $[L_-, R_-] \gets \textsc{StringLevelAncestor}(k_-,\ell, n, LCP_-)$
+      \Comment{$\op{repr}(\rext{W}) = (L_-, R_-, \ell)$}
+    \State \textbf{return} $(L_-, R_-, \ell)$
+  \end{algorithmic}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+% %%%%%%%%%%%%%%%%%%
+% \begin{algorithm}[t]
+%   \caption{$\textsc{ExtendBoth}(L,R,\ell)$のアルゴリズム．
+%   このアルゴリズムは入力として，テキストの任意の部分文字列$W$のSA区間$[L,R]$を受け取り，補助配列$LCP,LCP\rev$上で，$W$を含む一意な極大反復文字列$\lrc{W}$を返す．
+%   }\label{algo:ExtendBoth}
+%   \begin{algorithmic}[1]
+%     \Require{部分文字列$W$のSA区間$[L,R]$}
+%     \Ensure{$W$を含む一意な極大反復文字列$\lrc{W}$}
+%     \If{$L\geq R$}
+%         \State \textbf{return} $\perp$;
+%     \Else
+%     \Statex //\textit{Transform the forward triple $\op{repr}(W) = (L,R, \ell)$ to the reverse triple $\op{repr}((\rext{W})^R) = (L\rev, R\rev, \ell')$}
+%     \State $\ell' \gets RMQ_{LCP}(L+1,R)$
+%       \Comment{Compute $\ell' = |\rext{W}|$}
+%     \State $m \gets \text{arbitrary rank in } [L, R]$
+%     \State $p\rev \gets n - \id{SA}[m] - \ell' +\,1$
+%       \Comment{the end position of $\rext{W}$ in $T\rev$}
+%     \State $k \gets \id{ISA}\rev[p\rev]$      
+%       \Comment{the rank of the reverse suffix $T\rev_{p\rev}$ in $SA\rev$}    
+%     \State $[L\rev, R\rev] \gets \textsc{StringLevelAncestor}\rev(k,\ell, n)$
+%       \Comment{$\op{repr}(\rext{W}) = (L\rev, R\rev, \ell')$}
+%     %%%
+%     \Statex //\textit{Transform back the reverse triple $\op{repr}\rev((\rext{W})\rev) = (L\rev, R\rev, \ell')$ to the forward triple $\op{repr}(\mext{W}) = (L_*, R_*, \ell_*)$}    
+%     \State $\ell_* \gets RMQ_{LCP\rev}(L\rev+1,R\rev)$
+%       \Comment{$\ell_* = |\mext{W}|$, where $\mext W = \lext{(\rext{W})}$}
+%     %\State $[L,R]\gets \textsc{ReverseToForwardInterval}(L\rev_*,R\rev_*,\ell_*)$ 
+%     \State $m\rev \gets \text{arbitrary rank in } [L\rev, R\rev]$    
+%     \State $p_* = n - \id{SA}\rev[m\rev] - \ell_* +\,1$
+%       \Comment{the start position of $\mext{W}$ in $T$}
+%     \State $k_* \gets \id{ISA}[p_*]$
+%       \Comment{the rank of the suffix $T_{p_*}$ in $SA$}  
+%     \State $[L_*, R_*] \gets \textsc{StringLevelAncestor}(k_*,\ell_*, n)$
+%     \Comment{$\op{repr}(\mext{W}) = (L_*, R_*, \ell_*)$}
+%     %%
+%     \State \textbf{return} $(L_*,R_*,\ell_*)$;
+%     \EndIf
+%   \end{algorithmic}
+% \end{algorithm}
+% %%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{部分文字列の極大拡張演算の実現}
+%\subsection{部分文字列への左右への極大拡張}
+%%\label{sec:propose:FindMRfastalgo}
+%\subsection{順方向から逆方向への区間表現の変換.}
+
+本節では，部分文字列の極大拡張演算の実現について説明する．
+\cref{algo:ExtendBoth}に，この演算を実現する副手続き\textsc{ExtendBoth}を与える．
+
+% まず部分問題として，逆方向テキストに対するLCP配列を用いて，テキスト上の任意の部分文字列のSA区間から，その逆方向部分文字列の逆方向SA区間を$O(\log n)$時間で計算可能なことを示す。
+
+\begin{lemma}[\textsc{ExtendBoth}の4行目]
+入力としてテキスト$T$の任意の部分文字列$W$の三つ組表現$\op{repr}(W) = (L,R,\ell)$に対して，非負整数を$\ell'= RMQ_{LCP}(L+1,R)$とおくと，$\op{repr}(\rext{W}) = (L,R, \ell')$が成立する．
+\end{lemma}
+
+\begin{proof}
+   
+\end{proof}
+
+\begin{lemma}
+任意の部分文字列の三つ組表現を$\op{repr}(W) = (L,R,\ell)$をとすると．\textsc{ExtendBoth}の5〜8行目を実行した後で，$\op{repr}\rev((\rext{W})\rev) = (L\rev, R\rev, \ell')$が成立する．
+\end{lemma}
+
+
+% \begin{lemma}[正しく書くこと]
+% \textsc{ExtendBoth}において，
+% 入力としてテキスト$T$の任意の部分文字列$W$の三つ組表現$\op{repr}(W) = (L,R,\ell)$を受け取り，出力としてxxxを返す．
+% \end{lemma}
+
+% 同様にして，$LCP$配列を格納した$RMQ$構造上で二分探索を行い，逆方向SA区間$[L\rev,R\rev]$をSA区間$[L,R]$に変換する手続きを$\textsc{ReverseToForwardInterval}$とする．
+
+% %%%%%%%%%%%%%%%%%%
+% \begin{algorithm}[t]
+%   \caption{$\textsc{ForwardToReverseInterval}(L,R,\ell)$のアルゴリズム．
+%   このアルゴリズムは入力として， テキスト長$n$のテキスト$T$の任意の部分文字列$W$のSA区間$[L,R]$と
+%   $W$の長さ$\ell$を受け取り，出力として，$W\rev$の逆方向SA区間$[L\rev,R\rev]$を返す．
+%   }
+%   \label{algo:ReverseInterval}
+%   \begin{algorithmic}[6]
+%     \Require{$W$のSA区間$[L,R]$と$W$の長さ$\ell$}
+%     \Ensure{$W\rev$の逆方向SA区間$[L\rev,R\rev]$}
+%     \State $k \gets \id{ISA}\rev[n - \id{SA}[L] - \ell +\,1]$
+%     \State $[L\rev, R\rev] \gets \textsc{StringLevelAncestor}(k,\ell, n)$
+%     \State \textbf{return} $[L\rev,R\rev]$
+%   \end{algorithmic}
+% \begin{algorithmic}[6]
+% \\
+% \State $\textsc{StringLevelAncestor}(k,\ell, n)$: 
+%     \State $L\rev \gets \textsc{GetLeftBound}(1,k,k,\ell)$
+%     \State $R\rev \gets \textsc{GetRightBound}(k + 1,n,k,\ell)$
+% \end{algorithmic}  
+% \end{algorithm}
+% %%%%%%%%%%%%%%%%%
+
+
+
+% \begin{algorithm}[t]
+%   \caption{$\textsc{ExtendBoth}(L,R,\ell)$のアルゴリズム．
+%   このアルゴリズムは入力として，テキストの任意の部分文字列$W$のSA区間$[L,R]$を受け取り，補助配列$LCP,LCP\rev$上で，$W$を含む一意な極大反復文字列$\lrc{W}$を返す．
+%   }
+%   \label{algo:ExtendBoth}
+%   \begin{algorithmic}
+%     \Require{部分文字列$W$のSA区間$[L,R]$}
+%     \Ensure{$W$を含む一意な極大反復文字列$\lrc{W}$}
+%     \If{$L\geq R$}
+%         \State \textbf{return} $\perp$;
+%     \Else
+%     \State $\ell' \gets RMQ_{LCP}(L+1,R)$
+%     \State $[L\rev,R\rev]\gets \textsc{ForwardToReverseInterval}(L,R,\ell')$ 
+%     \State $\ell_* \gets RMQ_{LCP\rev}(L\rev+1,R\rev)$
+%     \State $[L,R]\gets \textsc{ReverseToForwardInterval}(L\rev_*,R\rev_*,\ell_*)$ 
+%     \State \textbf{return} $(L_*,R_*,\ell_*)$;
+%     \EndIf
+%   \end{algorithmic}
+% \end{algorithm}
+% %%%%%%%%%%%%%%%%%%%%%%
+
+% 手続き\textsc{ForwardToReverseInterval}は，次のステップを順に実行する．
+
+% \begin{enumerate}
+%     \item Step~1: $k' =  \id{ISA}^{rev}[n-\id{SA}[k]-|X| + 1]$の関係を用いて$k\in[L,R]$から$k'$を計算する．
+    
+%     \item Step~2: $LCP\rev$配列上での$RMQ$の値を，右端を$k'$に固定し，左端を動かしながら二分探索することによって，逆方向SA区間の左端$L\rev$を計算する(手続き\textsc{GetLeftBound})．
+    
+%     \item Step~3: $LCP\rev$配列上での$RMQ$の値を，左端を$k'$に固定し，右端を動かしながら二分探索することによって，逆方向SA区間の右端$R\rev$を計算する(手続き\textsc{GetRightBound})．
+    
+%     \item Step~4: 出力として逆方向SA区間$[L\rev,R\rev]$を出力する．
+
+% \end{enumerate}
+
+% $LCP\rev$配列上での$RMQ$の値を$|W|$と比較しながら，$RMQ$の範囲の片側を固定して二分探索することによって，逆方向部分文字列の逆方向SA区間の左端$L\rev$（右端$R\rev$）を計算する副手続きを\textsc{GetLeftBound}~(resp.~\textsc{GetRightBound})とする．
+
+
+% \begin{lemma}
+% \label{theorem1}
+%     \cref{algo:ReverseInterval}の手続き\textsc{ForwardToReverseInterval}は，入力としてテキスト$T$の任意の部分文字列$X$のSA区間$[L,R]$を受け取り，$O(n)$時間の前処理ののち，$O(\log n)$時間と$O(n\log n)$領域で，$X^{rev}$の逆方向SA区間$[L^{rev},R^{rev}]$を返す．
+% \end{lemma}
+
+% \begin{proof}[\textbf{証明}]
+%     手続き\textsc{ForwardToReverseInterval}では，副手続き\textsc{GetLeftBound}と\textsc{GetRightBound}を用いて長さ$n$の$LCP^{rev}$配列上での$RMQ$の値を，$RMQ$の範囲の片方を固定して二分探索することにで$L^{rev},R^{rev}$をそれぞれ求めている．よって$O(\log n)$時間で実行可能．また，補助配列として，$LCP^{rev}$配列を格納した$RMQ$構造，$SA$配列，$ISA^{rev}$配列を用いるため，$O(n\log n)$領域が必要となる．
+% \end{proof}
+
+%%%%%%%%%%%
+
+
+
+% \subsection{部分文字列への左右への極大拡張}
+% %%\label{sec:propose:FindMRfastalgo}
+
+双方向LCP配列を用いることで，テキスト$T$の任意の部分文字列$W$から，それを含む一意な一意な極大反復文字列$\lrc{W}$を，$O(\log n)$時間で計算するアルゴリズムを与える．
+
+はじめに準備として，部分文字列の左右への拡張を導入する．これにより，極大反復文字列の特徴づけを得る．
+テキスト$T$の{極大反復文字列}とは，テキスト$T$の部分文字列のうち，テキスト中に2度以上出現しており，かつその出現位置の集合のサイズを変化させることなく左方向あるいは右方向にこれ以上延長することのできない部分文字列のことであった．
+そこで，$T$の部分文字列$W$に対して，その出現位置の集合の大きさを変化させずに左方向に限りなく延長する演算を$\lc{W}$と表し，この部分文字列$\lc{W}$を左極大な部分文字列という．同様に$W$を右方向に限りなく延長する演算を$\rc{W}$と表し，この部分文字列$\rc{W}$を右極大な部分文字列という．
+このとき，極大反復文字列は，テキスト中に2度以上出現する部分文字列$W$に対して，その左極大かつ右極大な（両極大な）文字列$\lrc{W}$を計算することで求めることができる．
+
+\cref{algo:ExtendBoth}に，手続き\textsc{ExtendBoth}を示す．
+この手続きは，補助配列$LCP,LCP\rev$上で，入力としてテキスト$T$の任意の部分文字列$W$のSA区間$[L,R]$を受け取り，$W$を含む一意な極大反復文字列$\lrc{W}$を返す．
+%%%%%%%
+手続き\textsc{ExtendBoth}の計算量について，以下の定理を示すことができる．
+
+
+%この手続きの鍵となる性質として，$X$の右極大$\rc{X}$は$X$の$\Spos_T(X)$が変化しない限り，$X$を右に延長して得られる最長の文字列であるため，$X$のSA区間$\SAInt(X)$と$\rc{X}$のSA区間$\SAInt(\rc{X})$は一致することと，LCP配列上の区間$\SAInt(X)$での$RMQ$の値が，右極大文字列$\rc{X}$の長さを表していることを利用している．同様に，$X$の左極大$\lc{X}$を求める際は，$LCP^{rev}$上の区間$\SAInt^{rev}(X^{rev})$での$RMQ$の値を利用している．
+
+
+%\subsection{計算量解析}
+% \section{アルゴリズムの計算量解析}
+%\label{sec:propose:ExtendBothlAnalysis}
+
+
+
+\begin{lemma}
+\label{lemma3}
+    \cref{algo:ExtendBoth}の手続き\textsc{ExtendBoth}は，入力としてテキストの任意の部分文字列$W$のSA区間$[L,R]$を受け取り，$O(n)$時間の前処理ののち，$O(\log n )$時間と$O(n \log n)$領域で，部分文字列$X$を含む一意な極大反復文字列$\lrc{W}$を返す．
+\end{lemma}
+% \begin{proof}[\textbf{証明}]
+%     \cref{theorem1}より，SA区間を逆方向SA区間に変換する手続き\textsc{ForwardToReverseInterval}には，$O(\log n)$時間と$O(n\log n)$領域が必要であり，
+%     %る．\textsc{ExtendBoth}では，与えられた部分文字列$X$のSA区間$[L,R]$上のLCP配列に$RMQ$を使用したのち，手続き$\textsc{ForwardToReverseInterval}$で$X$のSA区間$[L,R]$を$X^{rev}$の逆方向SA区間$[L^{rev},R^{rev}]$に変換する．区間$[L^{rev},R^{rev}]$上の逆方向LCP配列に$RMQ$を使用したのち，手続き$\textsc{ForwardToReverseInterval}^{rev}$で逆方向SA区間をSA区間に変換して出力している．
+%     双方向LCP配列を格納した$RMQ$構造は，$O(n)$時間の前処理をすることで，$O(1)$時間と$O(n\log n)$領域で$RMQ$を実行できるため．~\cite{Bender2000RMQ}
+% %，手続き\textsc{ExtendBoth}は$O(\log n)$時間で実行可能．また，補助配列として，双方向LCP配列を格納した$RMQ$構造，$SA$配列，$ISA^{rev}$配列を用いるため，$O(n\log n)$領域が必要となる．
+% \end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%
+%%\subsection{極大反復文字列の列挙}
+
+
+%%%%%%%
+%\subsubsection{手続きMaxRepeats}
+%\label{sec:propose:MaxRepeats}
+
+
+
+主結果として，アルゴリズムの正当性と計算量を与える．
+
+% \begin{lemma}
+% \label{theoremreclcp}
+% %\cref{algo:MaxRepeats}の
+% 再帰手続き\textsc{MaxRepeats}は，アルファベットサイズ$\sigma$，テキスト長$n$のテキスト$T$中の極大反復文字列を，任意の整数$k>0$に対して，$O(kn)$時間と$(n/k)\log\sigma + 2n + o(n)$領域の前処理ののち，1つあたり$O(\log n)$ならし遅延と$\sigma(2\log n +1)$作業領域で$MRs(T)$に格納する．
+% \end{lemma}
+
+\begin{theorem}
+\label{theoremreclcp}
+%\cref{algo:MaxRepeats}の
+手続き\textsc{MaxRepeats}は， アルファベット$\Sigma$上の長さ$n$のテキスト$T$に対して，$T$から線形時間の前処理で構築された双方向索引$\mathcal B(T)$を受け取り，$T$に含まれる極大反復文字列すべてを，$O(\mu\log n)$計算時間と$O(n\log n)$領域で列挙する．
+\end{theorem}
+
+\begin{proof}[\textbf{証明}]
+\cref{lemma3}より， 続き\textsc{ExtendBoth}は， 任意の部分文字列$W$の三つ組表現から，それを含む一意な極大反復文字列の三つ組表現を$O(\log n)$時間と$O(n \log n)$領域で計算する．また，手続き\textsc{LeftExtendByChar}は$O(\log n)$時間と$O(n\log\sigma)$領域で実行可能であり，手続き\textsc{WideRangeDistincQuery}は、極大反復文字列$\lrc{X}$の左に追加する文字を1つあたり$O(1)$ならし遅延で発見する．発見した文字1つにつき，%再帰手続き\textsc{MaxRepeats}はちょうど1度呼び出される．再帰手続き\textsc{MaxRepeats}の各呼び出しに対して
+極大反復文字列は一意に発見されるため，再帰手続き\textsc{MaxRepeats}はテキスト中の極大反復文字列すべてを，$O(\mu\log n)$計算時間と$O(n\log n)$領域で列挙する．
+    % \cref{theorem3}より，手続き\textsc{ExtendBoth}は，任意の部分文字列からそれを含む一意な極大反復文字列を，$O(\log n)$時間と$O(n\log n)$領域で計算可能である．また，手続き\textsc{LeftExtendByChar}は極大反復文字列$\lrc{X}$の左に追加する文字を1つあたり$O(1)$ならし遅延で発見する．発見した文字1つにつき，%再帰手続き\textsc{MaxRepeats}はちょうど1度呼び出される．再帰手続き\textsc{MaxRepeats}の各呼び出しに対して
+    % 極大反復文字列は一意に発見されるため，再帰手続き\textsc{MaxRepeats}はテキスト中の極大反復文字列すべてを，$O(n)$前処理時間と$O(n\log n)$領域を用いて，$O(\mu\log n)$計算時間で列挙する．
+\end{proof}
+
+% \begin{proof}[\textbf{証明}]
+% 再帰手続き\textsc{MaxRepeats}は，アルファベットサイズ$\sigma$，テキスト長$n$のテキスト$T$中の極大反復文字列を，任意の整数$k>0$に対して，$O(kn)$時間と$(n/k)\log\sigma + 2n + o(n)$領域の前処理ののち，1つあたり$O(\log n)$ならし遅延と$\sigma(2\log n +1)$作業領域で$MRs(T)$に格納する．
+%     \cref{theorem3}より，手続き\textsc{ExtendBoth}は，任意の部分文字列からそれを含む一意な極大反復文字列を，$O(\log n)$時間と$O(n\log n)$領域で計算可能である．また，手続き\textsc{LeftExtendByChar}は$O(\log n)$時間と$O(n\log\sigma)$領域で実行可能である~\cite{Ferragina05:FM}. 
+%     $\lrc{W}$のSA区間上のBWTに対する$RDQ$は，任意の整数$k>0$に対して，$O(kn)$時間と$(n/k)\log\sigma + 2n + o(n)$領域の前処理ののち，極大反復文字列$\lrc{X}$の左に追加する文字を1つあたり$O(1)$ならし遅延と$\sigma(2\log n +1)$作業領域で発見する．~\cite{belazzougui2020linear}発見した文字1つにつき，%再帰手続き\textsc{MaxRepeats}はちょうど1度呼び出される．再帰手続き\textsc{MaxRepeats}の各呼び出しに対して
+%     極大反復文字列は一意に発見されるため，再帰手続き\textsc{MaxRepeats}はテキスト中の極大反復文字列を1つあたり$O(\log n)$ならし遅延と$\sigma(2\log n +1)$作業領域で$MRs(T)$に格納する．
+% \end{proof}
+%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%
+\def\Procedure{\Statex\hspace-1.0\leftmargin\textbf{Procedure}}
+\begin{algorithm}[t]
+  \begin{algorithmic}[1]
+\Statex\Key{Global variable} $S \subseteq [1..n]^2$, $color: S\to \Sigma$
+\medskip  
+\Proc{\textsc{PreprocessingWideRangeDistinct}}$(BWT[1..n])$
+\State $S \gets \emptyset$
+\State //Prepare the previous array $P[1..n]$ from $BWT[1..n]$
+\State $H = \emptyset$
+\State \textbf{for} $c \in \Sigma$ \textbf{do}
+$H[c]\gets 0$
+\For{$i \in [1..n]$}
+\State $c \gets BWT[i]$; $P[i]\gets H[c]$; $H[c]\gets i$
+\EndFor
+\For{$j \in [1..n]$}
+\If{$P[j] \ge 1$}
+\State Insert  into $S$ the point $p = (i, j)$ with $i = P[i]$ such that $color(p) = B[i]$
+\EndIf
+\EndFor
+  %%%% Procedure %%%%%%%%%%%%%%%%%%%%%
+\medskip  
+\Proc{\textsc{WideRangeDistinctQuery}}$(L, R, BWT)$  
+  \Require{An SA-range $[L..R]$ and a BWT}
+  \Ensure{The set of distinct colors $c \in \Sigma$ that appears in $BWT[L..R]$ at least twice.} 
+  \State $Q \gets [L..n]\times [0..R]$
+  \State $D 
+  \gets \textsc{ColoredRangeReport}(S, Q)
+  := \sete{ color(p) : p \in S\cap Q }
+  $
+  \State \textbf{return} $D$  
+  \end{algorithmic}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%
+\section{異なり先行文字集合の計算}
+
+
+\section{結論}
+
+本稿では、テキスト中の全ての極大反復文字列を列挙する効率良いアルゴリズムを考察した。
+今後の課題として、時間と領域の両方で提案アルゴリズムを改良することがあげられる。
+
+%現在、$r-index$等の順方向テキストに関する準線形領域の圧縮索引が知られている。
+%圧縮された双方向のテキスト索引を用いた$O(\mu polylog(n))$時間と領域の極大反復文字列全ての列挙があげられる。
+
+% \section{本論文の構成}
+% 本論文の構成は次のとおりである．
+% 第2章では，文字列と極大反復文字列，Burrows-Wheeler変換などに関する概要と基本的な用語を準備する．
+% 第3章では，順方向テキストにおける接尾辞配列区間を逆方向テキストにおける接尾辞配列区間に変換するアルゴリズムと，部分文字列からそれを含む一意な極大反復文字列を発見するアルゴリズムを提案する．
+% 第4章では，双方向テキストにおけるBurrows-Wheeler変換，LCP配列を用いた極大反復の列挙アルゴリズムを提案する．
+% 第5章では，本論文のまとめと今後の課題について述べる．
+
+
+

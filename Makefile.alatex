@@ -1,0 +1,67 @@
+### Makefile 
+### suffix rule
+.SUFFIXES: .ps .eps .tex .dvi .pdf .pre .preview .pack .kill
+.PHONY: alatex.build alatex.gen 
+
+MAIN=main
+
+CHAPTERS=
+## pack
+LATEXDIR='cpm2023camera_divlcs'
+ALATEXDIR='alatex'
+PJNAME=2023diverselcs-camera
+PACKDIR=~/PUB
+
+######
+AMAIN=amain
+alatex.build: 
+	-rm -fr $(ALATEXDIR)
+	mkdir $(ALATEXDIR)
+	cd $(LATEXDIR); make clean;
+	make alatex.gen
+	cp -r $(LATEXDIR)/$(AMAIN).tex $(ALATEXDIR)
+	cp -r $(LATEXDIR)/latexmkrc $(LATEXDIR)/Makefile $(ALATEXDIR)
+	cp -r $(LATEXDIR)/*.* $(ALATEXDIR)
+	cp -r $(LATEXDIR)/fig/*.pdf $(ALATEXDIR)
+	cp -r $(LATEXDIR)/abody.tex $(ALATEXDIR)
+	ls -latr $(LATEXDIR)
+
+alatex.rebuild:
+	make alatex.build
+	make alatex.pre
+
+alatex.gen: 
+	cd $(LATEXDIR); make alatex.gen 
+	cp -r $(LATEXDIR)/abody.tex $(ALATEXDIR)
+
+alatex.pdf:
+	cd $(ALATEXDIR); make $(AMAIN).pdf
+alatex.pre:
+	cd $(ALATEXDIR); make $(AMAIN).pre
+alatex.kill:
+	cd $(LATEXDIR); make kill
+alatex.ps:
+	cd $(LATEXDIR); make ps 
+alatex.ls:
+	cd $(ALATEXDIR); ls
+alatex.lr:
+	cd $(ALATEXDIR); ls -latr 
+alatex.clean:
+	cd $(ALATEXDIR); make clean 
+alatex.cleanall:
+	-rm -fr $(ALATEXDIR)
+
+kill:
+	cd $(LATEXDIR); make kill
+ps:
+	cd $(LATEXDIR); make ps 
+## 
+zip: 
+	zip -r $(ALATEXDIR).zip $(ALATEXDIR)
+
+##  pack
+pack: $(MAIN).pdf 
+	cp $(MAIN).pdf $(PACKDIR)/$(PJNAME)_$(MAIN)`date +"%y%m%da%H%M"`.pdf
+	@ls -altr $(PACKDIR) | tail -1 
+
+#EOF

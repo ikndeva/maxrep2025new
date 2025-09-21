@@ -1,0 +1,37 @@
+%%% 数式モードで使う表記
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\iffdef}{\stackrel{\idrm{def}}{\iff}}
+\renewcommand{\mod}{\idrm{mod}}
+\newcommand{\Key}[1]{\Statex\hspace{-1.2\leftmargin}  \textbf{#1}\hspace{.25em}}
+\newcommand{\Proc}[1]{\Key{Procedure}{#1}}
+%\newcommand{\Proc}[1]{\Statex\hspace{-1.2\leftmargin}  \textbf{Procedure}\hspace{.25em}{#1}}
+\newcommand{\ename}[2]{\textbf{#1} (\textit{#2})}
+\newcommand{\itl}[1]{\textit{#1}}
+\newcommand{\sig}[1]{\mathcal{#1}}
+
+%%% 数式モードで文字が開く問題を解消する機能
+
+\def\id#1{\ensuremath{\mathit{#1}}}
+\let\idit=\id
+\def\idbf#1{\ensuremath{\mathbf{#1}}}
+\def\idrm#1{\ensuremath{\mathrm{#1}}}
+\def\idtt#1{\ensuremath{\mathtt{#1}}}
+\def\idsf#1{\ensuremath{\mathsf{#1}}}
+\def\idcal#1{\ensuremath{\mathcal{#1}}} 
+
+%%% 参照の便利版
+\usepackage{cleveref}
+\crefname{algorithm}{アルゴリズム}{Algorithms}
+\crefname{table}{表}{Tables}
+\crefname{figure}{図}{Figures}
+\crefname{section}{節}{Sections}
+\crefname{chapter}{章}{Chapters}
+\crefname{problem}{問題}{Problems}
+\crefname{definition}{定義}{Definitions}
+\crefname{lemma}{補題}{Lemmas}
+\crefname{fact}{事実}{Facts}
+\crefname{property}{性質}{Properties}
+\crefname{proposition}{命題}{Propositions}
+\crefname{thmeorem}{定理}{Theorems}
+\crefname{cor}{系}{Corollaries}
+\crefname{footnote}{脚注}{Footnotes}

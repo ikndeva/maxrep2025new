@@ -1,0 +1,204 @@
+%%% intro.tex
+\newpage
+\section{Introduction}
+
+\subsection{Backgrounds}
+
+Detection of all patterns in a text string is a fundamental problem in biological sequence analysis and text mining, where a \textit{pattern} (or a substring features) is a substring whose occurrences capture a certain interesting property of a part of the text~\cite{gusfield1997book:stree}.
+
+\textit{Maximal repeats} are one of the most widely studied classes of patterns in biological sequence analysis since their discovery~\cite{raffinot2001maximal,blumer1987complete}. In this paper, we consider the problem of enumerating all distinct maximal repeats in a given string. 
+A maximal repeat is defined as such a repeated substring of an input text that cannot be extended to the left or to the right without being destroyed. Precisely, a substring $U$ of a text $T$ is a maximal repeats if and only if it has two occurrences $\alpha_1 U \beta_1$ and $\alpha_2 U \beta_2$ in $T$ such that $\alpha_1\not= \alpha_2$ and $\beta_1\not= \beta_2$, where $T$ is assumed to be surrounded by two distinct characters $\#$ and $\daller$ that do not appear elsewhere in $T$.
+The class $\id{MR}(T)$ of maxmal repeats is not only important as a central substring feature, but also forms bases of many other substring features widely studied in sequence analysis~\cite{inenaga:iwoca2024computing:maw}, such as
+\textit{minimal absent words} (MAW), 
+\textit{minimal unique substrings} (MUS),
+\textit{extended bispecial factors} (EBFs), 
+and
+\textit{minimal rare words} (MRW),
+to name a few~\cite{crochemore1998automata,ilie2011minimum,charalampopoulos2018extended,belazzougui2015space:unusual}. 
+
+%% 本論文では，現在のネットワークと計算環境を反映して，次のシナリオでenumerating maximal repeatsを考える．
+
+\subsection{Research Goal}
+
+In this paper, we consider the problem of \textit{enumerating maximal repeats} under the following scenario, taking into account current network and computational environments: a data holder preprocesses an input string into a data structure, called a \textit{text index}, before publication; then, the constructed text index efficiently supports various operations and is used to accelerate \textit{pattern enumeration tasks} that are subsequently provided in an ad-hoc manner.
+
+Text indexes can be generally categorized into graph-based and array-based indexes (see the survey~\cite{navarro2021indexing:ii}). \textit{Graph-based indexes}, such as \textit{suffix trees}~\cite{weiner1973linear} and \textit{compacted directed acyclic word graphs} (CDAWGs)~\cite{blumer1987complete}, occupy linear space in the text length $n$ but often suffer from high memory consumption and poor locality of reference in practical applications, limiting their use. 
+\textit{Array-based indexes}, such as \textit{suffix arrays} and the \textit{Burrows-Wheeler transform} (BWT), can mimic graph-based indexes with auxiliary data structures~\cite{navarro2016cds:book}. However, it remains an open question whether array-based indexes can achieve the same efficiency as graph-based indexes for pattern enumeration tasks.
+
+%% Text indexは，主にgraphに基づくものと，arrayに基づくものに大別できる．
+%% 代表的なgraphに基づくtext indexとして，input stringのthe suffix treeと the CDAWGがある．これらは，input stringの長さ$n$の linear spaceであるが，実際の応用では，使用メモリが大きく，メモリのlocality of referenceがよくないため，現在では特殊な場合を除きあまり利用されない．配列に基づくtext indexとして，the suffix array, the BWT (FM-index)などがある．これらは，長さ$n$の整数配列または文字配列として実現され，適切な補助構造の助けを借りることで，graphに基づくtext indexを模倣できる．しかし，arrayに基づくtext indexがpattern enumeration を，graphに基づくtext indexと完全に同じ効率で実現できるかどうかは，現状ではわかっていない．
+
+A fundamental text index structure for maximal repeat enumeration is the CDAWG, introduced by Blumer~\textit{et al.}~\cite{blumer1987complete} in 1987. The CDAWG of an input text is a directed acyclic graph (DAG) obtained by merging isomorphic subtrees of the suffix tree of the same text. A CDAWG has $e_R$ forward edges and $e_L$ backward edges 
+originating from tree edges and suffix links, respectively,
+of the suffix tree, resulting in $O(e_R + e_L)$ words of space. 
+In 2001, Raffinot~\cite{raffinot2001maximal} proved that the set of all maximal repeats in a text exactly coincides to the set of all vertices but the sink in the CDAWG of the same text.
+%% This implies that the number $\mu = |\id{MR}(T)|$ satisfies the relationship that 
+%% $\mu \le \min(e_L, e_R) \le \max(e_L, e_R) \le n$.
+%% %% $\mu \le e_R\le n$ and $\mu \le e_L\le n$. 
+This implies that all distinct maximal repeats can be enumerated in $O(e_R)$ or $O(e_L)$ time and words of space using depth-first search on the CDAWG~\cite{raffinot2001maximal}.
+
+%% maximal repeat enumerationに関する基本的なtext index は，Blumerらによって1987年に提案された，graphに基づくtext indexであるCDAWGである．Input textのCDAWGは，同じtextのsuffix treeから，その同型な部分木をマージして得られるDAGの形をしたデータ構造である．CDAWGは，suffix treeのtree edges由来の e_R本のforward edgesと，suffix link由来の e_L本の backward edgesをもっており，e_R + e_L のサイズをもつ．
+%% 2001年に，Raffinotは，テキストのmaximal repeatsの全体が，同じテキストのCDAWGのsinkを除く全ての頂点の全体に正確に一致することを示した．このことより，CDAWG上のDFSを用いて，all distinct maximal repeatsを，O(e_R)時間または$O(e_L)$時間でenumerate可能である．
+
+\subsection{Previous Work}
+
+The study of array-based maximal repeat enumeration algorithms is initiated by the first-generation algorithm proposed by Narisawa \textit{et al.} in 2007, which is based on bottom-up traversal of the suffix tree. Their algorithm can enumerate all distinct maximal repeats in $O(n)$ time and $O(e_R)$ space by simulating this bottom-up traversal based on the method by Kasai \textit{et al.}~\cite{kasai:lee2001lcp:linear} using the suffix array (SA), inverse suffix array (ISA), and a constant-time range-minimum query (RMQ) data structure on the longest common prefix array (LCP). Okanohara and Tsujii have proposed essentially the same approach. However, due to the limitations of bottom-up traversal, these algorithms require visiting all right-most branches of the suffix tree, resulting in an $O(n)$ time complexity.
+
+Subsequently, Beller, Berger, and Ohlebusch introduced the second-generation algorithm based on top-down traversals of the Weiner tree. By simulating this traversal using the Burrows-Wheeler transform (BWT) and a Wavelet Tree (WT) on the BWT, they achieved the same $O(n)$ time and $O(e_R)$ space complexity based on the method by Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing}. Later algorithms, such as those by Belazzougui \textit{et al.} using succinct suffix trees and Nishimoto and Tabei using r-space indexes on run-length encoded BWT, also follow the top-down traversal approach but with different time and space complexities. However, these second-generation algorithms still require traversing all backward edges of the Weiner tree, leading to an $O(n)$ time complexity.
+
+In summary, all existing array-based maximal repeat enumeration algorithms have a time complexity of $\Theta(n)$, which is proportional to the text length. Therefore, it remains an open question whether there exists an array-based algorithm that can enumerate all distinct maximal repeats in $O(e_R)$ or $O(e_L)$ time, matching the efficiency of graph-based algorithms using CDAWGs.
+
+%% Arrayに基づくtext indexを用いた maximal repeats enumeration は，2007年のNarisawa et al.らの研究で提案された第一世代の arrayにもとづくアルゴリズムに始まる．彼らの手法は，テキストのsuffix tree のボトムアップの巡回に基づいている．この巡回を，Suffix arrayとinverse suffix arrayと，補助構造としてLCP配列上の定数時間のrange-minima 構造を用いて模倣することで，彼らのアルゴリズムは，$O(n)$時間と$O(e_R)$作業領域で all distinct maximal repeatsをenumerateすることができる．OkanoharaとTsujiiも，本質的に同じアプローチのアルゴリズムを提案している．これらのアルゴリズムを，第一世代の arrayにもとづくmaximal repeat enumerationのアルゴリズムと呼ぶことができる．この第一世代のアルゴリズムは，ボトムアップの巡回では効果的な枝刈りができないため，$O(n)$個あるsuffix treeのノードに対応する右分岐文字列全てを訪問しなくてはならないことから，$O(n)$時間を要してしまう．
+
+%% つづいて，Beller, Berger, and Ohlebuschらの論文により，第二世代の arrayにもとづくmaximal repeat enumerationのアルゴリズムが登場した．第一世代のアルゴリズムと異なり，第二世代のアルゴリズムは，テキストのWeiner tree の トップダウンの巡回に基づいている．テキストのWeiner treeは，同じテキストのsuffix treeのsuffix linkを逆転させた symbol-labeed directed edgesからなる根付き木であるので，これは，suffix treeのbackward edgesを用いたCDAWGの巡回の模倣であると考えることができる．この巡回を，BWT配列と補助構造としてBWT配列上のWavelet tree構造を用いて模倣することで，彼らのアルゴリズムは，$O(n)$時間と$O(e_R)$作業領域で all distinct maximal repeatsをenumerateすることができる．これ以後に提案されたアルゴリズムとして，同じテキストのWeiner tree の トップダウンの巡回の模倣にもとづいている，
+%% 定数時間演算をもつ簡潔接尾辞木を用いたBelazzougui, Cunial, K\"{a}rkk\"{a}inen, and M\"{a}kinenらによって提案された$(O(n\log n\log\sigma), O(n))$時間-領域のalgorithmと，run-length encoded BWT配列を用いた$r$-space indexを用いたNishimoto and Tabeiらの$(O(r\log\frac{n}{r}\log n), O(n\polylog(n)))$時間-領域のalgorithmがある．
+%% この第二世代のアルゴリズムは，Weiner木のbackward edgesが，文字でラベル付されたatomic edgesであることから$O(n)$本あり，それらすべてを横断しなければならないことから，$O(n)$時間を要してしまう．
+
+%% まとめると，現在までに提案されたarrayにもとづくmaximal repeat enumerationアルゴリズムは，すべて，text lengthに比例した$\Theta(n)$時間を要してしまる．したがって，graphに基づく索引であるCDAWGを用いた列挙アルゴリズムと同じ計算時間である，$O(e_R)$時間または$O(e_L)$時間で all distinct maximal repeats をenumerateできるような arrayに基づくmaximal repeat enumerationアルゴリズムが存在するかはまだわかっていない．
+
+\subsection{Main results}
+
+We present a new array-based algorithm for enumerating maximal repeats in a text using the suffix array and auxiliary data structures. It is simple, easy to implement, and works efficient on large text data in the real world. As a main result of this paper, we show the following theorem. 
+
+\begin{theorem}\label{thm:old:algo:maxrep:main}
+Let $T$ be any text of length $n$ over an alphabet of $\sigma\ge 2$ symbols. We assume an oracle $\sig O$ for accessing the suffix array $SA$ and inverse suffix array $ISA$ for $T$ and the RMQ on the LCP array in $t_\fn{acc}$ time. Then, there exists an algorithm that enumerates all of $\mu$ maximal repeats contained in the text $T$ in $O(e_R\cdot t_\fn{acc}(n))$ time and $O(\sigma^2 \log e_R)$ words of working space using the oracle $\sig O$. 
+\end{theorem}
+
+From \cref{thm:old:algo:maxrep:main}, we can derive the various enumeration algorithms for $MR(T)$ that have different time-space trade-offs by using different SA implementations.
+Assuming the classic SA-index, we obtain the next result, solving the aforementioned open question positively. 
+
+\begin{theorem}[classic SA-index]\label{thm:old:algo:maxrep:classic}
+  Let $T$ be any text of length $n$ over an alphabet of $\sigma\ge 2$ symbols.
+There exists an $O(e_R)$-time and $O(n)$-space algorithm based on the classical suffix and LCP arrays (Manber and Myers~\cite{manber:myers1993suffixarrays}) with the RMQ structure (e.g.~\cite{bender:colton2000thelcaproblem}). 
+%% (\textit{classic SA-index})
+\end{theorem}
+
+Assuming compressed indexes for repetitive texts and a bi-directional index, we obtain th following results. 
+
+\begin{theorem}[compressed SA indexes]\label{thm:old:algo:maxrep:derived}
+For any text of length $n$ over an alphabet of $\sigma$ symbols, we have the following algorithms with the claimed time and space complexity for solving maximal repeat enumeration problem, assuming the underlying indexing array structures. 
+%\begin{itemize}[$\bullet$]
+\begin{enumerate}[1.]
+%% \item An $O(e_R)$-time and $O(n)$-space algorithm based on the classical suffix and LCP arrays (Manber and Myers~\cite{manber:myers1993suffixarrays}) with the RMQ structure (e.g.~\cite{bender:colton2000thelcaproblem}). 
+%% (\textit{classic SA-index})
+
+\item An $O(e_R \log {\frac n r})$-time and $O(r\log {\frac n r}\log n)$-space algorithm based on the $r$-spaced suffix and LCP arrays by Gagie, Navarro, and Prezza~\cite{gagie:navarro:prezza2020fully}. 
+(\textit{$r$-sized SA-index})
+
+\item An $O(e_R \log^{4+\eps}(n))$-time and $O(\delta\log({\frac n \delta}) \log n)$-space algorithm based on the latest compressed SA with $\delta$-space, proposed by Kempa and Kociumaka~\cite{kempa:kociumaka2023collapsing}. 
+(\textit{$\delta$-sized SA-index})
+
+\item An $O(\min\set{e_L, e_R})$-time and $O(n)$-space algorithm based on a two copies of the classical suffix and LCP arrays~\cite{manber:myers1993suffixarrays} with the RMQ structure~\cite{bender:colton2000thelcaproblem}, one for $T$ and the other for $T\rev$, where $e_L$  is the number of reverse edges in the CDAWG for $T$.  (\textit{bi-directional SA-index})
+\label{it:algo:maxrep:bidirect}
+%\end{itemize}
+\end{enumerate}
+\end{theorem}
+
+%% In \cref{thm:old:algo:maxrep:derived} above, we remark on Result~\ref{it:algo:maxrep:bidirect}; it is shown by Inenaga and Kosolobov~\cite{inenaga:kosolobov2024relating:left:right} that $e_R$ is at most $O(\sqrt{n})$ times larger than $e_L$, and the converse also holds. 
+
+In \cref{table:summary}, we show the summary of the previous and the proposed results on the enumeration problem of maximal repeats.
+%% From this, we see that among all array-based enumeration algorithms for distinct maximal repeats, our algorithm is the first one that achieves the time proportional to the size of the CDAWG and linear space, that is, $O(e_R)$ time and $O(n)$ words of space. Furthermore, it semultaneously achieves time proportional to the CDAWG-space $e_R$ with poly-logarithmic factor and sublinear space in the text length. 
+Overall, the proposed algorithm will be a useful alternative of the previous methods for large-scale sequence analysis due to its simplicity, efficiency, and modularity. 
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%55
+%% \bigskip
+%% \section*{Unprocessed}
+%% It is well known that the complete set $MR(T)$ of distinct maximal repeats in a text $T$ can be characterized as the set of all nodes but the sink in a graph-based data structure, called the CDAWG for the same text, proposed by Blumer et al. 
+%% %The CDAWG can be constructed in linear time in the length $n$ of an input text. 
+%% Consequently, given the CDAWG for $T$, the set $MR(T)$ can be enumerated in either $O(e_R)$ or $O(e_L)$ time and space with respect to the numbers $e_R$ and $e_L$ of all forward and backward edges of the CDAWG by simple DFS. 
+
+%% %%In the contrast, 
+%% On the other hand, there have been a number of array-based enumeration algorithms for MRs with indexing arrays such as the suffix array or the BWT. These array-based MR enumeration algorithms are time and memory effficient in practice and widely used for large-scale sequence analysis. However, all of them require $\Theta(n)$ time, namely, the time proportional to the text length $n$, which can be exponentially larger than the parameter $e_R$ or $e_L$ for highly-repetitive texts such as millions of human genomes or versioned texts, regardless an underlying indexing arrays are. 
+
+%% Especially, we are interested in the CDAWG-size, namely $e_R$. 
+%% For highly-repetitive texts, it is known that the parameters $\delta$, $\gamma$, $r$, $z$, and $e_R$ can be sublinear in the text size $n$, and sometimes logarithmically smaller than $n$. In general, it is shown that $\delta \le \gamma \le r\le e_R \le n$. From this view, we have the following open questions related to compressed indices for highly-repetitive texts. 
+
+%% In general, we are interested in whether and how we can effectively solve string analysis problems such as enumeration of maximal repeat by applying recent array-based compressed text indices for highly-repetitive texts, such as $\delta$-SA, $\gamma$- and $r$-indices. 
+
+%% In particular, we consider the following questions concerning to efficient simulation of maximal repeat enumeration based on the CDAWG by Raffinot~\cite{raffinot2001maximal}. 
+%% \begin{itemize}[$\bullet$]
+%% \item Can $MR(T)$ be enumerated in time proportinal to the CDAWG size using a linear-sized array-based text index for highly-repetitive texts? 
+
+%% \item Can $MR(T)$ be enumerated in sublinear time and space in text length $n$ using a compressed array-based text index for highly-repetitive texts? 
+%% \end{itemize}
+
+%% In this paper, we tackle these questions, and obtain a collection of results answering them. Actually, we have obtained a slightly more general result as explained below. 
+
+
+
+%%%%%%%%%%%
+%% basic text indexing structures : array-based 
+\begin{table}[t]\centering\tabcolsep=.25em 
+  \input{tab/tabnew} %% static indexes
+\end{table}
+%%%%%%%%%%%
+
+
+%% \subsection{Main results}
+%% We present a new array-based algorithm for enumerating maximal repeats in a text using the suffix array and auxiliary data structures. It is simple, easy to implement, and works efficient on large text data in the real world. As a main result of this paper, we show the following theorem. 
+
+%% \begin{theorem}\label{thm:old:algo:maxrep:main}
+%% Let $T$ be any text of length $n$ over an alphabet of $\sigma\ge 2$ symbols. We assume an oracle $\sig O$ for accessing the suffix array $SA$ and inverse suffix array $ISA$ for $T$ and the RMQ on the LCP array in $t_\fn{acc}$ time. Then, there exists an algorithm that enumerates all of $\mu$ maximal repeats contained in the text $T$ in $O(e_R\cdot t_\fn{acc}(n))$ time and $O(\sigma^2 \log e_R)$ words of working space using the oracle $\sig O$. 
+%% \end{theorem}
+
+%% From \cref{thm:old:algo:maxrep:main}, we can derive the various enumeration algorithms for $MR(T)$ that have different time-space trade-offs by using different SA implementations as follows.
+
+%% \begin{theorem}\label{thm:old:algo:maxrep:derived}
+%% For any text of length $n$ over an alphabet of $\sigma$ symbols, we have the following algorithms with the claimed time and space complexity for solving maximal repeat enumeration problem, assuming the underlying indexing array structures. 
+%% %\begin{itemize}[$\bullet$]
+%% \begin{enumerate}[1.]
+%% \item An $O(e_R)$-time and $O(n)$-space algorithm based on the classical suffix and LCP arrays (Manber and Myers~\cite{manber:myers1993suffixarrays}) with the RMQ structure (e.g.~\cite{bender:colton2000thelcaproblem}). 
+%% (\textit{classic SA-index})
+
+%% \item An $O(e_R \log {\frac n r})$-time and $O(r\log {\frac n r}\log n)$-space algorithm based on the $r$-spaced suffix and LCP arrays by Gagie, Navarro, and Prezza~\cite{gagie:navarro:prezza2020fully}. 
+%% (\textit{$r$-sized SA-index})
+
+%% \item An $O(\delta\log({\frac n \delta}) \log n)$-time and $O(e_R \log^{4+\eps}(n))$-space algorithm based on the latest compressed SA with $\delta$-space, proposed by Kempa and Kociumaka~\cite{kempa:kociumaka2023collapsing}. 
+%% (\textit{$\delta$-sized SA-index})
+
+%% \item An $O(\min\set{e_L, e_R})$-time and $O(n)$-space algorithm based on a two copies of the classical suffix and LCP arrays~\cite{manber:myers1993suffixarrays} with the RMQ structure~\cite{bender:colton2000thelcaproblem}, one for $T$ and the other for $T\rev$, where $e_L$  is the number of reverse edges in the CDAWG for $T$.  (\textit{bi-directional SA-index})
+%% \label{it:algo:maxrep:bidirect}
+%% %\end{itemize}
+%% \end{enumerate}
+%% \end{theorem}
+
+%% In \cref{thm:old:algo:maxrep:derived} above, we remark on Result~\ref{it:algo:maxrep:bidirect}; it is shown by Inenaga and Kosolobov~\cite{inenaga:kosolobov2024relating:left:right} that $e_R$ is at most $O(\sqrt{n})$ times larger than $e_L$, and the converse also holds. 
+
+%% In \cref{table:summary}, we show the comparison of the previous and the proposed enumeration algorithms for the maximal repeats.
+%% From this, we see that among all array-based enumeration algorithms for distinct maximal repeats, our algorithm is the first one that achieves the time proportional to the size of the CDAWG and linear space, that is, $O(e_R)$ time and $O(n)$ words of space. Furthermore, it semultaneously achieves time proportional to the CDAWG-space $e_R$ with poly-logarithmic factor and sublinear space in the text length. 
+
+
+%% Overall, the proposed algorithm will be useful for large-scale sequence analysis due to its simplicity, efficiency, and modularity. 
+
+%% %   \caption{Comparison of the enumeration time and index space of the previous and the proposed enumeration algorithms for the maximal repeats.
+%% %   For each algorithm, columns from left to right indicate, resp., its \textit{name}, \textit{underlying structures}, \textit{total time for enumeration}, \textit{index space} in words, and \textit{type of traversal}, where $\idrm{BU}$, $\idrm{TD}^{+}$, and  $\idrm{TD}^{+}$, resp., indicate the \textit{bottom-up}, \textit{forward top-down}, and \textit{backward top-down} traversals of the associated graph index.
+%% % %% Parameters $r, e_R$, and $e_L$ satisfy the relation $r\le e_R \le n$ and $e_L \le n$. The space is measured in words. 
+%% % }\label{table:summary}
+
+
+%%into four classes $\idtt{td.fw, td.bw, bu.fw, bu.bw}$ 
+
+\subsection{Techniques}
+
+
+To obtain our main results, we employ a novel search strategy for maximal repeats, which is a combination of the top-down traversal of the suffix tree $\sig S$ of a text following their forward edges (tree edges). 
+Moreover, we newly characterize where to find maximal repeats in the top-down traversal, and how to efficiently identify and skip non-maximal repeats during the traversal. 
+
+In \cref{sec:algo}, we will show how our approach and techniques could solve the difficulties in the previous approaches. Specifically, thanks to the above combination of top-down search and forward edges, we can efficiently avoid traversal of $O(n)$ atomic backward edges as well as we can successfully make sound pruning of $\Theta(n)$ non-maximal nodes (as subwords). 
+
+We remark that our approach is different from both of the 1st-generation and 2nd-generation algorithms. Unlike the present main stream enumeration algorithms based on top-down traversal of the Weiner tree $\sig W$~\cite{beller:berger2012space:efficient:bbo,belazzougui2020linear,nishimoto:cpm2021enum} by following backward edge with the BWT and auxiliary structures, our algorithm works with the suffix tree $\sig S$ and following forward edges. 
+Our approach is also different from that by Narisawa~et al.~\cite{narisawa2007efficient}. Although it employs the search over the suffix tree $\sig S$, it makes the bottom-up traversal rather than the top-down one. 
+%% In \cref{sec:review}, we will give a brief survey of the state-of-the-art methods for maximal repeats. 
+
+\subsection{Organization of this paper}
+%The organization of this paper is as follows. 
+In \cref{sec:review}, we start with introducing basic definitions and notations, and then make a brief review of the previous algorithms for maximal repeat enumeration. In \cref{sec:algo}, we show our algorithms and prove \cref{thm:old:algo:maxrep:main} and \cref{thm:old:algo:maxrep:derived}. Finally, in \cref{sec:conc}, we conclude this paper, and discuss future work. 
+
+% Specifically, it is different from either of the widely used top-down traversal of the Weiner tree with BWT array (see Beller, Berger, and Ohlebusch~\cite{beller:berger2012space:efficient:bbo}, 
+% Belazzougui, Cunial, K\"{a}rkk\"{a}inen, and M\"{a}kinen~\cite{belazzougui2020linear}, 
+% Nishimoto and Tabei~\cite{nishimoto:cpm2021enum}, 
+% or the bottom-up traversal of the suffix tree with SA and LCP arrays (see Narisawa, Inenaga, Bannai, and Takeda~\cite{narisawa2007efficient}). 
+
+% . In addition, an extra advantage is the extensibility due to its use of the underlying SA and LCP arrays as an oracles. Thanks to this modularity, the proposed algorithm can offer different time-space trade-offs 
+
+%%% EOF

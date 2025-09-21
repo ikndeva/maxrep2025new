@@ -1,0 +1,562 @@
+%%%%%%%%%% ref.tex 
+
+%%%%% the full ppaer
+@article{arimura:full2023thispaper,
+  author    = {Hiroki Arimura and Shunsuke Inenaga and Yasuaki Kobayashi and Yuto Nakashima and Mizuki Sue},
+  title     = {Optimally Computing Compressed Indexing Arrays Based on the Compact Directed Acyclic Word Graph},
+  OPTjournal   = {Manuscript},
+  journal   = {CoRR, http://arxiv.org/abs/},
+  OPTvolume    = {},
+  month      = {August},
+  year      = {2023},
+  OPTnote = {http://arxiv.org/abs},
+  OPTee        = {http://arxiv.org/},
+  OPTee        = {http://arxiv.org/abs/1207.0016},
+  OPTee     = {http://arxiv.org/abs/dddd.dddd},
+}
+
+%%%%% text books 
+@book{cormen2009introduction,
+  title={Introduction to algorithms},
+  author={Cormen, Thomas H and Leiserson, Charles E and Rivest, Ronald L and Stein, Clifford},
+  year={2009},
+  publisher={MIT press}
+}
+
+@book{gusfield1997book:stree,
+author={Gusfield, Dan},
+year={1997},
+title={Algorithms on Strings, Trees, and Sequences: Computer Science and Computational Biology},
+publisher={Cambridge University Press},
+OPTDOI={10.1017/CBO9780511574931},
+OPTplace={Cambridge},
+}
+
+%%%% CDS book
+@book{navarro2016cds:book,
+  title={Compact data structures: A practical approach},
+  author={Navarro, Gonzalo},
+  year={2016},
+  publisher={Cambridge University Press}
+}
+
+%%%% survey
+@article{navarro2021indexing:i,
+  title={Indexing highly repetitive string collections, part I: repetitiveness measures},
+  author={Navarro, Gonzalo},
+  journal={ACM Computing Surveys (CSUR)},
+  volume={54},
+  number={2},
+  pages={1--31},
+  year={2021},
+  publisher={ACM New York, NY, USA}
+}
+
+@article{navarro2021indexing:ii,
+  title={Indexing highly repetitive string collections, part II: Compressed indexes},
+  author={Navarro, Gonzalo},
+  journal={ACM Computing Surveys (CSUR)},
+  volume={54},
+  number={2},
+  pages={1--32},
+  year={2021},
+  publisher={ACM New York, NY, USA}
+}
+
+%%%%% To date, the fastest indexes for repetitive texts are based on the run-length compressed Burrows–Wheeler transform (BWT) and on the Compact Directed Acyclic Word Graph (CDAWG).
+@article{navarro2019universal,
+  title={Universal compressed text indexing},
+  author={Navarro, Gonzalo and Prezza, Nicola},
+  journal={Theoretical Computer Science},
+  volume={762},
+  pages={41--50},
+  year={2019},
+  publisher={Elsevier}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%% CDAWG 
+
+%%%% original paper1: CDAWG
+@article{blumer:jacm1987cdawg,
+  title={Complete inverted files for efficient text retrieval and analysis},
+  author={Blumer, Anselm and Blumer, Janet and Haussler, David and McConnell, Ross and Ehrenfeucht, Andrzej},
+  journal={JACM},
+  OPTjournal={Journal of the ACM (JACM)},
+  volume={34},
+  number={3},
+  pages={578--595},
+  year={1987},
+  publisher={ACM New York, NY, USA}
+}
+
+%%%% original paper2: CDAWG
+@article{crochemore1986transducers,
+  title={Transducers and repetitions},
+  author={Crochemore, Maxime},
+  journal={Theoretical Computer Science},
+  volume={45},
+  pages={63--86},
+  year={1986},
+  publisher={Elsevier}
+}
+
+@inproceedings{crochemore1997direct,
+  title={Direct construction of compact directed acyclic word graphs},
+  author={Crochemore, Maxime and V{\'e}rin, Renaud},
+  booktitle={CPM 1997},
+  OPTbooktitle={Combinatorial Pattern Matching: 8th Annual Symposium, CPM 97 Aarhus, Denmark, June 30--July 2, 1997 Proceedings 8},
+  pages={116--129},
+  year={1997},
+  organization={Springer}
+}
+
+@article{inenaga2005online,
+  title={On-line construction of compact directed acyclic word graphs},
+  author={Inenaga, Shunsuke and Hoshino, Hiromasa and Shinohara, Ayumi and Takeda, Masayuki and Arikawa, Setsuo and Mauri, Giancarlo and Pavesi, Giulio},
+  journal={Discrete Applied Mathematics},
+  volume={146},
+  number={2},
+  pages={156--179},
+  year={2005},
+  publisher={Elsevier}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% CDAWG: Representing
+%%% Belazzougui, Cunial CPM2017
+%%% Table 1: Time complexity of the operations [this paper]
+%%% O(1):  leftmostLeaf, rightmostLeaf
+%%% O(lg n): selectLeaf, lca, SA[i], ISA[i], LCP[i] PLCP[i], T[i]
+%%% O(lg n + output): SA[i..j], ISA[i..j], LCP[i..j], T[i..j], depth ancestor strAncestor
+%%% CDAWG and the reverse CDAWG
+%%% - Property 1 ([4]).
+%%% - Property 2 ([4]). 
+%%% - Property 3 (this). Rev CDAWGと，positionの文法
+%%% - Property 4 (this). leaves-weight を用いたlex-rankの計算
+%%% Belazzougui and Cunial (2017)
+
+@inproceedings{belazzougui:cunial2017cpm:representing,
+  author    = {Djamal Belazzougui and Fabio Cunial},
+  title     = {Representing the Suffix Tree with the {CDAWG}},
+  booktitle = {CPM 2017},
+  series    = {LIPIcs},
+  volume    = {78},
+  pages     = {7:1--7:13},
+  OPTpublisher = {Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik},
+  year      = {2017}
+}
+
+%%%%%%%% Belazzougui \textit{et al.} CPM2015
+%%%%%%%% Belazzougui, Djamal and Cunial, Fabio and Gagie, Travis and Prezza, Nicola and Raffinot, Mathieu CPM2015
+%%%%%%%% paper [4] and Table 2 of belazzougui2017cpm:representing : Complexity of the operations on the suffix tree of a string T in paper [4]. Djamal Belazzougui, Fabio Cunial, Travis Gagie, Nicola Prezza, and
+%%%%%%%% Mathieu Raffinot. Composite repetition-aware data structures.
+%%%%%%%% In Annual Symposium on Combinatorial Pattern Matching, 2015.
+%%%%%%%% O(1): stringDepth nLeaves, height locateLeaf firstChild, child, isAncestor, leafRank
+%%%%%%%% O(lglg n): parent, nextSibling, suffixLink, weinerLink
+%%%%%@inproceedings{belazzougui2015cpm:composite,
+%%   title={Composite repetition-aware data structures},
+%%   author={Belazzougui, Djamal and Cunial, Fabio and Gagie, Travis and Prezza, Nicola and Raffinot, Mathieu},
+%%   booktitle={CPM 2015},
+%%   OPTbooktitle={Combinatorial Pattern Matching: 26th Annual Symposium, CPM 2015, Ischia Island, Italy, June 29--July 1, 2015, Proceedings 26},
+%%   pages={26--39},
+%%   year={2015},
+%%   organization={Springer}
+%% }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%% Takagi~\textit{et al.} (2017)
+@inproceedings{takagi:spire2017lcdawg,
+  title={Linear-size {CDAWG}},
+  OPTtitle={Linear-size {CDAWG}: New repetition-aware indexing and grammar compression},
+  author={Takagi, Takuya and Goto, Keisuke and Fujishige, Yuta and Inenaga, Shunsuke and Arimura, Hiroki},
+  booktitle={SPIRE 2017},
+  OPTbooktitle={International Symposium on String Processing and Information Retrieval},
+  pages={304--316},
+  year={2017},
+  OPTorganization={Springer}
+}
+
+
+@inproceedings{pape:lange2019maximal:repeats,
+  title={On Maximal Repeats in Compressed Strings},
+  author={Pape-Lange, Julian},
+  booktitle={30th Annual Symposium on Combinatorial Pattern Matching (CPM 2019)},
+  year={2019},
+  organization={Schloss Dagstuhl-Leibniz-Zentrum fuer Informatik}
+}
+
+%%%% SLP to LZ78
+@inproceedings{bannai2013converting,
+  title={Converting {SLP} to {LZ78} in almost Linear Time},
+  author={Bannai, Hideo and Gawrychowski, Pawe{\l} and Inenaga, Shunsuke and Takeda, Masayuki},
+  booktitle={CPM 2013},
+  OPTbooktitle={Combinatorial Pattern Matching: 24th Annual Symposium, CPM 2013, Bad Herrenalb, Germany, June 17-19, 2013. Proceedings 24},
+  pages={38--49},
+  year={2013},
+  organization={Springer}
+}
+
+%%%% Suffix tree
+@inproceedings{weiner1973linear,
+  title={Linear pattern matching algorithms},
+  author={Weiner, Peter},
+  booktitle={14th Annual Symposium on Switching and Automata Theory (swat 1973)},
+  pages={1--11},
+  year={1973},
+  organization={IEEE}
+}
+
+@inproceedings{ukkonen1992constructing,
+  title={Constructing suffix trees on-line in linear time},
+  author={Ukkonen, Esko},
+  booktitle={Proceedings of the IFIP 12th World Computer Congress on Algorithms, Software, Architecture-Information Processing'92, Volume 1-Volume I},
+  pages={484--492},
+  year={1992}
+}
+
+%%%% Lex and LZ-parse : Navarro, Ochoa, and Prezza: Navarro et al.
+@article{navarro:ochoa:2020approx,
+  title={On the approximation ratio of ordered parsings},
+  author={Navarro, Gonzalo and Ochoa, Carlos and Prezza, Nicola},
+  journal={IEEE Trans.~Inf.~Theory},
+  OPTjournal={IEEE Transactions on Information Theory},
+  volume={67},
+  number={2},
+  pages={1008--1026},
+  year={2020},
+  publisher={IEEE}
+}
+
+%%%% Lempel-Ziv parse
+@article{lempel1976complexity,
+  title={On the complexity of finite sequences},
+  author={Lempel, Abraham and Ziv, Jacob},
+  journal={IEEE Transactions on information theory},
+  volume={22},
+  number={1},
+  pages={75--81},
+  year={1976},
+  publisher={IEEE}
+}
+
+@article{kempa:kociumaka2022resolution,
+  title={Resolution of the burrows-wheeler transform conjecture},
+  author={Kempa, Dominik and Kociumaka, Tomasz},
+  journal={Communications of the ACM},
+  volume={65},
+  number={6},
+  pages={91--98},
+  year={2022},
+  publisher={ACM New York, NY, USA}
+}
+
+
+%%%% LCPCOMP
+@inproceedings{dinklage2017compression,
+  title={Compression with the tudocomp framework},
+  author={Dinklage, Patrick and Fischer, Johannes and K{\"o}ppl, Dominik and L{\"o}bel, Marvin and Sadakane, Kunihiko},
+  booktitle={Proc. 16th International Symposium on Experimental Algorithms (SEA 2017)},
+  pages={13:1–13:22},
+  year={2017},
+  OPTorganization={Leibniz International Proceedings in Informatics}
+}
+
+%%%% RLBWT: RLFM
+@inproceedings{makinen2005succinct,
+  title={Succinct suffix arrays based on run-length encoding},
+  author={M{\"a}kinen, Veli and Navarro, Gonzalo},
+  booktitle={Combinatorial Pattern Matching: 16th Annual Symposium, CPM 2005, Jeju Island, Korea, June 19-22, 2005. Proceedings 16},
+  pages={45--56},
+  year={2005},
+  organization={Springer}
+}
+
+%%%% main ref on RLCSA, RLBWT-based index: LF/\Psi, BWT, SA/ISA, PLCP; LZ77-parsing (NSV/PSV); Lyndon-parsing; Textbook problems; 
+@inproceedings{kempa2019optimal,
+  title={Optimal construction of compressed indexes for highly repetitive texts},
+  author={Kempa, Dominik},
+  booktitle={SODA 2019},
+  OPTbooktitle={Proceedings of the Thirtieth Annual ACM-SIAM Symposium on Discrete Algorithms},
+  pages={1344--1357},
+  year={2019},
+  organization={SIAM}
+}
+
+@article{gagie:navarro:prezza2020fully,
+  title={Fully functional suffix trees and optimal text searching in BWT-runs bounded space},
+  author={Gagie, Travis and Navarro, Gonzalo and Prezza, Nicola},
+  journal={Journal of the ACM (JACM)},
+  volume={67},
+  number={1},
+  pages={1--54},
+  year={2020},
+  publisher={ACM New York, NY, USA}
+}
+
+%%%% Computing LZ77
+%%%%% in O((1/c) n) time and O((1+c)n \lg n + O(n)) bits of space
+%%%%% in O(n \log^c n) time and O(n \lg\sigma) bits of space
+@article{koppl2021nonlz77factor,
+  title={Non-overlapping LZ77 factorization and LZ78 substring compression queries with suffix trees},
+  author={K{\"o}ppl, Dominik},
+  journal={Algorithms},
+  volume={14},
+  number={2},
+  pages={44},
+  year={2021},
+  publisher={MDPI}
+}
+
+%%%%%% BWT
+@article{burrows:wheeler1994blocksorting,
+  title={A block-sorting lossless data compression algorithm},
+  author={Burrows, Michael},
+  journal={SRC Research Report, 124},
+  year={1994},
+  publisher={Digital Systems Research Center}
+}
+
+%%%%%% SA
+@article{manber1993suffix,
+  title={Suffix arrays: a new method for on-line string searches},
+  author={Manber, Udi and Myers, Gene},
+  journal={siam Journal on Computing},
+  volume={22},
+  number={5},
+  pages={935--948},
+  year={1993},
+  publisher={SIAM}
+}
+
+%%%% Psi array/function
+@article{sadakane2003new:csa,
+  title={New text indexing functionalities of the compressed suffix arrays},
+  author={Sadakane, Kunihiko},
+  journal={Journal of Algorithms},
+  volume={48},
+  number={2},
+  pages={294--313},
+  year={2003},
+  publisher={Elsevier}
+}
+
+%%%% Psi array/function: Best explanation by Navarro
+@article{grossi:vitter2005compressed,
+  title={Compressed Suffix Arrays and Suffix Trees with Applications to Text Indexing and String Matching},
+  author={Grossi, Roberto and Vitter, Jeffrey Scott},
+  journal={SIAM Journal on Computing},
+  volume={35},
+  number={2},
+  pages={378},
+  year={2005},
+  publisher={Society for Industrial and Applied Mathematics}
+}
+
+%%%% bidirectional macro scheme
+@article{storer1982bidirectional:macro:scheme,
+  title={Data compression via textual substitution},
+  author={Storer, James A and Szymanski, Thomas G},
+  journal={Journal of the ACM (JACM)},
+  volume={29},
+  number={4},
+  pages={928--951},
+  year={1982},
+  publisher={ACM New York, NY, USA}
+}
+
+%%% grammar
+
+%%%%%% upperbound by z: g = O(z log (n/z))
+@inproceedings{gawrychowski2011pattern,
+  title={Pattern matching in Lempel-Ziv compressed strings: fast, simple, and deterministic},
+  author={Gawrychowski, Pawe{\l}},
+  booktitle={Algorithms--ESA 2011: 19th Annual European Symposium, Saarbr{\"u}cken, Germany, September 5-9, 2011. Proceedings 19},
+  pages={421--432},
+  year={2011},
+  organization={Springer}
+}
+
+%%%%%% upperbound by zno: g = O(zno log (n/zno))
+@article{rytter2003application,
+  title={Application of Lempel--Ziv factorization to the approximation of grammar-based compression},
+  author={Rytter, Wojciech},
+  journal={Theoretical Computer Science},
+  volume={302},
+  number={1-3},
+  pages={211--222},
+  year={2003},
+  publisher={Elsevier}
+}
+
+%%%%%% collage system c
+@article{kida2003collage,
+  title={Collage system: a unifying framework for compressed pattern matching},
+  author={Kida, Takuya and Matsumoto, Tetsuya and Shibata, Yusuke and Takeda, Masayuki and Shinohara, Ayumi and Arikawa, Setsuo},
+  journal={Theoretical Computer Science},
+  volume={298},
+  number={1},
+  pages={253--272},
+  year={2003},
+  publisher={Elsevier}
+}
+
+%%%%
+
+%%%% PLCP array
+
+@inproceedings{karkkainen2009permuted,
+  title={Permuted longest-common-prefix array},
+  author={K{\"a}rkk{\"a}inen, Juha and Manzini, Giovanni and Puglisi, Simon J},
+  booktitle={CPM 2009},
+  OPTbooktitle={Combinatorial Pattern Matching: 20th Annual Symposium, CPM 2009 Lille, France, June 22-24, 2009 Proceedings 20},
+  pages={181--192},
+  year={2009},
+  organization={Springer}
+}
+
+%%%%% from karkkainenn2009permuted
+%%% 
+@inproceedings{sadakane2002succinct,
+  title={Succinct representations of lcp information and improvements in the compressed suffix arrays},
+  author={Sadakane, Kunihiko},
+  booktitle={SODA},
+  volume={2},
+  pages={225--232},
+  year={2002},
+  OPTnote={The PLCP array first appeared in its succinct bitarray form in [19], where Sadakane introduced it as a concise representation of the LCP array, but he did not address the problem of constructing it. The full or sparse PLCP array is used in the LCP construction algorithm by Khmelev, which has not been published in literature but an implementation is available [11].}
+}
+
+%%% Computing LCP array from BWT in $O(n \log\sigma)$ time using $o(n \log\sigma)$ bits of working space
+@article{prezza2019space,
+  title={Space-efficient computation of the LCP array from the Burrows-Wheeler transform},
+  author={Prezza, Nicola and Rosone, Giovanna},
+  journal={arXiv preprint arXiv:1901.05226},
+  year={2019}
+}
+
+
+@inproceedings{nishimoto2021enumeration,
+  author       = {Takaaki Nishimoto and
+                  Yasuo Tabei},
+  title        = {R-enum: Enumeration of Characteristic Substrings in BWT-runs Bounded Space},
+  booktitle    = {32nd Annual Symposium on Combinatorial Pattern Matching, {CPM} 2021},
+  OPTbooktitle    = {32nd Annual Symposium on Combinatorial Pattern Matching, {CPM} 2021,
+                  July 5-7, 2021, Wroc{\l}aw, Poland},
+  series       = {LIPIcs},
+  volume       = {191},
+  pages        = {21:1--21:21},
+  OPTpublisher    = {Schloss Dagstuhl - Leibniz-Zentrum f{\"{u}}r Informatik},
+  year         = {2021},
+}
+
+%%%% LPF-array
+@article{crochemore2008computing:lpf,
+  title={Computing longest previous factor in linear time and applications},
+  author={Crochemore, Maxime and Ilie, Lucian},
+  journal={IPL},
+OPTjournal={Information Processing Letters},
+  volume={106},
+  number={2},
+  pages={75--80},
+  year={2008},
+  publisher={Elsevier},
+  OPTnote={The first paper},
+}
+
+%%%%%%% LPnF-array: Crochemore, Iliopoulos, Kubica, Rytter+
+@article{crochemore2012efficient:lpnf,
+  title={Efficient algorithms for three variants of the LPF table},
+  author={Crochemore, Maxime and Iliopoulos, Costas S and Kubica, Marcin and Rytter, Wojciech and Wale{\'n}, Tomasz},
+  journal={Journal of Discrete Algorithms},
+  volume={11},
+  pages={51--61},
+  year={2012},
+  publisher={Elsevier}
+}
+
+%%%%%% for LPnF: Tamdem/contiguous repeat in O(n log n) time
+@article{stoye:gusfield2002simple,
+  title={Simple and flexible detection of contiguous repeats using a suffix tree},
+  author={Stoye, Jens and Gusfield, Dan},
+  journal={Theoretical Computer Science},
+  volume={270},
+  number={1-2},
+  pages={843--856},
+  year={2002},
+  publisher={Elsevier}
+}
+
+%%%% Phi-array
+@article{karkkainen2016extlcp:phi,
+  title={LCP array construction in external memory},
+  author={K{\"a}rkk{\"a}inen, Juha and Kempa, Dominik},
+  journal={Journal of Experimental Algorithmics (JEA)},
+  volume={21},
+  pages={1--22},
+  year={2016},
+  publisher={ACM New York, NY, USA}
+}
+
+%%% y-fast trie
+@article{willard1983loglog,
+  title={Log-logarithmic worst-case range queries are possible in space $\Theta$ (N)},
+  author={Willard, Dan E},
+  journal={Information Processing Letters},
+  volume={17},
+  number={2},
+  pages={81--84},
+  year={1983},
+  publisher={Elsevier}
+}
+%%%%%%%%
+
+%%% Morphic words
+
+%%% CDAWG for Finite TM words. #Nodes for the i-th TM words is 2i + 1
+@article{radoszewski:rytter2012structure:cdawg:thuemorse,
+  title={On the structure of compacted subword graphs of Thue--Morse words and their applications},
+  author={Radoszewski, Jakub and Rytter, Wojciech},
+  journal={JDA},
+  OPTjournal={Journal of Discrete Algorithms},
+  volume={11},
+  pages={15--24},
+  year={2012},
+  publisher={Elsevier}
+}
+
+%%%% r_bwt = Theta(log n) for some purely morphic words
+@inproceedings{frosini2022logarithmic,
+  title={Logarithmic equal-letter runs for BWT of purely morphic words},
+  author={Frosini, Andrea and Mancini, Ilaria and Rinaldi, Simone and Romana, Giuseppe and Sciortino, Marinella},
+  booktitle={Developments in Language Theory: 26th International Conference, DLT 2022, Tampa, FL, USA, May 9--13, 2022, Proceedings},
+  pages={139--151},
+  year={2022},
+  organization={Springer}
+}
+
+%%% BWT size for the i-th Thue-Morse words is 2i
+@inproceedings{brlek2019burrows:thuemorse,
+  title={Burrows-Wheeler transform of words defined by morphisms},
+  author={Brlek, Srecko and Frosini, Andrea and Mancini, Ilaria and Pergola, Elisa and Rinaldi, Simone},
+  booktitle={IWOCA 2019},
+  OPTbooktitle={Combinatorial Algorithms: 30th International Workshop, IWOCA 2019, Pisa, Italy, July 23--25, 2019, Proceedings 30},
+  pages={393--404},
+  year={2019},
+  OPTorganization={Springer}
+}
+
+%%% BWT size for the i-th Fibonacci words is 2 
+@article{mantaci2017measuring:burrows:fibonacci,
+  title={Measuring the clustering effect of BWT via RLE},
+  author={Mantaci, Sabrina and Restivo, Antonio and Rosone, Giovanna and Sciortino, Marinella and Versari, Luca},
+  journal={Theoretical Computer Science},
+  volume={698},
+  pages={79--87},
+  year={2017},
+  publisher={Elsevier}
+}
+
+%%%% EOF
+

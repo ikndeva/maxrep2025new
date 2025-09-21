@@ -1,0 +1,103 @@
+echo \#abcadabcabc\$ | main6stree.exe -L -f 18  -g -d main6stree 
+@debug: update: node[6] this->posbeg=5 old_branch->ch_suf=a
+@debug: update: node[9] this->posbeg=7 old_branch->ch_suf=a
+@debug: update: node[11] this->posbeg=8 old_branch->ch_suf=b
+@debug: update: node[15] this->posbeg=10 old_branch->ch_suf=a
+@debug: update: node[17] this->posbeg=11 old_branch->ch_suf=b
+@debug: update: node[19] this->posbeg=12 old_branch->ch_suf=c
+T  : n=13 : '#abcadabcabc$'
+SA : n=0 : []
+BWT: n=0 : ''
+LCP: n=0 : []
+print all suffixes in the lexicographic-order...
+done.
+print all suffixes in the lexicographic-order...
+size: n=0: 
+T	size: n=0: 
+done.
+build: enter
+build_sa: enter
+build_sa: exit
+build_bwt: enter
+build_bwt: exit
+build_lcp: enter
+build_lcp: exit
+build_plcp: enter
+build_plcp: exit
+T  : n=13 : '#abcadabcabc$'
+SA : n=13 : [0 12 9 6 1 4 10 7 2 11 8 3 5]
+BWT: n=13 : '$ccd#caaabbba'
+LCP: n=13 : [0 0 0 3 4 1 0 2 3 0 1 2 0]
+print all suffixes in the lexicographic-order...
+rank	SA	BWT	LCP	SH	suff	size: n=13: 
+0	0	$	0	1	'#abcadabcabc$'	
+1	12	c	0	1	'$'	
+2	9	c	0	0	'abc$'	
+3	6	d	3	1	'abcabc$'	
+4	1	#	4	1	'abcadabcabc$'	
+5	4	c	1	1	'adabcabc$'	
+6	10	a	0	1	'bc$'	
+7	7	a	2	0	'bcabc$'	
+8	2	a	3	0	'bcadabcabc$'	
+9	11	b	0	1	'c$'	
+10	8	b	1	0	'cabc$'	
+11	3	b	2	0	'cadabcabc$'	
+12	5	a	0	1	'dabcabc$'	
+done.
+print all suffixes in the lexicographic-order...
+size: n=13: 
+pos	T	PLCP	TH	size: n=13: 
+0	#	0	1	'#abcadabcabc$'	
+1	a	4	1	'abcadabcabc$'	
+2	b	3	0	'bcadabcabc$'	
+3	c	2	0	'cadabcabc$'	
+4	a	1	1	'adabcabc$'	
+5	d	0	1	'dabcabc$'	
+6	a	3	1	'abcabc$'	
+7	b	2	0	'bcabc$'	
+8	c	1	0	'cabc$'	
+9	a	0	0	'abc$'	
+10	b	0	1	'bc$'	
+11	c	0	1	'c$'	
+12	$	0	1	'$'	
+done.
+build: exit
+T  : n=13 : '#abcadabcabc$'
+SA : n=13 : [0 12 9 6 1 4 10 7 2 11 8 3 5]
+BWT: n=13 : '$ccd#caaabbba'
+LCP: n=13 : [0 0 0 3 4 1 0 2 3 0 1 2 0]
+print all suffixes in the lexicographic-order...
+rank	SA	BWT	LCP	SH	suff	size: n=13: 
+0	0	$	0	1	'#abcadabcabc$'	
+1	12	c	0	1	'$'	
+2	9	c	0	0	'abc$'	
+3	6	d	3	1	'abcabc$'	
+4	1	#	4	1	'abcadabcabc$'	
+5	4	c	1	1	'adabcabc$'	
+6	10	a	0	1	'bc$'	
+7	7	a	2	0	'bcabc$'	
+8	2	a	3	0	'bcadabcabc$'	
+9	11	b	0	1	'c$'	
+10	8	b	1	0	'cabc$'	
+11	3	b	2	0	'cadabcabc$'	
+12	5	a	0	1	'dabcabc$'	
+done.
+print all suffixes in the lexicographic-order...
+size: n=13: 
+pos	T	PLCP	TH	size: n=13: 
+0	#	0	1	'#abcadabcabc$'	
+1	a	4	1	'abcadabcabc$'	
+2	b	3	0	'bcadabcabc$'	
+3	c	2	0	'cadabcabc$'	
+4	a	1	1	'adabcabc$'	
+5	d	0	1	'dabcabc$'	
+6	a	3	1	'abcabc$'	
+7	b	2	0	'bcabc$'	
+8	c	1	0	'cabc$'	
+9	a	0	0	'abc$'	
+10	b	0	1	'bc$'	
+11	c	0	1	'c$'	
+12	$	0	1	'$'	
+done.
+dot -Tpdf main6stree.dot > main6stree.pdf
+rm main6stree.dot

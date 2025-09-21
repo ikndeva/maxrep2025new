@@ -1,0 +1,174 @@
+
+%% %%%%%%
+%% \begin{figure}[t]
+%% \centering  
+%%   \includegraphics[width=0.99\textwidth]{fig/exp1/revstree.pdf}
+%%   \caption{The suffix tree for the reversed text $T\rev = \mathtt{\$cbacbadacba\#}$.}\label{fig:revstree}
+%% \end{figure}
+%% %%%%%%
+
+%%%%%%%%%%%%%%%%
+\section{The Second Algorithm with the BWT Array}
+\label{sec:algo:reverse}
+
+In this section, we present the enumeration algorithm for all maximal repeats in a text  of length $n$. It uses the BWT array, and runs in $O(e_\fn{min}\log n)$ time and $O(e_\fn{min}\log n)$ words of working space, where $e_\fn{min} = \max(e_R, e_L)$.
+
+In this section, we present the second algorithm that enumerates all maximal repeats in a text $T$ of length $n$ in $O(e_\fn{min} \log n)$ time and $O(\sigma^2 \log e_\fn{min})$ words of working space using precomputed arrays, namely, the BWT, suffix, inverse suffix, and LCP arrays for $T$ and the reversed versions for $T\rev$ occupying $O(n)$ words space.
+%%, where $e_\fn{min} = \max(e_R, e_L)$.
+It uses the DFS over the virtual Weiner tree for $T$, which is isomorphic to the suffix tree for the reversed text $T$.
+
+
+%%\subsection{The proposed algorithm}
+
+Now, we introduce our algorithm for enumerating all maximal repeats based on a bidirectional index.
+In Algorithm~\ref{algo:MaxRepeats}, we show the pseudocode of the main routine of our algorithm for enumerating all maximal repeats based on the bidirectional index $\mathcal B(T,T\rev)$ explained above. 
+This procedure enumerates all descendant branch nodes of the currently visited branch node in the Weiner tree $\mathcal W$ by skipping long non-branching chains using a bidirectional index constructed in linear time from the input text of length $n$. This allows us to visit only the $\mu$ branch nodes by following $O(e_L)$ Weiner links, each with an amortized time of $O(\log n)$.
+
+In the algorithm, we represent a substring $W$ of $T$ by a triple $\op{repr}(W) = (L,R,\ell) $, where $[L .. R]$ is the SA-interval of $W$ in $SA[1..n]$ and $\ell = |W|$ is the length of $W$.
+Procedure \textsc{MaxRepeats} use following subprocedures: 
+\begin{itemize}
+\item $\textsc{ExtendBoth}_{\mathcal{I},\mathcal{I}\rev}(L_*,R_*,\ell)$: Given a triple representation $\op{repr}(W) = (L,R,\ell)$ of a repeated substring $W$, it returns triple representation $(L_*,R_*,\ell_*)$ of the unique maximal repeat $\mext W$ containing $W$ (called the maximal extension operation). 
+This can be supported to run in $O(\log n)$ operation time (see Algorithm~\ref{algo:ExtendBoth}). 
+
+\item $\textsc{RangeDistinctQuery}_{BWT}(L,R)$: Given the range $\op{range}(W) = [L, R]$, it returns the set of distinct characters which contained in the range $[L,R]$ for the $BWT$, such that 
+\begin{math}
+RD(L, R) = \{\: c = BWT[k] : k \in [L, R], |BWT[L..R]|_c \ge 1 \:\}  
+\end{math}
+This can be supported to run in $O(\log\sigma)$ operation time on the BWT array with the Wavelet tree (see Beller, Berger, Ohlebusch~\cite{beller:berger2012space:efficient:bbo}). 
+
+% \item $\textsc{WideRangeDistinctQuery}_{BWT}(L,R)$: Given the range $\op{range}(W) = [L, R]$, it returns the set of distinct characters which contained in the range $[L,R]$ for the $BWT$, such that 
+% \begin{math}
+% WRD(L, R) = \{\: c = BWT[k] : k \in [L, R], |BWT[L..R]|_c \ge 2 \:\}  
+% \end{math}
+
+
+\item $\textsc{LeftExtendByChar}_{BWT}(L, R, c)$: Given a range of a substring $W$ $\op{range}(W) = [L, R]$, it returns the range $\op{range}(cW) = [L', R']$ if $cW$ is a substring of T, return empty range $[L+1, L]$ otherwise.
+This operation is exactly the \textit{LF-mapping} of the FM-index, and can be supported to run in $O(\log\sigma)$ operation time on the BWT array with the Wavelet tree and the $C$ array (see Ferragina and Manzini~\cite{Ferragina05:FM}). 
+\end{itemize}
+
+We remark that the test for right-branchingity in the first if-sentence can be checked in constant time by the range distinct query for the reverse direction. 
+In Algorithm \ref{algo:ExtendBoth}, we show the subprocedures \textsc{MaximallyExtendToEnd} and \textsc{MoveToOpposite}. These routines use the following operations on the LCP arrays in both directions.
+\begin{itemize}
+    \item $RMQ_{LCP}(L,R)$: returns the minimum value $\ell = min\{LCP[k] | k \in [L..R]\}$ in the subarray of the LCP array $LCP[L,R]$.
+    It is the range-minima query over the LCP array, and can be supported in $O(1)$ operation time and $O(n)$ words of space (see Bender and Farach-Colton~\cite{bender:colton2000thelcaproblem}).
+    
+    \item $\textsc{StringLevelAncestor}(k,\ell,n,LCP)$: returns the representation $(L,R,\ell)$ of the highest node $v$ whose depth is no less than $\ell$ in the suffix tree for $T$ with the shape determined by the LCP array (see~\cite{belazzougui2020linear}). This can be supported in $O(\log n)$ operation time and $O(n)$ words of space on the LCP array with the RMQ structure by using binary search.
+\end{itemize}
+
+
+%\def\Procedure{\Statex\hspace-1.0\leftmargin\textbf{Procedure}}
+\begin{algorithm}[t]
+  \caption{ The subroutine $\textsc{ExtendBoth}(L,R,\ell)$. 
+  It receives the triple representation $(L,R, \ell)$ of a substring $W$ of $T$,
+  and returns the unique maximal repeat
+  %% $W$
+  %% $\overleftrightarrow{W}$
+  containing $W$ using indexing arrays $LCP$ and $LCP\rev$ for $T$ and $T\rev$, respectively.
+  }
+  %\label{algo:ExtendBoth}
+  %% \begin{algorithmic}[1]
+  %%   \Proc{\textsc{ExtendBoth}}$(L, R, \ell, (\sig I, \sig I\rev))$
+  %%   \Require{The triple representation $\op{repr}(W) = (L, R, \ell)$ for a substring $W$, where $[L,R]$ is the SA-range of $W$.}
+  %%   \Ensure{The triple representation $\op{repr}(W) = (L_*, R_*, \ell_*)$ of the unique maximal repeat $\mext{W}$ in $T$ containing $W$ as a substring.}
+  %%   \If{$L\geq R$} \textbf{return} $\perp$;
+  %%   \Else
+  %%   \Comment{Starting in the forward side}
+  %%   %\State $\ell' \gets RMQ_{LCP}(L+1,R)$    
+  %%   \State $(L, R, \ell') \gets \textsc{MaximallyExtendToEnd}((L, R, \ell), LCP)$  
+  %%     \Comment{Applying maximal right-extension}
+  %%   \State $(L\rev,R\rev,\ell') \gets \textsc{MoveToOpposite}((L, R, \ell'), SA, ISA\rev, LCP\rev)$
+  %%   \Comment{Moving to the reverse side}  
+  %%   \State $(L\rev, R\rev, \ell_*) \gets \textsc{MaximallyExtendToEnd}((L\rev, R\rev, \ell'), LCP\rev)$  
+  %%   %\State $\ell_* \gets RMQ_{LCP\rev}(L\rev+1,R\rev)$
+  %%     \Comment{Applying maximal left-extension}
+  %%   \State $(L_*,R_*,\ell_*) \gets \textsc{MoveToOpposite}((L\rev, R\rev, \ell_*), SA\rev, ISA, LCP)$   
+  %%     \Comment{Moving to the forward side}
+  %%   \State \textbf{return} $(L_*,R_*,\ell_*)$
+  %%   \Comment{the maximal extension $(L_*, R_*, \ell_*) = \op{repr}(\mext{W}) = \op{repr}(\lext{(\rext{W})})$}
+  %%   \EndIf
+  %% %%%% Procedure convert %%%%%%%%%%%%%%%%%%%%%
+  %% \Statex\Proc{\textsc{MaximallyExtendToEnd}}$((L, R, \ell), LCP)$  
+  %%   \Require{The triple representation $\op{repr}(W) = (L, R, \ell)$ of $W$, the longest common prefix array $LCP$}
+  %%   \Ensure{The triple representation $\op{repr}(\rext W) = (L, R, \ell')$ of the one-sided maximal extension $\rext W$ specified by the array $LCP$}
+  %% \State $\ell' \gets RMQ_{LCP}(L+1,R)$
+  %% \Comment{The range maximum query}
+  %% \State \textbf{return} $(L, R, \ell')$
+
+
+  %% \Statex\Proc{\textsc{MoveToOpposite}}$((L_+, R_+, \ell), SA_+, ISA_-, LCP_-)$
+  %%   \Require{The triple representation $\op{repr}_+(W) = (L_+, R_+, \ell)$ of $W$ and the suffix array $SA_+$ in one direction, and the inverse suffix array $ISA_-$ and the longest common prefix array $LCP_-$ in the opposite direction.}
+  %%   \Ensure{The triple representation $\op{repr}_-(W_-) = (L_-, R_-, \ell)$ of the reversed substring $W_-$ in the reverse suffix array $SA\rev$.}
+  %%   \State $k_+ \gets \text{arbitrary rank in } [L, R]$
+  %%   \State $p_+ \gets \id{SA_+}[k_+]$
+  %%   \State $p_- \gets n - p_+ - \ell +\,1$
+  %%     \Comment{the end position of $\rext{W}$ in $T_-$}
+  %%   \State $k_- \gets \id{ISA}_-[p_-]$      
+  %%     \Comment{the rank of the reverse suffix $T_-{p_-}$ in $SA_-$}    
+  %%   \State $[L_-, R_-] \gets \textsc{StringLevelAncestor}(k_-,\ell, n, LCP_-)$
+  %%     \Comment{$\op{repr}(\rext{W}) = (L_-, R_-, \ell)$}
+  %%   \State \textbf{return} $(L_-, R_-, \ell)$
+  %% \end{algorithmic}
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%
+
+\begin{lemma}\label{lem:oper:movetoopposite}
+For any subword $W$ of $T$, 
+the procedure  $\textsc{MoveToOpposite}$  of Algorithm~\ref{algo:ExtendBoth} transforms
+the rich-representation of $X$ on $SA$ in the forward direction into 
+the rich-representation of $X\rev$ on $SA\rev$ in the reverse direction. 
+\end{lemma}
+
+\begin{proof}
+We can see the correctness of the procedure as follows. Suppose that we are given the triple $\tau = (L, R, \ell)$ for a subword $W$. Then, $W$ is the common prefix of all suffixes in the range $[L,R]$ having the length $\ell$. 
+Therefore, it selects an arbitrary suffix $S$ of the text $T$ whose rank $k_+$ in $SA$ belongs to the given range $[L,R]$ at Line~11, and converts it to the starting position $p_+ = SA[k_+]$ of the suffix $S$. Since $W$ is the length-$\ell$ prefix of the suffix $S$, $p_+$ is also the starting position of $W$ in $T$, and $q_+ := p_+ + \ell - 1$ is the end position of $W$ in $T$. 
+
+Now, Line~13 converts the end position $q_+$ into the associated position $p_- = n - p_+ - \ell + 1$ in the reversed text $T\rev$. We observe that the end position $q_+$ of $W$ in $T$ corresponds to the start position $p_-$ of $W\rev$ in the reversed text $T\rev$, and $p_-$ is also the start position of the reversed suffix $S_- = T\rev[p_-..n]$ (or the prefix $T[1..q_+]$ of $T$) . 
+Thus, Line~14 computes the rank of $S_-$ in $SA\rev$. 
+By construction, the reversed subword $W\rev$ must be the prefix of $S_-$ with length $\ell$. Hence, we can compute the $SA\rev$-range of $W\rev$ by computing the widest range that cotains the reversed suffix $S_-$ and whose lcp length is at least $\ell$. This can be done by \textsc{StringLevelAncestor} operation. Combining the above arguments, the correctness of  $\textsc{MoveToOpposite}$ follows. 
+\end{proof}
+
+\begin{lemma}\label{lem:oper:extendboth}
+The procedure  $\textsc{ExtendBoth}_{\sig{I},\sig{I}\rev}(L_*,R_*,\ell)$ of Algorithm~\ref{algo:ExtendBoth} 
+can be supported on the bidirectional index $\sig B(T, T\rev)$ to run in $O(\log n)$ operation time using $O(n\log n)$ bits of space. 
+\end{lemma}
+
+\begin{proof}
+Given a rich-representation triple $\tau = (L, R, \ell)$ of any subword $W$ of $T$, let $\tau' = (L, R, \ell')$ be the triple returned by the call $\textsc{MaximallyExtendToEnd}(\tau, LCP)$ at Line~3. Then, we observe that $\ell'$ is the length of the longest common prefix of all suffixes in the SA-range $[L, R]$. This implies that the triple $\tau'$ represents the right-extension $U = \rext{W}$ of $W$. 
+%%% 
+Next, we let $\pi = (L\rev,R\rev,\ell')$ be the triple computed by the call $\textsc{MoveToOpposite}((L, R, \ell'), SA, ISA\rev, LCP\rev)$  at Line~4. This gives that $\pi$ is the rich-representation of $\rext{W}$ in the form of the $SA\rev$-range in the reverse direction using the unidirectional index $\sig I(T\rev)$. 
+%%% 
+By symmetry, the successive applications of Line~5 and Line~6 to $\pi$ yield the left-extension of $V = \rext W$, namely, the maximal extension $\mext{W} = \lext{V}$ of $W$. Hence, the lemma is proved. 
+\end{proof}
+
+By Lemmas~\ref{lemma:characterization:child}, \ref{lem:oper:movetoopposite}, and \ref{lem:oper:extendboth}, and the above discussions, we have the following theorem. 
+% Let $\sig I(T) = (BWT_T, SA_T, ISA_T, LCP_T)$ be the unidirectional index consisting of the BWT on the top of the Wavelet tree, the suffix, the inverse suffix, and the longest common prefix arrays for a text $T$. Our bidirectional index is a pair $\sig B(T, T\rev) := (\sig I(T), \sig I(T\rev))$ of the unidirectional indices for the text $T$ and its  reversed text $T\rev$. 
+%We denote by $A_{T}$
+
+\begin{theorem}
+Let $T[1..n]$ be any text of length $n$ over alphabet $\Sigma$ of size $\sigma\ge 2$, and $\sig B(T, T\rev) := (\sig I(T), \sig I(T\rev))$ be the bidirectional indices for $T$ that occupies $O(n\log n)$ bits of space and requires $O(n)$ preprocessing time, where $\sig I(T) = (BWT, SA, ISA, LCP)$ is the tuple of the associated uni-directional text index arrays.
+Based on $\sig B(T, T\rev)$, Algorithm~\ref{algo:MaxRepeats} then enumerates  
+the triple representations of all of $\mu$ distinct maximal repeats in a text $T$ in  $O(e_L\log n)$ time and $O(\sigma\log^2 n)$ bits of working space, where $e_L \;(\mu \le e_L = O(n))$ is the number of  the left-extensions of maximal repeats. 
+\end{theorem}
+
+\begin{proof}
+The correctness and the time complexity immediately follow from Lemmas~\ref{lemma:characterization:child}, \ref{lem:oper:movetoopposite}, and \ref{lem:oper:extendboth}, and the construction of Algorithm~\ref{algo:MaxRepeats}. 
+%%%
+For the space complexity, if we implement the recursive procedure \textsc{MaxRepeats} by the standard DFS procedure with a stack $S$ of triples $(L, R, \ell)$, the stack can contain $O(e_L)$ triples in the worst case since the algorithm may search $O(\mu)$ maximal repeats examining $O(e_L)$ Weiner links. Thus, we reduce the space complexity using the \textit{heavy leaf decomposition technique} by Belazzougui, Cunial, K{\"{a}}rkk{\"{a}}inen, and M{\"{a}}kinen~\cite{belazzougui2020linear} as follows (see also Bille and Gortz~\cite{bille:gort:TALG:2011:treeinclusion}). At each iteration with a parent triple $\tau$ with $1\le k\ge \sigma$ children $\tau_1, \dots, \tau_k$, we first push the widest triple $\tau_i = (L_i, R_i, \ell_i)$ having the widest range $[L_i,R_i]$ as a \textit{heavy node} to the stack $S$, and then push the remaining children (as light nodes). Since the width of any light child does not exceed the half of that of its parent, any path from the root to a node can contain at most $\log_2 n$ light nodes, and only light nodes can have at most $\sigma$ younger siblings in the stack, the length of the stack $S$ is upperbounded by $(\sigma-1)\log_2 n = O(\sigma\log n)$. Since each triple requires $O(\log n)$ bits, the working space is bounded by $O(\sigma\log^2 n)$ bits.
+\end{proof}
+
+% In the above theorem, we note that the factor $e_L$, instead of $\mu$, comes from possible failures of the test for non-right-branching strings after $e_L$ left-extensions. 
+% Further, we remark that the parameter $e$ satisfies that $\mu \le e = O(n)$, $r \le e$, $z \le e$, and $e \le \mu\sigma$, where $e = e_L + e_R$, and $r$ and $z$ are the number of the equi-letter runs in the BWT and the number of LZ77 phrases for $T$, respectively. 
+% Moreover, $e$ can be polynomial of the text length $n$, while it can be as small as $O(\log n)$ for some family of highly repetitive texts, such as Fibonacci words and Thue-Morse words 
+% (See Radoszewski and Rytter~\cite{radoszewski:rytter2012structure:cdawg:thuemorse} and \cite{frosini2022logarithmic}).
+
+
+%% old result
+% The main result is an algorithm that constructs a bidirectional index in linear time for an input text of length $n$ and enumerates all SA interval representations of $\mu$ maximal repetitive strings using the constructed bidirectional index, each with a delay of $O(\log n)$. This allows all $\mu \le n$ maximal repetitive strings to be output in $O(\mu \log n)$ time and $O(n \log n)$ bits of space using O(n) time for preprocessing.
+
+% \subsection{Research Objectives and Results}
+
+% Thispaper aims to accelerate the BBO algorithm by employing indexing structures for both a text $T = T[1] . . . T[n]$ and its reverse text $T^\idrm{R} = T[n] . . . T[1]$.
+
+% As described in the previous subsection, the BBO algorithm enumerates all maximal repeats represented by branching nodes in Weiner tree $\\mathcal W$ by mimicking the traversal of nodes in $\\mathcal M$'s indexing structure $\mathcal I(T)$. However, the problem lies in the fact that the tree $\mathcal W$ requires $O(\log \sigma)$ time for each of the $O(n)$ non-branching nodes with only one child, which is the source of unnecessary computations.
+
+
