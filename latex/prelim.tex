@@ -18,31 +18,36 @@ For positions $i\le j$ in $S$, we denote by $S[i..j]$ the \textit{factor} (or a 
 %%%% Convention
 Throughout this paper, we assume an \textit{input string} $S = S[1..n]$ of length $n\ge 1$ over an alphabet $\Sigma$ is given to our algorithms. For convention, we assume an extended alphabet $\hat\Sigma = \Sigma\cup\set{\sharp, \daller}$, where $\#, \daller \not \in \Sigma$. Then, we define an \textit{extended string} $\hat S[0..n+1] = \hat S[0]\cdot S[1..n]\cdot \hat S[n+1]$  over $\hat \Sigma$ of length $n+2$, whose index starts from $0$ by prepending and appending special endmarkers $\hat S[0] = \sharp$ and $\hat S[n+1] = \daller$, respectively. 
 %% Under this convention, we formulate classes of patterns in terms of $\hat S$ rather than an input $S$.
+%% 
+A position $p \in 1..|S|$ is an occurrence of a word $w$ in $S$, if $w = S[p..p+|w|-1]$ holds. Then, we say that $w$ \textit{occurs in} a string $S$ at start position $p$ or end position $q = p + |w| - 1$. 
+We denote by $\spos(w)$ and $\epos(w)$ the sets of all start positions and all end positions of $w$ in $S$, respectively. 
+We define the number of occurrences of $w$ by $\occ(w) := |\spos(w)| = |\epos(w)|$. 
 
-%%%%
-\mysubsubsection{Classes of unusual words of a string} 
-We introduce classes of unusual words of a string $S$. A string $w \in \Sigma^*$ is \textit{trivial} if $|w| = 1$, i.e., $w = c$ for some letter $c$ in $\Sigma$, and \textit{non-trivial} otherwise. We remark that clearly, non-tivial string $w$ has length three and has the form $w = aub$ for some letter $a, b \in \hat\Sigma$ and a non-empty string $u \in \Sigma^+$. Throughout, we consider only non-trivial unusual words.
 
-%%%
-%Ilie and Smyth~\cite{ilie2011minimum} initiated the study of
-A \textit{minimal unique substrings} (MUSs) of a string $S$, studied by Ilie and Smyth~\cite{ilie2011minimum}, is a non-trivial string $w$ that has unique occurrence in $S$, and any proper factor has more than one occurrences in $S$. 
-That is, a MUS of $S$ is a string $w = a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
-\begin{enumerate*}[(i)]
-\item $\Occ(w) = 1$; and 
-\item $\Occ(au) \ge 2$ and $\Occ(ub) \ge 2$. 
-\end{enumerate*}
-We denote by $\MAW(S)$ and $\MUS(S)$ the sets of all MAWs and all MUSs of a string $S$, respectively. 
+%% %%%%
+%% \mysubsubsection{Classes of unusual words of a string} 
+%% We introduce classes of unusual words of a string $S$. A string $w \in \Sigma^*$ is \textit{trivial} if $|w| = 1$, i.e., $w = c$ for some letter $c$ in $\Sigma$, and \textit{non-trivial} otherwise. We remark that clearly, non-tivial string $w$ has length three and has the form $w = aub$ for some letter $a, b \in \hat\Sigma$ and a non-empty string $u \in \Sigma^+$. Throughout, we consider only non-trivial unusual words.
 
-%%% 
-The class of \textit{minimal rare words} was introduced by Belazzougui and Cunial~\cite{belazzougui2015space:unusual}, whose abstracted the properties of unusual words with statistical surprise studied by Apostolico, Bock, Lonardi, and Xu~\cite{apostolico2000efficient}. 
-For every $k\ge 0$, a \textit{$k$-minimal rare word} ($k$-MRW) of a string $S$ is a non-trivial string $w$ that occurs in $S$ exactly $k$ times, and any proper factor occurs in $S$ less frequently (see \cite{belazzougui2015space:unusual}). That is, a $k$-MRW of $S$ is a string $w = a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
-\begin{enumerate*}[(i)]
-\item $\Occ(w) = k$; and 
-\item $\Occ(au) \ge k+1$ and $\Occ(ub) \ge k+1$. 
-\end{enumerate*}
-We denote by $\MRW_k(S)$ and $\MRW(S) = \bigcup_{k\ge 0} \MRW_k(S)$ the sets of all $k$-MRWs and all MRWs of a string $S$, respectively. 
+%% %%%
+%% %Ilie and Smyth~\cite{ilie2011minimum} initiated the study of
+%% A \textit{minimal unique substrings} (MUSs) of a string $S$, studied by Ilie and Smyth~\cite{ilie2011minimum}, is a non-trivial string $w$ that has unique occurrence in $S$, and any proper factor has more than one occurrences in $S$. 
+%% That is, a MUS of $S$ is a string $w = a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
+%% \begin{enumerate*}[(i)]
+%% \item $\Occ(w) = 1$; and 
+%% \item $\Occ(au) \ge 2$ and $\Occ(ub) \ge 2$. 
+%% \end{enumerate*}
+%% We denote by $\MAW(S)$ and $\MUS(S)$ the sets of all MAWs and all MUSs of a string $S$, respectively. 
 
-%%%% 
+%% %%% 
+%% The class of \textit{minimal rare words} was introduced by Belazzougui and Cunial~\cite{belazzougui2015space:unusual}, whose abstracted the properties of unusual words with statistical surprise studied by Apostolico, Bock, Lonardi, and Xu~\cite{apostolico2000efficient}. 
+%% For every $k\ge 0$, a \textit{$k$-minimal rare word} ($k$-MRW) of a string $S$ is a non-trivial string $w$ that occurs in $S$ exactly $k$ times, and any proper factor occurs in $S$ less frequently (see \cite{belazzougui2015space:unusual}). That is, a $k$-MRW of $S$ is a string $w = a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
+%% \begin{enumerate*}[(i)]
+%% \item $\Occ(w) = k$; and 
+%% \item $\Occ(au) \ge k+1$ and $\Occ(ub) \ge k+1$. 
+%% \end{enumerate*}
+%% We denote by $\MRW_k(S)$ and $\MRW(S) = \bigcup_{k\ge 0} \MRW_k(S)$ the sets of all $k$-MRWs and all MRWs of a string $S$, respectively. 
+
+%% %%%% 
 
 
 %% \subsection{Texts, substrings, prefixes, and suffixes}
@@ -63,7 +68,7 @@ We denote by $\MRW_k(S)$ and $\MRW(S) = \bigcup_{k\ge 0} \MRW_k(S)$ the sets of 
 %% %% size: n=12
 %% \begin{table}[t]
 %% \caption{
-%%   An example of the rank, suffix, inverse suffix, and Burrows-Wheeler Transformation (BWT), and longest common prefix arrays, and the set of lexicographically ordered suffixes of a text \texttt{abcadabcabc\daller} of length $n=13$, where $\# < \daller < a < b < c < d$ and the index starts from $0$. 
+%%   An example of the rank, suffix, inverse suffix, and Burrows-Wheeler Transformation (BWT), and longest common prefix arrays, and the set of lexicographically ordered suffixes of a string \texttt{abcadabcabc\daller} of length $n=13$, where $\# < \daller < a < b < c < d$ and the index starts from $0$. 
 %% }\label{tbl:arrays}
 %% %% \small 
 %% \ttfamily
@@ -150,8 +155,7 @@ In the \textit{rich representation} on $SA$ array (see, e.g.\cite{kasai:lee2001l
 \item $i..j \subseteq 1..n$ is the SA-interval of $w$, i.e., $SA[i..j] = \Occ(w)$; and  
 \item $\ell$ is the length of $w$, i.e., $\ell = |w|\ge 0$. 
 \end{enumerate*}
-Conversely, the rich representation $\tau = (i, j, \ell)$ can be decoded by $w := S[p..p+\ell-1]$ and $p := SA[k]$ for any rank $\btw kij$. 
-
+Conversely, the rich representation $\tau = (i, j, \ell)$ can be decoded by the function $\getfactor(i..j, \ell) := S[p..SA[k]+\ell-1]$ using $\SA$ and $S$, where $\btw kij$ can be any rank in $i..j$. 
 
 The \textit{longest common prefix array} $LCP[1..n]$ contains in the $k$-th rank the length of the longest common prefix of adjuscent suffixes $\Suf[SA[k-1]]$ and $\Suf[SA[k]]$ for all $k \in [n]$; We define $LCP[1] = 0$. It can be preprocessed in linear time supporting the \textit{range minima query} $RMQ_{LCP}(i, j)$ that, given $i\le j$, returns the minimum of $\set{\LCP[i], \LCP[i+1], \dots, \LCP[j]}$ in constant time and $O(n)$ space (Bender and Colton~\cite{bender:colton2000thelcaproblem}).
 An example is shown in \cref{fig:example:arrays}. 

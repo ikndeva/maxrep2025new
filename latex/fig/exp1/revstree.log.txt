@@ -34,7 +34,7 @@ int main( int argc, char* argv[] ){
   ConvStreeToCDAWG conv;
   CDAWG *C = conv.convert(G); 
 
-  // printing a text 
+  // printing a string 
   std::string textstr = C->get_substring(0, INT_MAX);
   int n = textstr.length(); 
   if (TRACE) printf("text: len:%d\nidx: %s \nstr:'%s'\n",

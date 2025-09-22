@@ -7,7 +7,7 @@ After review, in the next section, we propose our novel algorithm schema \TDSA{}
 
 
 \textit{Overview of the search strategies}. In what follows, the categories \textsf{BU}/\textsf{TD} indicate \textit{bottom-up/top-down traversal}, respectively, while \textsf{SA}/\textsf{BW} indicate and \textit{SA/BWT arrays}. 
-In \cref{fig:fwdstree}, we show the illustration of the search space, the suffix tree for a text $T = \mathtt{\#abcadabcabc\$}$, for algorithm schema in this paper. In the figure, \BUSA{} traverses the black tree of downward arrows (the suffix tree), while  \TDBW{} traverses the red tree (the Winer tree) of upward arrows (suffix links). Our \TDSA{} in \cref{sec:algo} traverses the black tree, but from the root to the leaves top-down, unlike \BUSA{} or \TDBW{}. 
+In \cref{fig:fwdstree}, we show the illustration of the search space, the suffix tree for a string $T = \mathtt{\#abcadabcabc\$}$, for algorithm schema in this paper. In the figure, \BUSA{} traverses the black tree of downward arrows (the suffix tree), while  \TDBW{} traverses the red tree (the Winer tree) of upward arrows (suffix links). Our \TDSA{} in \cref{sec:algo} traverses the black tree, but from the root to the leaves top-down, unlike \BUSA{} or \TDBW{}. 
 
 %% %%%%%%%%
 %% \input{figsearchspace}
@@ -54,7 +54,7 @@ Therefore, in \cref{fig:fwdstree}, \BUSA{} traverse the suffix tree~\cite{gusfie
 }  
 %%%%%%%%%%%%%%%%%
 
-In the procedure \BUSA{}, whenever the triple $\tau = (L, R, \ell)$ is encountered at Line~7, it represents a right-branching substring of a text $S$ because
+In the procedure \BUSA{}, whenever the triple $\tau = (L, R, \ell)$ is encountered at Line~7, it represents a right-branching substring of a string $S$ because
 %it is ensured
 the depth $\ell$ equals the range minima of the subarray $LCP[L..R]$ by induction on the stage~$i\ge 1$. Therefore, if the triple $\tau$ at Line~7 is left-branching, we see that it is both left- and right-branching, and thus, a maximal repeat of $S$. By amortized analysis~\cite{kasai:lee2001lcp:linear}, the procedure executes the code for Lines from 7 to 10 at most $O(n)$ time.
 As shown in the next section, the test for left-branchingity can be done in $O(1)$ time using $SA$ and $ISA$ only.
@@ -86,7 +86,7 @@ Therefore, in \cref{fig:fwdstree}, \TDBW{} traverse the red tree (the Weiner tre
   %% \caption{Top-down MR-enumeration algorithm with BWT}\label{algo:maxrep:tdbw}
   \textbf{Procedure} \TDBW$([L_0..R_0])$:\\
   %%\KwGiven{}
-  %% \KwIn{An SA-range $[L_0..R_0]$ for a text.}
+  %% \KwIn{An SA-range $[L_0..R_0]$ for a string.}
   %% \KwOut{}
   \Begin{
       Compute the set $\set{a_1, \dots, a_k}$ of $k$ mutually distinct characters in the subarray $BWT[L_0..R_0] \in \Sigma^*$ and the subranges $[L_1..R_1], \dots, [L_k..R_k]$\;
@@ -114,7 +114,7 @@ Given the SA-range $[L_0..R_0]$, it first computes the sequence of $k\ge 1$ mutu
 %%% 
 Next, it computes the sequence of SA-ranges $[L_1..R_1], \dots, [L_k..R_k]$ for the substrings $a_1 U, \dots a_k U$, respectively, in $O(\log\sigma)$ time per symbol $a_i$ for all $i \in [k]$, using the LF-mapping supported by the Wavelet tree with $BWT$ in $O(n/\log_\sigma n)$ space, by the method of Ferragina and Manzini~\cite{Ferragina05:FM}.
 
-By construction, we can see that this algorithm follows atomic Weiner links reading their character labels one by one. Since it is shown that the Weiner tree for a text of length $n$ contains $\Theta(n)$ atomic Weiner edges. Hence, we conclude: 
+By construction, we can see that this algorithm follows atomic Weiner links reading their character labels one by one. Since it is shown that the Weiner tree for a string of length $n$ contains $\Theta(n)$ atomic Weiner edges. Hence, we conclude: 
 
 %% \begin{remark}[Beller, Berger, and Ohlebusch~\cite{beller:berger2012space:efficient:bbo}]
 \begin{remark}[Beller \textit{et al.}~\cite{beller:berger2012space:efficient:bbo}]

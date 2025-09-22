@@ -13,8 +13,45 @@
 \newcommand{\MAW}{\idrm{MAW}} 
 \newcommand{\MUS}{\idrm{MUS}} 
 \newcommand{\MRW}{\idrm{MRW}} 
-\newcommand{\MRWK}[1][k]{\mbox{$#1$-\idrm{MRW}}}
+%% \newcommand{\MRWK}[1][k]{\mbox{$#1$-\idrm{MRW}}}
+\newcommand{\MRWS}[1][k]{\idrm{MRW}_{#1}}
+\newcommand{\MRWK}[1][k]{\MRWS[k]}
+%% \newcommand{\MRWS}[2][S]{\idsf{MRW}_{#2}({#1})}
 
+%%% spire2024
+\newcommand{\subword}[1][\SA]{\idtt{subword}_{#1}}
+\newcommand{\brep}[1][]{\mbox{\rm\texttt{bi-rep}}_{#1}}
+%%\newcommand{\Procedure}{\textbf{procedure}\hspace{0.375em}}
+\newcommand{\mr}{\mu}
+\newcommand{\eL}{e}
+\newcommand{\eR}{e\rev}
+%% %% \newcommand{\npos}[1][T]{\idrm{\sharp pos}_{#1}} 
+%% \newcommand{\AW}[1][T]{\idsf{AW}({#1})}
+%% %\newcommand{\WW}[1][k]{\idsf{W}_k(T)}
+%% \newcommand{\MR}[1][T]{\idsf{MR}({#1})}
+%% \newcommand{\MAW}[1][T]{\idsf{MAW}({#1})}
+%% \newcommand{\MUS}[1][T]{\idsf{MUS}({#1})}
+\newcommand{\EBF}[1][T]{\idsf{EBF}({#1})}
+%% \newcommand{\MRW}[1][T]{\idsf{MRW}({#1})}
+%% \newcommand{\MRWS}[2][T]{\idsf{MRW}_{#2}({#1})}
+%% \newcommand{\W}{\idsf{W}}%
+
+%% \newcommand{\MF}[1][k]{\idsf{MF}_{=#1}(T)}
+%% \newcommand{\MFO}[1][k]{{\idsf{MF}}_{\le #1}(T)}
+
+
+%%% end:spire2025
+
+%%% data structures
+\newcommand{\stree}{\idrm{STree}}%exp
+\newcommand{\weiner}{\idrm{Weiner}}%exp
+\newcommand{\CDAWG}{\idrm{CDAWG}}
+%% \newcommand{\S}{\id{S}}
+\newcommand{\SA}{\id{SA}}
+\newcommand{\ISA}{\id{ISA}}
+\newcommand{\BWT}{\id{BWT}}
+\newcommand{\LCP}{\id{LCP}}
+\newcommand{\LCE}[1][T]{\idrm{LCE}_{#1}}
 %%%
 %% \newcommand{\rk}[1]{^{(#1)}} %%alias 
 %% \newcommand{\idx}[3]{_{#1=#2}^{#3}} %%alias
@@ -33,6 +70,17 @@
 
 \newcommand{\LSigma}[1][{\hat S}]{\idrm{L\Sigma}_{#1}}
 \newcommand{\RSigma}[1][{\hat S}]{\idrm{R\Sigma}_{#1}}
+\newcommand{\getfactor}[1][{\SA, S}]{\op{W}_{#1}} 
+%% \newcommand{\getfactor}[1][{\SA, S}]{\op{getFactor}_{#1}} 
+\newcommand{\isLeftBranching}[1][{\SA, \ISA, S}]{\proc{isLeftBranching}_{#1}}\newcommand{\RREP}{\mathcal{RP}}  %% TDSA
+ 
+
+%%% algo
+\newcommand{\MREnum}{\textsf{EnumMR}}  %% TDSA
+\newcommand{\MRRec}{\textsf{RecMR}}  %% TDSA
+\newcommand{\GenChildren}[1][{\LCP, \SA, S}]{\textsf{GenChildren}_{#1}}  
+\newcommand{\ColoredRange}[1][{\BWT,RMQ}]{\textsf{ColoredRange}_{#1}}  
+\newcommand{\append}{\op{append}}
 
 
 %% private macros: cdawg
@@ -54,19 +102,9 @@
 \newcommand{\lstate}[1]{[{#1}]_{\equiv_L}}
 %%%
 \newcommand{\BUSA}{\textsf{BUSA}} 
-\newcommand{\TDSA}{\textsf{MREnum}}  %% TDSA
 %% \newcommand{\TDSA}{\textsf{TDSA}} 
 \newcommand{\TDBW}{\textsf{TDBW}}
 %%%%
-%%% data structures
-\newcommand{\stree}{\id{STree}}%exp
-\newcommand{\weiner}{\id{Weiner}}%exp
-\newcommand{\CDAWG}{\mathit{CDAWG}}
-\newcommand{\SA}{\id{SA}}
-\newcommand{\ISA}{\id{ISA}}
-\newcommand{\BWT}{\id{BWT}}
-\newcommand{\LCP}{\id{LCP}}
-\newcommand{\LCE}[1][T]{\idrm{LCE}_{#1}}
 %%%
 \newcommand{\repr}{\op{repr}}
 \newcommand{\intr}{\op{SA\textrm{-}Int}}
@@ -199,15 +237,25 @@ linesnumbered%
 \renewcommand{\@algocf@capt@plain}{above}% formerly {bottom}
 \makeatother
 %%% algorithm2e
-\newcommand{\Commentblock}[1]{\hfill$\rhd$\ \textit{#1}}
+\newcommand{\comblk}[1]{\hfill$\rhd$\ \textit{#1}}
+\newcommand{\Commentblock}[1]{\comblk{#1}}
 \newcommand{\Commentblockl}[1]{\kern0.5em$\rhd$\ \textit{#1}\ $\lhd$}
-\newcommand{\CM}[1]{\Commentblock{#1}}
+\newcommand{\CM}[1]{\comblk{#1}}
 %% \SetArgSty{textrm}%arguments for e.g., if, else, while etc. 
 %% \SetCommentSty{textit}%arguments for comments
 \SetKwComment{Comment}{$\rhd$}{} 
+\SetKwInput{KwInput}{Input}
+\SetKwInput{KwOutput}{Output}
+\SetKwInput{KwNotes}{Notes}
+%%%
+\SetKwInput{KwPreproc}{Preprocess}
+\SetKwInput{KwRuntime}{Runtime}
 \SetKwInput{KwGiven}{Given}
 \SetKwInput{KwGlobal}{Global}
 \SetKwInput{KwWork}{Working}
+\SetKwInput{KwMethod}{Method}
+\SetKwInput{KwPrecond}{Pre-condition}
+\SetKwInput{KwPostcond}{Post-condition}
 \SetArgSty{textrm}%arguments for e.g., if, else, while etc. 
 \SetCommentSty{textit}%arguments for comments
 \newcommand{\iIf}[2]{\textbf{if} {#1} \textbf{then}\hspace{0.125em}{\relax #2}}

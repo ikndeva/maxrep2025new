@@ -9,6 +9,7 @@
 \usepackage[appendix=append]{apxproof}%default
 \graphicspath{
   {fig/exp1/}
+  {fig/spire2024/}
 }%%画像のパス．末尾は'/'で終わること
 %% \usepackage[appendix=append]{apxproof}%default
 %% \usepackage[appendix=inline]{apxproof}%default
@@ -51,14 +52,14 @@
 
 %======= original title page
 \title{%Contribution Title
-  Output-Sensitive Enumeration of
+  %% Output-Sensitive Enumeration of
+  Faster Enumeration of
   %% Minimal Absent Words
   %% Minimal Unique Substrings,
   %% and 
   Unexpected Words in a String
   %% Based on
-  with 
-  Suffix Arrays
+  with Suffix Arrays
 %% A Simple and Faster Algorithm for Enumerating Maximal Repeats in Strings
 %% with Suffix Arrays
 %A Simple and Faster Enumeration Algorithm for Maximal Repeats with Suffix Arrays
@@ -118,9 +119,9 @@ Department of Informatics, Kyushu University, Japan
 \input{intro}
 \input{prelim}
 %% \input{prev}
-\input{maw}
+\input{mrep}
 \input{algo}
-\input{ext}
+\input{mrw}
 \input{conc}
 
 % ---- Bibliography ----
@@ -129,10 +130,9 @@ Department of Informatics, Kyushu University, Japan
 \bibliography{bib/ref}
 %% \bibliography{ref,subref}
 
-\appendix
-\clearpage
-\input{mrw}
-%% \input{review1}
+%% \appendix
+%% \clearpage
+%% \input{mrw}
 
 \end{document}
 

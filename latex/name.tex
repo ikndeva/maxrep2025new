@@ -1,8 +1,8 @@
 \begin{abstract}\parindent=1pc
 %%%%
-This paper presents a new algorithm for enumerating maximal repeats in a text using the suffix array and its auxiliary data structures. 
+This paper presents a new algorithm for enumerating maximal repeats in a string using the suffix array and its auxiliary data structures. 
 It is well known that the complete set of maximal repeats can be compactly represented in a graph-based data structure, called the CDAWG, proposed by Blumer \textit{et al}, with $e_R$ forward edges and $e_L$ reverse edges, where the parameter $e_R$ and $e_L$ are much smaller than $n$ for highly repetitive texts. 
-Unlike previous array-based algorithms that require $O(n)$ time for a text of length $n$, our algorithm enumerates all maximal repeats in $O(e_R)$ time, which is proportional to the size $e_R$ of the CDAWG, using the suffix, inverse suffix, and longest common prefix arrays with some auxiliary data structures. By combining novel characterizations of maximal repeats with top-down traversal of the suffix tree using the suffix arrays, we efficiently identify and skip non-maximal repeats during traversal. 
+Unlike previous array-based algorithms that require $O(n)$ time for a string of length $n$, our algorithm enumerates all maximal repeats in $O(e_R)$ time, which is proportional to the size $e_R$ of the CDAWG, using the suffix, inverse suffix, and longest common prefix arrays with some auxiliary data structures. By combining novel characterizations of maximal repeats with top-down traversal of the suffix tree using the suffix arrays, we efficiently identify and skip non-maximal repeats during traversal. 
 An advantage of our algorithm is its simplicy, and extensivility since it uses the indexing arrays as black box. Using this, we also show the different time-space bounds when implementd on compressed data structures. 
 This approach provides a simpler and faster alternative to existing methods, making it suitable for various sequence analysis tasks.
 %% %%%% 
