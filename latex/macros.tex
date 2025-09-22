@@ -3,26 +3,48 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% reference with [] in environment 
 \def\refbox(#1){$\mbox{\bf ({#1}) }$}
-\newcommand{\mysubsubsection}[1]{\textbf{#1}.\hspace{0.125em}}%% camera
+\newcommand{\mysubsubsection}[2][{.\hspace{0.125em}}]{\textbf{#2}#1}%%
+%\newcommand{\inlmysubsubsection}[1]{\textbf{#1}}%% camera
 %% \newcommand{\mysubsection}[1]{\subsection*{#1}}
+
+%% notation
+%%%
+\newcommand{\MR}{\idrm{MR}} 
+\newcommand{\MAW}{\idrm{MAW}} 
+\newcommand{\MUS}{\idrm{MUS}} 
+\newcommand{\MRW}{\idrm{MRW}} 
+\newcommand{\MRWK}[1][k]{\mbox{$#1$-\idrm{MRW}}}
+
+%%%
+%% \newcommand{\rk}[1]{^{(#1)}} %%alias 
+%% \newcommand{\idx}[3]{_{#1=#2}^{#3}} %%alias
+\newcommand{\btw}[3]{{#2}\le {#1}\le {#3}} %%alias
+\newcommand{\Fac}{\idrm{Fac}}
+\newcommand{\Pref}{\idrm{Pref}}
+\newcommand{\prefix}{\Pref}
+\newcommand{\Suf}{\idrm{Suf}}
+%%%
+\newcommand{\Spos}[1][{\hat S}]{\id{Spos}_{#1}}
+\newcommand{\Epos}[1][{\hat S}]{\id{Epos}_{#1}}
+\newcommand{\Occ}[1][{\hat S}]{\id{Occ}_{#1}}
+\newcommand{\spos}[1][S]{\Spos[#1]}
+\newcommand{\epos}[1][S]{\Epos[#1]}
+\newcommand{\occ}[1][S]{\Occ[#1]}
+
+\newcommand{\LSigma}[1][{\hat S}]{\idrm{L\Sigma}_{#1}}
+\newcommand{\RSigma}[1][{\hat S}]{\idrm{R\Sigma}_{#1}}
+
 
 %% private macros: cdawg
 %% class names
-\newcommand{\suffix}{\id{Suffix}}
-\newcommand{\substr}{\id{Substr}}
-\newcommand{\prefix}{\id{Prefix}}
-\newcommand{\Suf}{\suffix}
+%% \newcommand{\substr}{\id{Substr}}
+%% \newcommand{\Suf}{\suffix}
 \newcommand{\Substr}{\substr}
-\newcommand{\Pref}{\prefix}
 %%% 
 \newcommand{\lext}[1]{\overleftarrow{#1}} 
 \newcommand{\rext}[1]{\overrightarrow{#1}} 
 \newcommand{\mext}[1]{\overleftrightarrow{#1}}
 \newcommand{\str}{\op{str}}
-%%%
-\newcommand{\spos}[1][S]{\op{Spos}_{#1}}
-\newcommand{\epos}[1][S]{\op{Epos}_{#1}}
-\newcommand{\occ}[1][]{\op{Occ}_{#1}}
 %% maximal 
 \newcommand{\RM}{\sig{RM}}
 \newcommand{\LM}{\sig{LM}}
@@ -32,13 +54,9 @@
 \newcommand{\lstate}[1]{[{#1}]_{\equiv_L}}
 %%%
 \newcommand{\BUSA}{\textsf{BUSA}} 
-\newcommand{\TDSA}{\textsf{TDSA}} 
+\newcommand{\TDSA}{\textsf{MREnum}}  %% TDSA
+%% \newcommand{\TDSA}{\textsf{TDSA}} 
 \newcommand{\TDBW}{\textsf{TDBW}}
-%%%
-\newcommand{\MAW}{\idit{MAW}} 
-\newcommand{\MUS}{\idit{MUS}} 
-\newcommand{\MRW}{\idit{MRW}} 
-\newcommand{\MRWK}[1][k]{\mbox{$#1$-\idit{MRW}}}
 %%%%
 %%% data structures
 \newcommand{\stree}{\id{STree}}%exp

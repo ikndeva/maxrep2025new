@@ -1,10 +1,14 @@
 %%% abst.tex
 \begin{abstract}
-In this paper, we study the problem of enumerating all distinct maximal repeats in a given string using the suffix array (SA), focusing on a combinatorial parameter $e_R$ for measuring repetitiveness of strings, closely related to maximal repeats.  We start with a brief review of the previous approaches to observe that all the previous algorithms required linear time for the task regardless of the number $\mu$ of distinct maximal repeats.
-
-As a main result, we present a simple and faster algorithm that can enumerate all maximal repeats of a string $S$ in $O(e_R)$ time and $O(\sigma^2 \log n)$ working space using $O(n)$ space, where $e_R$ denotes the number of right extensions of maximal repeats satisfying $\mu\le e_R\le n$, which can be significantly smaller than the string length for highly repetitive strings. Our algorithm uses the SA with as auxiliary data structures, namely, the inverse SA, the input string $S$, and the range-minima query (RMQ) structure on the longest common prefix (LCP) array. 
-%%, which can be easily computed from the SA. 
-
-Moreover, we show that all maximal repeats can be enumerated in $O(e_R$ $\;\textrm{polylog}(n))$ time and space simultaneously using existing compressed text indexes. The key to the time complexity sensitive to $e_R$ is a simple and modular algorithm with a novel search strategy, which has not been used before for this problem. 
-Overall, this work presents a siginificant improvement in the field of sequence analysis offering the first sublinear, repetitiveness-aware algorithms for enumerating maximal repeats for highly repetitive strings.
+  A \textit{minimal absent word} (MAW) of a string $S$ is a prominent example of unusual words, which is defined as a string $w$ that does not occur in $S$ and any proper substring of $w$ occurs in $S$ as a substring.
+  The current fastest algorithms for finding MAWs uses as a substrait array-based structures, such as the suffix array or the Burrows-Wheeler transform of $S$ combined with small auxiliary data structures, rather than space inefficient data structures such as the suffix tree.
+  However, these algorithms are not \textit{output-sensitive} since they always grow linearly in the length $n$ of innput $S$ even when the number of solutions is sublinear in $n$.
+  %% However, total amount of their running time grows linearly in the length $n$ of $S$ even when the number $occ$ of unusual words is much smaller than $n$. In other words, their time complexity is not \textit{output-sensitive}.
+  In this paper, we present a new algorithm that, based on the suffix array, the inverse suffix arrays, longest common prefix array, and an input text, computes the set $MAW(S)$ of all minimal absent words in a string $S$ in $O(e_R + occ)$ time, where $occ$ denotes the number $|MAW(S)|$ of solusions, and  $e_R$ denotes the number of right-extensions of maximal repeats in $S$. For any string $S$ of length $n$, $e_R$ is linear in $n$, and can be sublinear in $n$, up to logarithmic.
+  We also show that modified algorithms computes other classes of unusual words, namely, \textit{minimal unique substrings} (MUSs) and their generalization, called \textit{mininimal rare words} (MRWs), in similar time complexities. 
 \end{abstract}
+
+
+  %% %% In this paper, we study efficient enumeration of non-trivial MAWs and other classes of unusual words, such as the \textit{minimal unique substrings} (MUSs) and the \textit{minimal rare words} (MRWs) in a string.
+  %%In addition, we consider the classes of \textit{minimal unique substrings} (MUSs) and \textit{minimal rare words} (MRWs) in a string.
+  %% For any integer $k\ge 0$, as most general form of unusual word, a \textit{minimal rare word} (MRW) of $S$ with frequency $k$ is any string $w$ that occurs in $S$ exactly $k$ times, and any proper substring of $w$ has strictly less occurrences in $S$. An unusual word is said to be non-trivial if it has length at least two.
