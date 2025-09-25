@@ -315,6 +315,11 @@ Let $\mext{\eps}$ be the shortest maximal repeat of $S$. We note that such $\mex
 %%%% 
 Based on \cref{lem:posmrw:characterization}, we will modify the basic algoritm shown in Algorithms~\ref{fig:example:mrep:main} and~\ref{fig:example:mrep:sub} that enumerates the set $\MRW_+(S)$ of all positive MRWs of $S$. In Algorithm~\ref{fig:example:mrw:subcode}, we show a fragment of codes that we substitute for the for-loop from \ref{line:recmr:for:begin} to \ref{line:recmr:for:end} of the recursive subprocedure $\MRRec$ in Algorithm~\ref{fig:example:mrep:sub}.
 
+As a key to analysis of complexity of the algorithm, we observe that each forward $b$-edge, say $g$, traversed by the algorithm from $u$ through $ub$ satisfies the condition that $|\LSigma[S](ub)| \ge 2$ implying that this corresponds to a primary edge in $\CDAWG(S)$ to another node. Whereas, each backward $a$-edge, say $f$, traversed from $ub$ to $aub$ corresponds to a Weiner link, either soft or hard, in $\CDAWG(S)$. This further means that $u$ also have a Weiner link to $au$. Thus, we can charge the related cost to the nearest real (branching) descendant of $ub$ that has an outgoing Weiner link.
+%%Moreover, if it satisfies that $|\RSigma[S](au)| \ge 2$, it is a hard Weiner link. 
+By this observation, we charge the cost of computations by the algorithm to all of $e_R$ primary edges and all Weiner links outgoing from a real node, i.e., representing a maximal repreat, in the CDAWG of $S$. 
+
+
   Combining \cref{lem:posmrw:characterization} and  \cref{lem:posmrw:parent}, we can show the correctness and computational complexity of the modified algorithm as follows. 
 
 \begin{theorem}[Output-sensitive enumeration of $\MRW_+(S)$]\label{thm:algo:mrw}
@@ -330,17 +335,19 @@ we can show that any MRW $w$ can be obtained as $w = aub$ from an maximal repeat
 
 For the time complexity of the modified algorithm, we note that the procedure $\MRRec$ vertually traverses forward edges of $\CDAWG(S)$ in Line~3.
 Note that the number of forward edges is upper-bounded by $e_R$.
-On the other hand, the algorithm traverse backward edges in Line~6. At the first sight, the total number of backward edges examined becomes $e_R\times e_L$; 
+On the other hand, the algorithm traverse backward edges in Line~6. At the first sight, the total number of backward edges examined becomes $e_R\times e_L$. However, we obtain from \cref{lem:posmrw:characterization} the following observation on amortized cost of the algorithm: 
 \begin{itemize}
-\item However, we follow the forward $b$-edge, say $g$, from $u$ through $ub$ only when $|\LSigma[S](ub)| \ge 2$; This implies that the edge $g$ is parimary, where $u$ is a branching node in $\CDAWG(S)$.
+\item At Lines 3--4, the algorithm follows the forward $b$-edge, say $g$, from $u$ through $ub$, where $u$ is an MR that corresponds to a real node $u$ in $\CDAWG$. We then observe that the locus $ub$ can be visited only via the MR node $u$. Thus, we can associate this forward $b$-edge uniquely to $u$. From the correctness of the recursive subprocedure $\MRRec$ in Algorithm~\ref{fig:example:mrep:sub}, we see that each MR $u$ is visited only once during the computation. Since $ub$ is a right-extension of an MR $u$, and $e_R$ is the number of such right-extensions of MRs by definition, the number of times of traversing such $b$-edges is upperbounded by $e_R$ during a run of the algorithm. Thus, we charge the cost of Line~4 to the edge $g$ outgoing from an MR $u$ through the child $ub$. 
   
-\item In addition, we follow the backward $a$-edge, say $f$, only when $|\RSigma[S](au)| \ge 2$; This imples that the link from $u$ to $au$ corresponds a hard Weiner link, and thus, the correspondence from $au$ to $u$ is unique (by just deleting the leading $a$ from $au$). 
+\item Similarly, we follow the backward $a$-edge, say $f$, from $ub$ to $aub$; This imples that the corresponding link from $ub$ to $aub$ a soft or hard Weiner link. Since if a node has a $a$-Weiner link, then all of its ancestor have $a$-Weiner links, too. Thus, this corresponds to the unique $a$-Weiner link outgoing from a real node $u$ in $\CDAWG(S)$, and also to a left-extension of the MR $u$. Since $e_L$ is the number of all left-extensions of maximal repeats, this quantities sum to $e_L$.
+  This means that during a run of the algorithm, each of $e_L$ hard Weiner link to $au$ is traversed exactly once from as its source an MR $u$, represented by the triple $\pair{i..j, \ell}$. Thus, we charge the cost of Lines~7--10 to the hard Weiner link of an MR $u$ associated to the destination $au$. 
 \end{itemize}
 
-Hence, if we separately estimate, the number $N_R$ of all of such forward $b$-edges and the number $N_L$ all of such backward $a$-edges is upperbounded by $e_L$, then we obtain $N_R$ is upperbounded by $e_R$ and $N_L$ is upperbounded by $e_L$. Hence, the total number of times to traverse edges is $O(e_R + e_L)$.
-For each forward $b$-edge, the ColoredRange query at Line~4 takes $O(|L_b| \log\sigma)$ time per interval $i_b..j_b$ on $\BWT$ with the Wavelet Tree. This sum to $O(e_L \log\sigma)$ over all of $e_L$ edges by above discussion. 
-For each backward $a$-edge, computation of the LF-mapping at Lines~7 and 9 take $O(\log\sigma)$ time per intervals $i_a..j_a$ and $i_{ab}..j_{ab}$ on $\BWT$ with the Wavelet Tree. The RMQ on LCP takes $O(1)$ time.
-This sum to $O(e_L \log\sigma)$ over all of $e_L$ edges by above discussion again. Combining the above discussion, the time complexity is derived. 
+From a basic property of $\CDAWG(S)$ (see Raffinot~\cite{raffinot2001maximal}), the numbers of all forward $b$-edges and all backward $a$-edges are upperbounded by $e_R$ and $e_L$, respectively. We estimate the charged cost per such edge of $\CDAWG(S)$. 
+To each forward $b$-edge, the ColoredRange query at Line~4 charge the cost of $O(|L_b| \log\sigma)$ time per interval $i_b..j_b$ on $\BWT$ with the Wavelet Tree.
+%% This sum to $O(e_L \log\sigma)$ over all of $e_L$ edges by above discussion. 
+To each backward $a$-edge, computation of the LF-mapping at Lines~7 and 9 charges the cost of $O(\log\sigma)$ time per intervals $i_a..j_a$ and $i_{ab}..j_{ab}$ on $\BWT$ with the Wavelet Tree and the RMQ on LCP at Line~8 charges $O(1)$ time.
+Overall, these costs sum to $O((e_R + e_L) \log\sigma)$ over all of $e_R$ and $e_L$ edges discussed above. Combining the above discussion, the time complexity is derived. 
 \qed 
 \end{proof}
 
