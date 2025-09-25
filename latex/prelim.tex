@@ -3,13 +3,13 @@
 \label{sec:prelim}
 %%%%
 
-\mysubsubsection{Basics}
+\subsection{Basics}
 We begin with basic definitions and notation following~\cite{charalampopoulos2018extended,barton2014linear,ilie2011minimum,belazzougui2015space:unusual}.
 For any integers $i\le j$, we denote by $i..j$ or $[i..j]$ the \textit{discrete interval} $\set{i, i+1, \dots, j}$. For a set $A$, we denote by $|A|$ the \textit{cardinality} of $A$, by $A^*$ and $A^+$ the \textit{sets of all finite sequences} of length $\ge 0$ and length $\ge 1$ over $A$, respectively.
 We assume the \textit{unit-cost RAM model} with machine word size $w = \floor{\log n}$ equipped with the standard Boolean and arithmetic operations over integers, where $n$ is an input size~\cite{cormen2009introduction}.
 
 %%%% Strings
-\mysubsubsection{Strings and factors}
+\subsection{Strings and factors}
 Let $S = S[1]\dots S[n] \in \Sigma^n$ be a \textit{string} (or a \textit{word}) \textit{of length} $n = |S|$ over a finite \textit{alphabet} $\Sigma$ of size $\sigma$. In particular, we consider the case of an \textit{integer alphabet} $\Sigma = \set{0,1,\dots, \sigma - 1} \subseteq \set{1, \dots, n}$. We define $\Sigma(S)$ to be the alphabet of $S$. 
 We often write $S[1..|S|]$ for $S$ to emphasize the indexing of $S$, meaning $S: 1..|S| \to \Sigma$. 
 For two strings $x[1..m]$ and $y[1..n]$, we denote the \textit{concatenation} of $x$ and $y$ by $(x\cdot y)[1..m+n] = x[1]\dots x[m]\cdot y[1]\dots y[n]$.
@@ -23,6 +23,14 @@ A position $p \in 1..|S|$ is an occurrence of a word $w$ in $S$, if $w = S[p..p+
 We denote by $\spos(w)$ and $\epos(w)$ the sets of all start positions and all end positions of $w$ in $S$, respectively. 
 We define the number of occurrences of $w$ by $\occ(w) := |\spos(w)| = |\epos(w)|$. 
 
+\subsection{unusual words}
+\label{sec:unusual}
+%% 
+We introduce classes of unusual words of a string $S$.
+A string $w \in \Sigma^*$ is \textit{trivial} if $|w| = 1$, i.e., $w = c$ for some letter $c$ in $\Sigma$, and \textit{non-trivial} otherwise.
+We can easily see that any non-tivial string $w$ has length two and has the form $w = aub$ for some letter $a, b \in \hat\Sigma$ and a possibly string $u \in \Sigma^*$. Throughout, we assume $|\Sigma(S)|\ge 2$ and consider only non-trivial unusual words.
+Let $S = S[1..n] \in \Sigma^n$ be a string over alphabet $\Sigma$.
+For convention, we assume virtual extended string $\hat S[0..n+1] = \# S\daller \in \hat\Sigma^{n+2}$ obtained from $S$ by prepending and appending endmarkers, where $S[0] = \#$ and $S[n+1] = \daller$.
 
 %% %%%%
 %% \mysubsubsection{Classes of unusual words of a string} 
@@ -138,7 +146,7 @@ the associated SA-interval $i..j$, respectively.
 \end{figure}
 %%%%%%
 
-\mysubsubsection{Text indexing arrays}
+\subsection{Text indexing arrays}
 %%\label{sec:prelim:ds:array}
 Let $S[1..n-1]$ be a string of length $n-1$ and $\hat S[1..n] = S\cdot \daller$ be its extended string with endmarker $\daller \not\in \Sigma$. For any position , we denote by $\Suf[p] = S[p..n]$ the suffix of $S$ starting at position $\btw i1n$. 
 We introduce a set of arrays for indexing a string as follows (see~\cite{navarro2016cds:book} for details).

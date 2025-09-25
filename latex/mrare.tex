@@ -1,0 +1,473 @@
+%%% mrw.tex
+%%% from spire2024 sub
+
+\section{A Modified Algorithm for Minimal Rare Words}
+\label{sec:mrw}
+
+%%%%%%%%%%%%%%
+%\paragraph{Algorithms for MRW}
+In this section, we present a modified algorithm for computing $\MRWK[k]$ with any $k\ge 1$.
+
+\subsection{Definition}
+%%%% 
+The class of \textit{minimal rare words} was introduced by Belazzougui and Cunial~\cite{belazzougui2015space:unusual}, whose abstracted the properties of unusual words with statistical surprise studied by Apostolico, Bock, Lonardi, and Xu~\cite{apostolico2000efficient}.
+
+\begin{definition}[minimal rare word]\rm 
+  For every integer $k\ge 0$,
+  a \textit{$k$-minimal rare word with frequency $k$}, or simply 
+  a \textit{$k$-minimal rare word} ($k$-MRW), of a string $S$ is a non-trivial string $w$ that occurs in $S$ exactly $k$ times, and any proper factor occurs in $S$ less frequently (see \cite{belazzougui2015space:unusual}). That is, a $k$-MRW of $S$ is a string $w = a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
+\begin{enumerate*}[(i)]
+\item $\Occ(aub) = k$; and 
+\item $\Occ(au) > k$ and $\Occ(ub) > k$. 
+\end{enumerate*}
+\end{definition}
+
+A $k$-minimal rare word with frequency $k\ge 1$ is called a \textit{positive minimal rare word} (positive MRW) if $k \ge 1$ and a \textit{minimal rare word} (MRW) if $k\ge 0$. 
+In what follows, we denote by
+$\MRW_k(S)$, 
+$\MRW_{+}(S) = \bigcup_{k\ge 1} \MRW_k(S)$, and 
+$\MRW(S) = \bigcup_{k\ge 0} \MRW_k(S)$
+the sets of
+all $k$-MRWs,
+all positive MRWs, and
+all MRWs
+of a string $S$, respectively.
+
+%% We denote by
+%% $\MRW_k(S)$ 
+%% and $\MRW(S) = \bigcup_{k\ge 0} \MRW_k(S)$ the sets of all $k$-MRWs and all MRWs of a string $S$, respectively.
+
+%% %%% def
+%% Ilie and Smyth~\cite{ilie2011minimum} initiated the study of \textit{minimal unique substrings} (MUSs) of a string $S$, studied by Ilie and Smyth~\cite{ilie2011minimum}, is a non-trivial string $w$ that has unique occurrence in $S$, and any proper factor has more than one occurrences in $S$.
+%% That is, a MUS of $S$ is a string $w = a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
+%% \begin{enumerate*}[(i)]
+%% \item $\Occ(w) = 1$; and 
+%% \item $\Occ(au) \ge 2$ and $\Occ(ub) \ge 2$. 
+%% \end{enumerate*}
+
+%% Garcia, Pinho, Rodrigues, Bastos, and Ferreira~\cite{garcia2011minimal} studied enumeration of minimal absent words in a string $S$.
+%% A \textit{minimal absent words} (MAWs) is a non-trivial string $w$ that does not occur in $S$, and any proper factor of $w$ occurs in $S$ as a substring (see \cite{garcia2011minimal}).
+%% Precisely, a MAW of $S$ is a string $a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
+%% \begin{enumerate*}[(i)]
+%% \item $w \not\in \Fac(\hat S)$; and 
+%% \item $au, ub \in \Fac(\hat S)$. 
+%% \end{enumerate*}
+
+%%% def
+Below, we introduce classes of patterns in a string $S$, which are closely related to MRWs. 
+%%
+Garcia, Pinho, Rodrigues, Bastos, and Ferreira~\cite{garcia2011minimal} studied enumeration of \textit{minimal absent words} (MAWs) in a string $S$, which is a non-trivial string $w$ that does not occur in $S$, and any proper factor of $w$ occurs in $S$ as a substring (see \cite{garcia2011minimal}).
+%% Precisely, a MAW of $S$ is a string $a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
+%% \begin{enumerate*}[(i)]
+%% \item $w \not\in \Fac(\hat S)$; and 
+%% \item $au, ub \in \Fac(\hat S)$. 
+%% \end{enumerate*}
+%% 
+Ilie and Smyth~\cite{ilie2011minimum} initiated the study of \textit{minimal unique substrings} (MUSs) of a string $S$, studied by Ilie and Smyth~\cite{ilie2011minimum}, which is a non-trivial string $w$ that has unique occurrence in $S$, and any proper factor has more than one occurrences in $S$.
+%% That is, a MUS of $S$ is a string $w = a u b$ with $a, b\in \hat\Sigma$ and $u \in \Sigma^+$ such that
+%% \begin{enumerate*}[(i)]
+%% \item $\Occ(w) = 1$; and 
+%% \item $\Occ(au) \ge 2$ and $\Occ(ub) \ge 2$. 
+%% \end{enumerate*}
+%% 
+%%%
+These classes of patterns are formally defined as follows. 
+
+\begin{definition}
+  We define the following class of patterns.
+  Let $w$ be any string $w = a u b$ with some characters $a, b\in \hat\Sigma$ and non-empty word $u \in \Sigma^+$. 
+  \begin{itemize}
+  %%
+  \item A string $w = a u b$ is a minimal absent word (MAW) of $S$ is a string $a u b$ if 
+  \begin{enumerate*}[(i)]
+  \item $w \not\in \Fac(\hat S)$; and
+  \item $au, ub \in \Fac(\hat S)$.
+  \end{enumerate*}
+
+  %% 
+  \item A string $w = a u b$ is a minimal unique word (MUS) of $S$ if 
+    \begin{enumerate*}[(i)]
+    \item $w \in \Fac(\hat S)$; and
+    \item $\Occ(au) \ge 2$ and $\Occ(ub) \ge 2$.
+    \end{enumerate*}
+
+  %% 
+  \item A string $w = a u b$ is an extended bispecial factor (EBF) of $S$ is a string $w = a u b$ if 
+    \begin{enumerate*}[(i)]
+    \item $w \in \Fac(\hat S)$; and
+    \item $cu, ud \in \Fac(\hat S)$
+      for some characters $c, d \in \hat\Sigma$. 
+    \end{enumerate*}
+
+\end{itemize}
+\end{definition}
+
+We denote by $\MAW(S)$, $\MUS(S)$, and $\EBF(S)$ the sets of all MAWs, all MUSs, and all EBFs of a string $S$, respectively.
+The following fact follows immediate from the definitions of MUSs and MAWs.
+
+\begin{lemma}[Belazzougui and Cunial~\cite{belazzougui2015space:unusual}, Inenaga et al.~\cite{inenaga2024computing}]
+  For any string $S$,
+  $\MAW(S) = \MRW_0(S)$ and 
+  $\MUS(S) = \MRW_1(S)$. 
+\end{lemma}
+
+\begin{example}
+  Consider the string $S = \texttt{aabaababb}$ over alphabet $\Sigma = \set{a, b}$.
+\begin{itemize}
+\item $S$ contains five maximal repeats $\tt \eps, a, aaba, ab$, and $\tt b$.
+\item The string $\tt bba$ is an example of a MAW of $S$ since we can see that
+$aub = \op{bba} \not\in \Fac(S)$, 
+$au = \op{bb} \in \Fac(S)$, and 
+  $ub = \op{ba} \in \Fac(S)$ hold
+  for $a = \op{b}, u = \op{b}$, and $b = \op{a}$. 
+  
+\item The string $\tt bab$ is an example of a MUS of $S$
+  since
+  %% if we put $a = \op{b}, u = \op{a}, b = \op{b}$,
+  we can see that 
+$\Occ[S](aub)= \Occ[S](\op{bab})= 1$, 
+$\Occ[S](au) = \Occ[S](\op{ba}) = 2 > 1$, and 
+  $\Occ[S](ub) = \Occ[S](\op{ab}) = 3 > 1$ hold
+  for $a = \op{b}, u = \op{a}$, and $b = \op{b}$. 
+
+\item The string $\tt aaba$ is an example of an EBF of $S$
+  since we can see that 
+$aub = \op{aaba} \in \Fac(S)$, 
+$cu = \op{bab} \in \Fac(S)$ for $c = \op{b}$, and 
+  $ud = \op{abb} \in \Fac(S)$ for $d = \op{b}$ hold
+  for $a = \op{b}, u = \op{ab}$, and $b = \op{a}$. 
+  Furthermore, we observe that the frequencies of $aub, au$, and $ub$ satisfy 
+  $\Occ[S](aub) = \Occ[S](\op{aaba}) = 1$
+  $\Occ[S](au) = \Occ[S](\op{aab}) = 2$, and  
+  $\Occ[S](ub) = \Occ[S](\op{aba}) = 2$, respectively.
+  Thus, $\tt aaba$ is also a $1$-MRW (i.e., a MUS) of $S$. 
+\end{itemize}
+\end{example}
+
+From the last example for EBF, one might wonder if any EBF of $S$ is always a positive MRW of $S$. However, it is not true in general.
+Actually, we observe that $\EBF(S) \not\subseteq \MRW_{+}(S)$ for some $S$ by the following counter example. Consider the string 
+  $S = \tt p\, aaba\, q\, aaba\, r\, cabd\, s$
+  over $\Sigma = {\tt a, b, c, d, p, q, r, s}$ and a factor $w = aub = \tt a ab a$ with $a = \op a, u = \op{ab}, b = \op a$.
+  Then, $aub$ is an EBF since $\op{aaba} \in \Fac(S)$ and
+  $\op{aab, aba, cab, abd} \in \Fac(S)$ with $c = \tt c$ and $d = \tt d$. On the other hand, we see that
+  $\Occ[S](\op{aaba}) = \Occ[S](\op{aab}) = \Occ[S](\op{aba}) = 2$.
+  Since the frequency of $\op{aaba}$ equals to $\tt aab, aba$, $\op{aaba}$ is not an MRW of $S$.
+
+  On the other hand, we can show that $\MRW_{+}(S) \subseteq \EBF(S)$ as follows. Let $aub$ be any member of $\MRW_k(S)$ with some $k\ge 1$.
+  It follows from \cref{lem:posmrw:characterization} that (ii) $|\LSigma[](ub)| \ge 2$. Therefore, we have some character $c \in \Sigma$ with $a \not= c$ such that $c \in \LSigma[](ub)$. This implies that $cub \in \Fac(S)$, and thus, $cu \in \Fac(S)$. By symmetry, it follows from \cref{lem:posmrw:characterization}, (iii) $|\RSigma[](au)| \ge 2$. By similar arguments as above, we have $ud \in \Fac(S)$. Combining above arguments, we have $aub, cu, ud \in \Fac(S)$, and thus, $aub$ is an EBF of $S$.
+
+\begin{lemma}[characterization of $\EBF(S)$]
+    \label{lem:characterization:ebf}
+For any $a, b \in \Sigma$ and $u\in\Sigma^*$, 
+\begin{enumerate*}[(1)]
+\item $aub \in \EBF(S)$ if and only if 
+\item $u\in\MR(S)$. 
+\end{enumerate*}
+\end{lemma}
+
+  \begin{proof}
+    Let $aub$ be any string satisfying the above assumption. . 
+    (1) $\Rightarrow$ (2): Suppose that $aub$ is an EBF of $S$. By definition, $aub, cu, ud \in \Fac(S)$ for some $c, d \in \Sigma$ with $c \not= a$ and $d \not= b$.
+    Since $aub\in \Fac(S)$ implies $au, ub\in \Fac(S)$,
+    we have both of $au$ and $cu$ with $a\not=c$ are contained in $S$. Terefore, we have $a, c \in \LSigma[S](u)$, and thus, $u$ is left-branching. By symmetry, we also have $b, d \in \RSigma[S](u)$, and thus, $u$ is right-branching. Combining the above arguments, we conclude that $u$ is a maximal repeat of $S$. 
+%%% 
+    (2) $\Rightarrow$ (1): Suppose that $u \in \MR(S)$. By definition, $u$ is both left- and right-branching factor of $S$, namely,
+    $|\LSigma[S](u)| \ge 2$ and $|\RSigma[S](u)| \ge 2$ hold. By assumption, we see that $a \in \LSigma[S](u)$ and $b \in \RSigma[S](u)$. By selecting any pair of characters $c \in \LSigma[S](u)\setminus\set{a}$ and $d \in \RSigma[S](u)\setminus\set{b}$, we have $au, cu, ub, ud \in \Fac(S)$ with $c \not= a$ and $d \not= b$, and thus, $aub$ is an EBF of~$S$. \qed 
+  \end{proof}
+
+\begin{remark}
+For any string $S$, $\MRW_{+}(S) \subseteq \EBF(S)$. The converse is not true in general. Acturally, $\EBF(S) \not\subseteq \MRW_{+}(S)$ for some string~$S$. 
+\end{remark}
+
+%%%%%%
+\begin{figure}[t]
+\centering  
+\includegraphics[width=0.60\textwidth]{fig3mrwproof.pdf}
+\vspace{.5\baselineskip}
+\caption{
+  An example of the parent of a positive MRW $w = aub$ of a string $S$.
+  The parent is the longest proper prefix $v = w[1..\ell] = a u_i b_i$ of $w$ that is right-branching in $S = S[1..n]$. 
+}\label{fig:mrw:parent}
+\end{figure}
+%%%%%%
+
+\subsection{Characterization}
+%%%% 
+We start with a characterization of $\MRWS[\ge k](S) := \bigcup_{k\ge 1}\MRWK[k]$ in maximal repeats in $\MR$. 
+Suppose that $|S|\ge 2$ and $|\Sigma(S)|\ge 2$
+The next lemma is a slightly modified version of the result shown by Belazzougui and Cunial~\cite{belazzougui2015space:unusual}. For the completeness, we show a sketch of the proof. 
+
+\begin{lemma}[characterization of $\MRW_k(S)$ by Belazzougui and Cunial~\cite{belazzougui2015space:unusual}]\label{lem:posmrw:characterization}
+For any $k\ge 0$, any $a, b \in \Sigma$, and $u\in\Sigma^*$, 
+\begin{enumerate*}[(1)]
+\item $aub \in \MRWK[k]$ if and only if 
+\item $u\in\MR(S)$, $|\RSigma[](au)| \ge 2$, $|\LSigma[](ub)| \ge 2$, and $\Occ[](aub) = k$. 
+\end{enumerate*}
+\end{lemma}
+
+\begin{proof}
+  (1) $\Rightarrow$ (2):  Suppose that $aub \in \MRWK[k]$ holds. From defininition, $\Occ[](aub) = k$ follows. By contradiction, suppose that $|\RSigma[](au)| = 1$. If we let $\RSigma[](au) = \set{c}$ for a character $c \in \Sigma$, it follows that $\Occ[](au) = \Occ[](aub) = k$, contradiction. Therefore, we have $|\RSigma[](au)| \ge 2$. Since $|\RSigma[](u)| \ge |\RSigma[](au)| \ge 2$, we see that $u$ is right-branching. By symmetry, we can also show that $|\LSigma[](ub)| \ge 2$, and thus, $u$ is left-branching. Combining the arguments, we conclude that $u \in \MR(S)$.
+  %%% 
+ (2) $\Rightarrow$ (1):  Suppose that $\Occ[](aub) = k$. 
+  If $|\RSigma[](au)| \ge 2$ and character $b$ is contained in $\RSigma[](au)$, then we have $\Occ[](au) > \Occ[](aub) = k$. By symmetry, if $|\RSigma[](au)| \ge 2$, then $\Occ[](ub) > \Occ[](aub) = k$ follows. Combining the above arguments, the claim is proved. 
+\qed\end{proof}
+
+\begin{definition}[The parent of a positive MRW]
+  \label{def:mrw:parent}
+  Given any positive MRW $w = aub$ of $S$, the parent of $w$, is the longest proper prefix
+  $\op{parent}_{S}(w)
+  := w[1..\ell]
+  = a u' b'$
+  of $w$ with length $1\le \ell \le |w|-1$ that is right-branching in~$S$, where
+  $a = w[1]$, 
+  $u' = w[2..\ell-1]$, and 
+  $b' = w[\ell]$ (see \cref{fig:mrw:parent}).
+  %%
+Given any positive MRW $v$ of $S$, if there exists some string $w$ such that $v = \op{parent}_{S}(w)$, then we call $w$ a child of $v$. 
+\end{definition}
+
+Let $\mext{\eps}$ be the shortest maximal repeat of $S$. We note that such $\mext{\eps} = \eps$ always exists and unique when $|\Sigma| \ge 2$. 
+
+\begin{lemma}[the parent of a positive MRW]
+  \label{lem:posmrw:parent}
+  Let $w = aub \in \MRW_+$ be any positive MRW of $S$, with $a, b \in \Sigma$ and $u\not= \mext{\eps} \;(u\in\Sigma^*)$. Then, $v = \op{parent}_{S}(w)$ satisfies the conditions (1)--(3) below: 
+\begin{enumerate}[(1)]
+\item $v$ is well-defined and unique.
+  
+\item $v$ is a positive MRW of $S$, that is, $v \in \MRW_+(S)$.
+  
+  %% \item (wrong) $v$ has a form of $v = a u' b'$, where $u'$ is the longest proper prefix of an MR $u$  of $S$ that is also an MR of $S$, and $a = w[1]$  and $b = w[|u'|+1]$.
+  
+\item \label{item:posmrw:parent:three}
+  There exists a character $c \in \Sigma$ that recovers $w$ from $v$ by $w = \rext{(vc)}$. Moreover, such a character $c$ is unique, that is, $w \not= \rext{(vd)}$ for any $d \in \Sigma$ with $d\not= c$. 
+\end{enumerate}
+\end{lemma}
+
+
+\begin{lemma}[Conjecture; children of a positive MRW]
+  \label{lem:posmrw:child}
+  Let $v = aub$ be any positive MRW of $S$.
+  For the unique maximal right-extension of $v$, $au' := \rext{v} = \rext{(aub)}$, and any character $b' \in \RSigma[S](au')$, the string $w = a u' b'$ satisfies the conditions (1)--(3) below: 
+  \begin{enumerate}[(1)]
+  \item $w \in \Fac(S)$. 
+  \item $w$ is a positive MRW of $S$.
+  \item $w$ is a child of $v$, i.e., $v = \op{parent}_S(w)$ holds. 
+  \end{enumerate}
+\end{lemma}
+
+
+%% From \cref{item:posmrw:parent:three} of \cref{lem:posmrw:parent}, we define a child
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{algorithm}[t]
+  \caption{A fragment of the code for a modified algorithm for enumerating the set $\MRW_+(S)$ of all minimal rare words of a string $S$ over alphabet $\Sigma$.
+    We remark that the modified algorithm uses $\BWT(S)$ with $RMQ$ and $WT$ in addition to $\SA(S), \ISA(S)$, $S$, and $\LCP(S)$ with $RMQ$. 
+}\label{fig:example:mrw:subcode}
+%%%\medskip
+  \KwInput{
+    A triple $\pair{i..j, \ell} \in \RREP$ for a MR $u$,
+    a monotone constraint $\Theta \subseteq \Sigma^*$, and 
+    a set $Words \subseteq \RREP$. 
+  }
+  \Begin{
+      $Children \gets \GenChildren(i..j, \ell, Children)$\; 
+      \For (\comblk{the triple for $ub$})
+           {each child $(b, \pair{i_b..j_b, \ell_b}) \in Children$
+           }{
+        \Comment{Modified 1: Check whether $|\LSigma[S](ub)|\ge 2$}
+        $L_b \gets \ColoredRange(i_b, j_b)$
+        \Comment*{$L_b = \LSigma[S](ub)$}
+        \If (\comblk{Case: $|\LSigma[S](ub)|\ge 2$})
+            { $|L_b|\ge 2$ }{
+          %% $L_b \gets \ColoredRange(i_b, j_b)$\; 
+              \For (\comblk{
+                %$k_{ab} = |\Occ[](aub)|$  for
+                $a \in \LSigma[S](ub)$
+                implies $aub \in \Fac(S)$
+              })
+                   {each $a \in L_b$
+                   }{
+                 \Comment{Modified 2: Check whether $|\RSigma[S](au)|\ge 2$}
+                 \Comment{Compute the triple $\pair{i_a..j_a, \ell_a}$ for $au$}
+                 $i_{a}\gets LF_{BWT,WT}(i)$;
+                 $j_{a} \gets LF_{BWT,WT}(j)$;
+                 $\ell_{a} \gets \ell + 1$\; 
+                 \If (\comblk{Case: $|\RSigma[S](au)|\ge 2$})
+                     {
+                       $RMQ_{LCP}(i_a+1, j_a) = \ell_a$
+                     }{
+                   \Comment{Output the triple $\pair{i_{ab}..j_{ab}, \ell_{ab}}$ for $aub$}
+                   $i_{ab}\gets LF_{BWT,WT}(i_b)$;
+                   $j_{ab} \gets LF_{BWT,WT}(j_b)$;
+                   $\ell_{ab} \gets \ell + 2$\;
+                   $Words.\append(\pair{i_{ab}..j_{ab}, \ell_{ab}})$\;
+                 }
+               }
+               $Words \gets \MRRec(\pair{i_b..j_b, \ell_b}, \Theta, Words)$\;
+        } %% if
+      } %% for
+    }%% Begin
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algorithm}
+%%%% 
+Based on \cref{lem:posmrw:characterization}, we will modify the basic algoritm shown in Algorithms~\ref{fig:example:mrep:main} and~\ref{fig:example:mrep:sub} that enumerates the set $\MRW_+(S)$ of all positive MRWs of $S$. In Algorithm~\ref{fig:example:mrw:subcode}, we show a fragment of codes that we substitute for the for-loop from \ref{line:recmr:for:begin} to \ref{line:recmr:for:end} of the recursive subprocedure $\MRRec$ in Algorithm~\ref{fig:example:mrep:sub}.
+
+  Combining \cref{lem:posmrw:characterization} and  \cref{lem:posmrw:parent}, we can show the correctness and computational complexity of the modified algorithm as follows. 
+
+\begin{theorem}[Output-sensitive enumeration of $\MRW_+(S)$]\label{thm:algo:mrw}
+  For any any string $S$ of length $n$ over an integer alphabet $\Sigma$ with $|\Sigma| \ge 2$, all minimal rare words in $\MRW_+(S)$ can be enumerated
+  in $O((e_L + e_R)\log\sigma + |\MRW_+(S)|)$ time using
+  $O(\sigma^2\log n)$ working space
+  based on a structure combining $\SA$, $\LCP$ with $RMQ$, and $\BWT$ with $RMQ$  and $WT$,  which are preprocessed from $S$ in linear time and stored in linear space in $n$. 
+\end{theorem}
+
+\begin{proof}
+  From \cref{thm:algo:main}, the modified algorithm correctly visit all maximal repeats $u$ in $\MR(S)$. From \cref{lem:posmrw:characterization},
+we can show that any MRW $w$ can be obtained as $w = aub$ from an maximal repeat $u$ for some $b \in \RSigma[](u)$ and $a \in \RSigma[](ub)$. Since the child $\pair{i_b..j_b, \ell_b}$ is the rich representation of a maximal right-extension $\rext{ub}$ such that $\Spos[](ub) = \Spos[](\rext{ub})$, we have $\RSigma[](ub) = \RSigma[](\rext{ub})$. 
+
+For the time complexity of the modified algorithm, we note that the procedure $\MRRec$ vertually traverses forward edges of $\CDAWG(S)$ in Line~3.
+Note that the number of forward edges is upper-bounded by $e_R$.
+On the other hand, the algorithm traverse backward edges in Line~6. At the first sight, the total number of backward edges examined becomes $e_R\times e_L$; 
+\begin{itemize}
+\item However, we follow the forward $b$-edge, say $g$, from $u$ through $ub$ only when $|\LSigma[S](ub)| \ge 2$; This implies that the edge $g$ is parimary, where $u$ is a branching node in $\CDAWG(S)$.
+  
+\item In addition, we follow the backward $a$-edge, say $f$, only when $|\RSigma[S](au)| \ge 2$; This imples that the link from $u$ to $au$ corresponds a hard Weiner link, and thus, the correspondence from $au$ to $u$ is unique (by just deleting the leading $a$ from $au$). 
+\end{itemize}
+
+Hence, if we separately estimate, the number $N_R$ of all of such forward $b$-edges and the number $N_L$ all of such backward $a$-edges is upperbounded by $e_L$, then we obtain $N_R$ is upperbounded by $e_R$ and $N_L$ is upperbounded by $e_L$. Hence, the total number of times to traverse edges is $O(e_R + e_L)$.
+For each forward $b$-edge, the ColoredRange query at Line~4 takes $O(|L_b| \log\sigma)$ time per interval $i_b..j_b$ on $\BWT$ with the Wavelet Tree. This sum to $O(e_L \log\sigma)$ over all of $e_L$ edges by above discussion. 
+For each backward $a$-edge, computation of the LF-mapping at Lines~7 and 9 take $O(\log\sigma)$ time per intervals $i_a..j_a$ and $i_{ab}..j_{ab}$ on $\BWT$ with the Wavelet Tree. The RMQ on LCP takes $O(1)$ time.
+This sum to $O(e_L \log\sigma)$ over all of $e_L$ edges by above discussion again. Combining the above discussion, the time complexity is derived. 
+\qed 
+\end{proof}
+
+%% \subsection{A modified Algorithm for MUSs:}   
+%%   %%%
+
+  Since $\MUS(S) = \MRW_1(S) \subseteq \MRW_+(S)$, we can enumerate all MUSs without duplicates just by filtering the result of $\MRW_+(S)$ computed by the algorithm of  \cref{thm:algo:mrw}.  
+
+\begin{corollary}[enumeration of MUSs]\label{thm:algo:mus:ebf}
+The set $\MUS(S)$ of all minimal unique substrings can be enumerated in $O(e_L + e_R + |\MUS(S)|)$ time and $O(\sigma^2\log n)$ working space
+  based on a structure combining $\SA$, $\LCP$ with $RMQ$, and $\BWT$ with $RMQ$ and $WT$,  which are preprocessed from $S$ in linear time and stored in linear space in $n$. 
+\end{corollary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{algorithm}[t]
+  \caption{A fragment of the code for a modified algorithm for enumerating the set $\MAW(S)$ of all minimal absent words of a string $S$ over alphabet $\Sigma$.
+    We remark that the modified algorithm uses $\BWT(S)$ with $RMQ$ and $WT$ in addition to $\SA(S), \ISA(S)$, $S$, and $\LCP(S)$ with $RMQ$. 
+}\label{fig:example:maw:subcode}
+%%%\medskip
+  \KwInput{
+    A triple $\pair{i..j, \ell} \in \RREP$ for a MR $u$,
+    a monotone constraint $\Theta \subseteq \Sigma^*$, and 
+    a set $Words \subseteq \RREP$. 
+  }
+  \Begin{
+      $Children \gets \GenChildren(i..j, \ell, Children)$\;
+      $L_* \gets \ColoredRange(i, j)$ \Comment*{$L_* = \LSigma[S](u)$}
+      \For (\comblk{the triple for $ub$})
+           {each child $(b, \pair{i_b..j_b, \ell_b}) \in Children$
+           }{
+        \Comment{Modified 1: Check whether $|\LSigma[S](ub)|\ge 2$}
+        $L_b \gets \ColoredRange(i_b, j_b)$ \Comment*{$L_b = \LSigma[S](ub)$}
+        %% \If (\comblk{Case: $|\LSigma[S](ub)|\ge 2$})
+        %%     { $|L_b|\ge 2$ }
+            {
+              \For (\comblk{
+                %%$k_{a} = |\Occ[](au)|$ for
+                $a \in \LSigma[S](u)$
+                and $a \not\in \LSigma[S](ub)$
+              })
+                   {each $a \in (L_*\setminus L_b)$
+                   }{
+                    \Comment{Notes: since it is ensured that $aub \not\in \Fac(S)$ and $au, ub\in \Fac(S)$, output the triple $\pair{i_{ab}..j_{ab}, \ell_{ab}}$ for $aub$}
+                 %% \Comment{Modified 2: Check whether $|\RSigma[S](au)|\ge 2$}
+                 %% \Comment{Compute the triple $\pair{i_a..j_a, \ell_a}$ for $au$}
+                 %% $i_{a}\gets LF_{BWT,WT}(i)$;
+                 %% $j_{a} \gets LF_{BWT,WT}(j)$;
+                 %% $\ell_{a} \gets \ell + 1$\; 
+                 %% \If (\comblk{Case: $|\RSigma[S](au)|\ge 2$})
+                 %%     {
+                 %%       $RMQ_{LCP}(i_a+1, j_a) = \ell_a$
+                 %%     }
+                     {
+                   $i_{ab}\gets LF_{BWT,WT}(i_b)$;
+                   $j_{ab} \gets LF_{BWT,WT}(j_b)$;
+                   $\ell_{ab} \gets \ell + 2$\;
+                   $Words.\append(\pair{i_{ab}..j_{ab}, \ell_{ab}})$\;
+                 }
+               }
+               $Words \gets \MRRec(\pair{i_b..j_b, \ell_b}, \Theta, Words)$\;
+        } %% if
+      } %% for
+    }%% Begin
+\end{algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{A modified Algorithm for MAWs (to check)}
+
+We give a characterization of $\MAW$ similar to the previous one as follows. 
+
+\begin{lemma}[characterization of $\MAW$]\label{lem:algo:chara:maw}
+%Let $S$ be a text with 
+Suppose that $|S|\ge 2$ and $|\Sigma[](S)|\ge 2$. 
+For any word $w = aub$ with $a,b\in\Sigma$,  $u\in\Sigma^*$, 
+\begin{enumerate*}[(1)]
+\item $aub \in \MAW(S)$ if and only if  
+%\item $u\in\MR(S)$, $\Occ[](au) \ge 1$, $\Occ[](ub) \ge 1$, and $\Occ[](aub) = 0$. 
+\item $u\in\MR(S)$,
+  $au, ub \in \Fac(S)$, 
+  $a \not\in \LSigma[](ub)$,
+  $b \not\in \RSigma[](au)$,
+  and $\Occ[](aub) = 0$. 
+%% \item $u\in\MR(S)$, $|\RSigma[](au)| \ge 2$, $|\LSigma[](ub)| \ge 2$, and $\Occ[](aub) = 0$. 
+\end{enumerate*}
+\end{lemma}
+
+Based on \cref{lem:algo:chara:maw},
+in Algorithm~\ref{fig:example:maw:subcode}  we show  a fragment of codes for enumeration of $\MAW(S)$
+by substituting it for the for-loop from \ref{line:recmr:for:begin} to \ref{line:recmr:for:end} of the recursive subprocedure $\MRRec$ in Algorithm~\ref{fig:example:mrep:sub}.
+
+\begin{theorem}[Output-sensitive enumeration of $\MAW(S)$]\label{thm:algo:mrw}
+  For any any string $S$ of length $n$ over an integer alphabet $\Sigma$ with $|\Sigma| \ge 2$, all minimal rare words in $\MAW(S)$ can be enumerated
+  in $O((e_L + e_R)\log\sigma + |\MAW(S)|)$ time using
+  $O(\sigma^2\log n)$ working space
+  based on a structure combining $\SA$, $\LCP$ with $RMQ$, and $\BWT$ with $RMQ$  and $WT$,  which are preprocessed from $S$ in linear time and stored in linear space in $n$. 
+\end{theorem}
+
+
+
+%% we will modify the basic algoritm shown in Algorithms~\ref{fig:example:mrep:main} and~\ref{fig:example:mrep:sub} that enumerates the set $\MRW_+(S)$ of all positive MRWs of $S$. 
+
+% Based on \cref{lem:algo:chara:maw}, 
+% we show in Algorithm~\ref{algo:process:maw} the procedure for computing $\MAW$ invoked from Line~\ref{line:recmr:process} of Algorithm~\ref{algo:main} with 
+% the representation $P = \repr(Y)$ of a $Y \in \MR(S)$. 
+
+%% Based on \cref{lem:algo:chara:maw}, we can compute all $aYb \in \MR(S)$ with $a,b \in \Sigma$ at Line~\ref{line:recmr:process} of Algorithm~\ref{algo:main} with 
+%% the representation $P = \repr(Y)$ of a $Y \in \MR(S)$. Hence, we have the following corollary. 
+
+%% \begin{corollary}[enumeration of $\MAW$]\label{thm:algo:maw}
+%% The classes $\MAW$ can be enumerated  in $O(\eL\polylog n + |\MAW|)$ deterministic time and $O(\min\set{\eL,\sigma\log n})$ words of working space on a data structure of 
+%% %$O((r + r\rev)\polylog n)$ 
+%% $O(r\polylog n)$
+%% words of space. 
+%% \end{corollary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%
+\begin{figure}[t]
+  \centering 
+  \includegraphics[width=0.65\textwidth]{fig_mrw.pdf}
+  %% \includegraphics[width=0.65\textwidth]{fig/fig_mrw.pdf}
+  \caption{Characterization of MRWs in terms of nodes in the CDAWG for a text $S$. In the figure, white circles indicate (real) branching nodes, associated to maximal repeats). Black circles and crosses indicate (virtual) loci, respectively. Black and red arrows indicate graph edges and Weiner links, respectively. 
+  }\label{fig:mus}
+\end{figure}
+%%%%%%%%%%%%%%%%%
+
+
+%%% EOF
