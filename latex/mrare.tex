@@ -106,6 +106,7 @@ We denote by $\MAW(S)$, $\MUS(S)$, and $\EBF(S)$ the sets of all MAWs, all MUSs,
 The following fact follows immediate from the definitions of MUSs and MAWs.
 
 \begin{lemma}[Belazzougui and Cunial~\cite{belazzougui2015space:unusual}, Inenaga et al.~\cite{inenaga2024computing}]
+  \label{lem:char:maw:mus}
   For any string $S$,
   $\MAW(S) = \MRW_0(S)$ and 
   $\MUS(S) = \MRW_1(S)$. 
@@ -351,15 +352,16 @@ Overall, these costs sum to $O((e_R + e_L) \log\sigma)$ over all of $e_R$ and $e
 \qed 
 \end{proof}
 
-%% \subsection{A modified Algorithm for MUSs:}   
-%%   %%%
+\subsection{A modified Algorithm for MUSs}   
+%%% 
+Recall that $\MUS(S) = \MRW_1(S) \subseteq \MRW_+(S)$ holds from \cref{lem:char:maw:mus}. From this fact, we can enumerate all MUSs without duplicates just by filtering the result of $\MRW_+(S)$ computed by the algorithm of  \cref{thm:algo:mrw}.  
 
-  Since $\MUS(S) = \MRW_1(S) \subseteq \MRW_+(S)$, we can enumerate all MUSs without duplicates just by filtering the result of $\MRW_+(S)$ computed by the algorithm of  \cref{thm:algo:mrw}.  
-
-\begin{corollary}[enumeration of MUSs]\label{thm:algo:mus:ebf}
-The set $\MUS(S)$ of all minimal unique substrings can be enumerated in $O(e_L + e_R + |\MUS(S)|)$ time and $O(\sigma^2\log n)$ working space
+\begin{proposition}[enumeration of MUSs]\label{thm:algo:mus}
+The set $\MUS(S)$ of all minimal unique substrings can be enumerated in $O(e_L + e_R + |\MRW_+(S)|)$ time and $O(\sigma^2\log n)$ working space
   based on a structure combining $\SA$, $\LCP$ with $RMQ$, and $\BWT$ with $RMQ$ and $WT$,  which are preprocessed from $S$ in linear time and stored in linear space in $n$. 
-\end{corollary}
+\end{proposition}
+
+We remark that the time complexity of \cref{thm:algo:mus} is not output-sensitive since $|\MUS(S)|$ can be arbitrary larger than $|\MAW(S)|$ as posbile. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{algorithm}[t]
@@ -440,6 +442,7 @@ by substituting it for the for-loop from \ref{line:recmr:for:begin} to \ref{line
 
 \begin{theorem}[Output-sensitive enumeration of $\MAW(S)$]\label{thm:algo:mrw}
   For any any string $S$ of length $n$ over an integer alphabet $\Sigma$ with $|\Sigma| \ge 2$, all minimal rare words in $\MAW(S)$ can be enumerated
+  %% in $O((e_L + e_R)\log\sigma + |\MAW(S)|)$ time using
   in $O((e_L + e_R)\log\sigma + |\MAW(S)|)$ time using
   $O(\sigma^2\log n)$ working space
   based on a structure combining $\SA$, $\LCP$ with $RMQ$, and $\BWT$ with $RMQ$  and $WT$,  which are preprocessed from $S$ in linear time and stored in linear space in $n$. 
