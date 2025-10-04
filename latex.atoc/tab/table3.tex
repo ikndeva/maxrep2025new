@@ -1,0 +1,25 @@
+%% table2.tex
+
+%% basic text indexing structures : array-based 
+\begin{table}[t]\centering\tabcolsep=.25em
+\caption{Array-based text indexing structures for static texts, where
+the columns SA, ISA, TA, and LCE indicate the times for accessing the  suffix and the inverse suffix arrays, text $T$, and the LCE query. See \cref{table:summary} for $s_r(n)$  and $s_\delta(n)$. 
+}\label{table:arrays}
+\medskip
+\begin{tabular}{l>{\centering}p{5em}>{\centering}p{7em}cccclll}\toprule
+Structure	& Construct\-ion time   & Space (words) & \multicolumn{3}{c}{Query time}	\\
+\cmidrule{4-6}
+& &  & SA \& ISA	& TA	& LCE	 \\
+  \midrule
+MM~\cite{manber:myers1993suffixarrays}	& $O(n)$   & $O(n)$	& $O(1)$	& $O(1)$	& $O(1)$	\\
+Belazzougui+~\cite{belazzougui2020linear} & $O(n)$   & $O(n\log n/\log\sigma)$	& $O(1)$	& $O(1)$	& $O(1)$	\\
+%$s_r(n) = O(r\log(n/r)\log n)$, 
+Gagie+~\cite{gagie:navarro:prezza2020fully}	& $s_r(n)$   & $O(r\log(n/r))$	& $O(\log(n/r))$	& $O(\log(n/r))$	& $O(\log(n/r))$	\\
+Kempa+~\cite{kempa:kociumaka2023collapsing}	& $s_\delta(n)$   & $O(\delta \log\frac{n\log\sigma}{\delta\log n})$	& $O(\log^{4+\eps} n)$	& $O(\log n)$	& $O(\log n)$	\\
+%% na	& sp	& sa	& isa	& ta	& lce	& reference \\
+\bottomrule
+\end{tabular}
+\end{table}
+%% EOF
+
+

@@ -1,0 +1,238 @@
+%% notation.tex
+
+%% tmp: modelfull
+\newcommand{\FY}{(\Sigma,Y)}
+\newcommand{\pred}{pred}
+\newcommand{\etal}{\textit{et al.}}
+\newcommand{\dtcano}{\op{dt-cano}}
+\newcommand{\ADTC}{\textsc{ADTC}}
+\newcommand{\minWHS}{\textsc{minWHS}}
+%% \newcommand{\dtcano}{dtcano}
+
+
+%%
+\newcommand{\medstrut}{\rule{0pt}{1pc}}
+\newcommand{\iFor}[2]{\textbf{for} {#1} \textbf{do}\hspace{0.25em}{\relax #2}}%exp
+
+% 2nd version
+%% basic 
+\newcommand{\sig}[1]{\mathcal{#1}}
+\newcommand{\alg}[1]{\idsc{#1}} %% algorithm 
+\newcommand{\proc}[1]{\alg{#1}}
+\newcommand{\op}[1]{\texttt{#1}} %% operation 
+\newcommand{\pb}[1]{{\mbox{\textsc{#1}}}} %% problem name
+%% \newcommand{\pb}[1]{\mbox{\textsc{#1}}} %% problem name
+%% \newcommand{\pb}[1]{\textsc{#1}} %% problem name
+
+%%
+\newcommand{\st}[1]{\substack{#1}}
+
+%% notation
+%%%% algebra
+\newcommand{\R}{\sig R} %% (semi)ring 
+\newcommand{\B}{\mathbb{B}}
+\newcommand{\M}{\sig M} %% monoid 
+\newcommand{\T}{\sig T} %% tensor
+\newcommand{\Vol}{\idrm{Vol}} %% tensor
+\newcommand{\TT}{\mathbb{T}} %% tensor
+%%%%
+\newcommand{\SemiringForm}{\R = (R, \add, \mul, e^\add, e^\mul)}
+\newcommand{\SemiringBody}{(R, \add, \mul, e^\add, e^\mul)}
+\newcommand{\MultiSemiringForm}[1][\Sigma]{(R, \add, \set{\mulsym[\sigma]}_{\sigma \in #1}, e^\add, e^\mul)} %% notation
+%%%% set product 
+\newcommand{\prodidx}[4]{\prod\idx{#2}{#3}{#4} {#1}_{#2}} 
+\newcommand{\prodseq}[4]{{#1}_{#3}\kern-.5pt\times\dots\times\kern-.5pt{#1}_{#4}}
+%%%% tuple
+\newcommand{\tupidx}[4]{({#1}_{#2})\idx{#2}{#3}{#4}} 
+\newcommand{\tupseq}[4]{({#1}_{#3}, \dots, {#1}_{#4})}
+%%%
+\newcommand{\domprod}[1]{{#1}_{\times}}
+%\newcommand{\Prod}{{\scriptsize\prod}\kern-1pt}
+\newcommand{\Prod}{\raisebox{-.99pt}{\scalerel*{\prod}{\overline{M}}}\kern0pt}
+%\scalerel
+\newcommand{\prodvec}[1]{{\vec{#1}}_{\Pi}}
+\newcommand{\Prodvec}[1]{\Prod\vec{#1}}
+
+
+%%%% classes
+
+%%
+\newcommand{\add}{\oplus}
+\newcommand{\mul}{\otimes}
+\newcommand{\bigadd}{\bigoplus}
+\newcommand{\bigmul}{\bigotimes}
+\newcommand{\setmn}{\!-\!}
+\newcommand{\eaddunit}{e^\oplus}
+\newcommand{\emulunit}{e^\otimes}
+%% 
+\newcommand{\mulsym}[1][\sigma]{\mul^{(#1)}}
+\newcommand{\mulset}{\mulsym[\uplus]}
+\DeclareMathOperator*{\bigmulset}{\mbox{$\mulsym[\uplus]$}}% for set
+%\DeclareMathOperator*{\mulset}{\mbox{$\bigmul^{(\uplus)}$}}% for set
+
+%%% complexity
+\newcommand{\wname}[2][\R]{\idrm{#2}({#1})} %% weighted name
+\newcommand{\NPR}[1][\R]{\idrm{NP}(#1)}
+\newcommand{\SRTM}[1][\R]{\idrm{SRTM}(#1)}
+\newcommand{\EMT}{\idsc{EMT}}
+
+%%% problems: ATDC 
+\newcommand{\Data}{\pow\D}
+\newcommand{\Feat}{\pow\F}
+
+%%% problems
+\newcommand{\SumProd}{\textsc{SumProd}}
+%% \newcommand{\NP}[1]{\idrm{NP}{#1}}
+%% \newcommand{\NPR}[1][(\R)]{\idrm{NP}{#1}}
+
+% 1st version
+%% \renewcommand{\vec}[1]{\boldsymbol{#1}} %% loaded by amsbmy (amsmath)
+\newcommand{\vvec}[1]{\overrightarrow{#1}} 
+\renewcommand{\-}{\textrm{-}}
+
+%% \newcommand{\DT}[1][d]{\mathcal{DT}^{#1}} 
+\newcommand{\DT}[1][d]{\id{DT}^{#1}} 
+\newcommand{\D}{\sig D}
+\renewcommand{\L}{\sig L}
+\newcommand{\HOMEXT}{\idsc{Homext}}
+
+\newcommand{\X}{\sig X}
+\newcommand{\Y}{\sig Y}
+\newcommand{\Z}{\sig Z}
+\newcommand{\F}{\mathbf{\Sigma}}
+\renewcommand{\S}{\sig S}
+\renewcommand{\H}{\sig H}
+
+\newcommand{\Lv}{\idrm{Lv}}
+\newcommand{\dep}{\op{dep}}
+\newcommand{\size}{\op{size}}
+\newcommand{\err}{\op{err}}
+\newcommand{\supp}{\op{supp}}
+%% \newcommand{\relerr}{\op{relerr}} %
+\newcommand{\tp}{\op{tp}}
+\newcommand{\fp}{\op{fp}}
+\newcommand{\tn}{\op{tn}}
+\newcommand{\fn}{\op{fn}}
+\newcommand{\disag}{\op{disag}}
+\newcommand{\fs}{\op{fset}} %
+
+%% Unfairness range 
+\newcommand{\infrac}[2]{({#1}/{#2})}
+\newcommand{\percent}{\%}
+
+%% math 
+
+\newcommand{\nd}[1]{\langle #1\rangle} %node 
+\renewcommand{\=}{\kern-2pt=\kern-2pt}
+\newcommand{\mn}[1]{_{-#1}}
+\newcommand{\spl}[1]{_{|#1}}
+
+
+%% math
+\newcommand{\dom}{\op{dom}}
+\newcommand{\rng}{\op{range}}
+
+\newcommand{\ind}[1]{\indone[#1]}
+\newcommand{\Ind}[1]{\indone\kern-0.125em\left[\,\rule{0pt}{.9em} #1\,\right]}
+\newcommand{\indone}{\mathbbm{1}}
+
+%%  tensor 
+%%  constant 
+\newcommand{\zero}{\mathbbm{0}}
+\newcommand{\one}{\mathbbm{0}}
+\newcommand{\met}[1][]{\vec\mu #1}
+
+%% whiteboard digits
+\newcommand{\Ttensor}[1][]{\mathbb{T}[\vec\M, \R]}
+\newcommand{\Tzero}{{\mathbbm{O}}}
+\newcommand{\Tone}{{\mathbbm{1}}}
+% \newcommand{\Tzero}{\midsym{\mathbbm{O}}}
+% \newcommand{\Tone}{\midsym{\mathbb{1}}}
+
+%% box oper
+\newcommand{\bigboxplus}{\mybigop{\boxplus}}
+\newcommand{\bigboxtimes}{\mybigop{\boxtimes}}
+\newcommand{\sym}[1]{\overline{#1}}
+
+%% Oh oper
+\newcommand{\bigoplusz}{\mybigop{\oplus}}
+\newcommand{\bigotimesz}{\mybigop{\otimes}}
+\DeclareMathOperator*{\mybigoplus}{\bigoplusz}
+\DeclareMathOperator*{\mybigotimes}{\bigotimesz}
+
+%% tensor operations
+\newcommand{\Tplus}{\mathbin{\widetilde{\oplus}}}
+\newcommand{\Ttimes}{\mathbin{\widetilde{\circledast}}}
+
+% \newcommand{\Tplus}{\mathrel{\ooalign{\hss$\oplus$\hss\cr\hss$\bigcirc$\hss}}}
+% \newcommand{\Ttimes}{\mathrel{\ooalign{\hss$\circledast$\hss\cr\hss$\bigcirc$\hss}}}
+
+\newcommand{\bigtenplusz}{\mybigop{\Tplus}}
+\newcommand{\bigtentimesz}{\mybigop{\Ttimes}}
+\DeclareMathOperator*{\bigtenplus}{\bigtenplusz}
+\DeclareMathOperator*{\bigtentimes}{\bigtentimesz}
+
+\newcommand{\bby}{\!\times\!}
+
+% %% tensor operations
+% \newcommand{\Tplus}{\mathrel{\ooalign{\hss$\oplus$\hss\cr\hss$\bigcirc$\hss}}}
+% \newcommand{\Ttimes}{\mathrel{\ooalign{\hss$\circledast$\hss\cr\hss$\bigcirc$\hss}}}
+
+% \newcommand{\bigtenplusz}{\mybigop{\Tplus}}
+% \newcommand{\bigtentimesz}{\mybigop{\Ttimes}}
+% \DeclareMathOperator*{\bigtenplus}{\bigtenplusz}
+% \DeclareMathOperator*{\bigtentimes}{\bigtentimesz}
+
+\newcommand{\poly}{\,\idrm{poly}}
+\newcommand{\stm}[1][.9em]{\rule{0pt}{#1}} %%mystem
+
+%%  tentative : slice operator
+\newcommand{\Dint}[2]{[#1\hskip1pt\raise-0pt\hbox{$:$\hskip1pt}#2]}
+% %%% tex hack: "::"コマンドを作成する
+% %%% https://tex.stackexchange.com/questions/4216/how-to-typeset-correctly\mathchardef\ordinarycolon\mathcode`\.
+% \mathcode`\.=\string"8000
+% \begingroup \catcode`\.=\active
+%   \gdef.{\hbox{\hskip1pt\raise-0pt\hbox{$:$\hskip1pt}}}
+% % \gdef.{\hbox{\hskip1pt\raise-2pt\hbox{$\cdot$\hskip1pt}}}
+% \endgroup
+% %%% end tex hack
+
+%% MPF: explanation
+\newcommand{\proj}[2]{_{|#1_{#2}}}
+
+%% Algorithms
+%\newcommand{\EMTUC}{\textsf{UncEMT}}
+
+\newcommand{\CT}{\mathbbm{CT}}
+
+
+
+% cref
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{cor}{Corollary}{Corollaries}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{property}{Property}{Properties}
+\crefname{condition}{Condition}{Conditions}
+\crefname{fact}{Fact}{Facts}
+\crefname{claim}{Claim}{Claims}
+\crefname{problem}{Problem}{Problems}
+\crefname{remark}{Remark}{Remarks}
+%
+\crefname{algorithm}{Algorithm}{Algorithms}
+%
+\crefname{section}{Sec.}{Secs.}
+\crefname{subsection}{Sec.}{Secs.}
+%
+\crefname{proof}{Proof}{Proofs}
+
+
+
+%% EOF
+% %\newcommand{\circledplusz}{\mathrel{\ooalign{\hss$\oplus$\hss\cr\hss$\circ$\hss}}}
+% %\newcommand{\circledoplus}{\mathrel{\ooalign{\hss$+$\hss\cr\hss$\bigcirc$\hss}}}
+% \newcommand{\tcircledast}{\mathrel{\ooalign{\hss$\circledast$\hss\cr\hss$\bigcirc$\hss}}}
+% \newcommand{\tcircleoplus}{\mathrel{\ooalign{\hss$\oplus$\hss\cr\hss$\bigcirc$\hss}}}
+% %\newcommand{\circleddast}{\mathrel{\ooalign{\hss$\textcircled{$\ast$}$\hss\cr\hss$\bigcirc$\hss}}}
+% %\newcommand{\circledoplus}{\mathrel{\ooalign{\hss$\textcircled{+}$\hss\cr\hss$\bigcirc$\hss}}}
+

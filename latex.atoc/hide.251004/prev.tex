@@ -1,0 +1,125 @@
+%%% prev.tex
+\section{Previous Algorithms}
+\label{sec:prev}
+
+In this section, we review two state-of-the-art algorithm schema, namely \BUSA{} and \TDBW{}, for enumerating all distinct maximal repeats of a string using text indexing arrays such as $SA$ or $BWT$ with auxiliary structures.
+After review, in the next section, we propose our novel algorithm schema \TDSA{}.
+
+
+\textit{Overview of the search strategies}. In what follows, the categories \textsf{BU}/\textsf{TD} indicate \textit{bottom-up/top-down traversal}, respectively, while \textsf{SA}/\textsf{BW} indicate and \textit{SA/BWT arrays}. 
+In \cref{fig:fwdstree}, we show the illustration of the search space, the suffix tree for a string $T = \mathtt{\#abcadabcabc\$}$, for algorithm schema in this paper. In the figure, \BUSA{} traverses the black tree of downward arrows (the suffix tree), while  \TDBW{} traverses the red tree (the Winer tree) of upward arrows (suffix links). Our \TDSA{} in \cref{sec:algo} traverses the black tree, but from the root to the leaves top-down, unlike \BUSA{} or \TDBW{}. 
+
+%% %%%%%%%%
+%% \input{figsearchspace}
+%% %%%%%%%%
+
+%%%% 
+\subsection{Bottom-up algorithm with SA}
+\label{sec:prev:busa}
+%%%%%
+The first algrithm scheme $\BUSA$ (\textit{bottom-up search with the suffix array}), proposed by Narisawa \textit{et al.}~\cite{narisawa2007efficient,narisawa2017efficient} in 2007, is a procedure that performs the bottom-up search over SA-ranges in forward direction.
+Okanohara and Tsujii~\cite{okanohara2009text} adopted a similar scheme.
+\footnote{Although it seems that \cite{okanohara2009text} uses $BWT$ at first glance, it essentially belongs to \BUSA{} since it does not use $BWT$ for top-down branching.}
+Specifically, it simulates the post-order traversal of the suffix tree for the same text using $SA$, $ISA$, and the RMQ structure on the top of $LCP$ by the \textit{bottom-up traversal method} of
+Kasai \textit{et al.}~\cite{kasai:lee2001lcp:linear}.
+%% Kasai, Lee, Arimura, Arikawa, and Park~\cite{kasai:lee2001lcp:linear}.
+Therefore, in \cref{fig:fwdstree}, \BUSA{} traverse the suffix tree~\cite{gusfield1997algorithms} shown in black bottom up from the leaves to the root, following the reversed arrows (reversed tree edges). 
+
+%%%%%%%%%%%%%%%%%
+{
+  \setlength{\interspacetitleruled}{0pt}%
+  \setlength{\algotitleheightrule}{0pt}%  
+  \begin{algorithm}[h]
+  \textbf{Procedure} \BUSA$()$:\\
+  \Begin{
+      $B \gets \set{ (-1,-1) }$; $n \gets |S|$\; 
+      \For{$i \gets 2$ \textbf{to} $n+1$}{
+        $(L_*, \ell_*) \gets (i-1, LCP[i])$\; 
+        \While{$ B.\op{top().depth()} > \ell_* $}{
+          $(L, \ell) \gets B.\op{pop()}$; $R \gets i-1$
+            \Comment*{$(L, R, \ell)$ is right-branching}
+          \If{$(L, R, \ell)$ is left-branching}{
+            \textbf{output} $(L, R, \ell)$
+            \Comment*{A maximal repeat is found}
+          }
+          $L_* \gets L$\; 
+        }
+        \iIf{$B.\op{top().depth()} < \ell_*$}{
+          $B.\op{push}((L_*, \ell_*)) $\; 
+        }
+        $B.\op{push}((i, i, n - SA[i] + 1))$\;
+      }
+  }%%Begin
+  \end{algorithm}
+}  
+%%%%%%%%%%%%%%%%%
+
+In the procedure \BUSA{}, whenever the triple $\tau = (L, R, \ell)$ is encountered at Line~7, it represents a right-branching substring of a string $S$ because
+%it is ensured
+the depth $\ell$ equals the range minima of the subarray $LCP[L..R]$ by induction on the stage~$i\ge 1$. Therefore, if the triple $\tau$ at Line~7 is left-branching, we see that it is both left- and right-branching, and thus, a maximal repeat of $S$. By amortized analysis~\cite{kasai:lee2001lcp:linear}, the procedure executes the code for Lines from 7 to 10 at most $O(n)$ time.
+As shown in the next section, the test for left-branchingity can be done in $O(1)$ time using $SA$ and $ISA$ only.
+
+On the other hand, \BUSA{} always takes $\Omega(n)$ time since it must visit all right-branching triple, corresponding to all of $\Theta$ internal nodes of the suffix tree. Actually, the for-loop from Lines 4 to 12 is executed exactly $n$ times, and each of them executes at least one instruction. Hence, we observe: 
+
+
+\begin{remark}[Narisawa \textit{et al.}~\cite{narisawa2007efficient}]
+\label{rem:lb:busa}  
+%% \begin{remark}[Narisawa, Inenaga, Bannai, and Takeda~\cite{narisawa2007efficient}]
+  The algorithm \BUSA{} requires $\Theta(n)$ time to compute all maximal repeats in a string of length $n$, regardless of $e_R \le n$. 
+\end{remark}
+
+
+%%%%%
+\subsection{Top-down algorithm with BWT}
+\label{sec:prev:tdbw}
+%%%%%
+The second algrithm scheme $\TDBW$ (\textit{top-down search with the Burrows-Wheeler Transformation/BWT}), proposed by Beller, Berger, and Ohlebusch~\cite{beller:berger2012space:efficient:bbo} 2012, is a recursive procedure that performs
+the top-down search over SA-ranges in backward direction using the LF-mapping on BWT,
+where the top-down traversal with BWT has been devised by~\cite{bellergogohlebusch2013computing,beller:berger2012space:efficient:bbo,belazzougui2015space:unusual,belazzougui2020linear}. 
+Therefore, in \cref{fig:fwdstree}, \TDBW{} traverse the red tree (the Weiner tree) top-down from the root to the leaves following the reversed red links (reversed suffix links or Weiner links~\cite{gusfield1997algorithms}). 
+
+%%%%%%%%%%%%%%%%%
+{
+  \setlength{\interspacetitleruled}{0pt}%
+  \setlength{\algotitleheightrule}{0pt}%  
+  \begin{algorithm}[h]
+  %% \caption{Top-down MR-enumeration algorithm with BWT}\label{algo:maxrep:tdbw}
+  \textbf{Procedure} \TDBW$([L_0..R_0])$:\\
+  %%\KwGiven{}
+  %% \KwIn{An SA-range $[L_0..R_0]$ for a string.}
+  %% \KwOut{}
+  \Begin{
+      Compute the set $\set{a_1, \dots, a_k}$ of $k$ mutually distinct characters in the subarray $BWT[L_0..R_0] \in \Sigma^*$ and the subranges $[L_1..R_1], \dots, [L_k..R_k]$\;
+      \If (\CM{$[L_0..R_0]$ is left-branching}) {$k > 1$}{
+        $\ell_0 \gets RMQ_{LCP}(L_k+1, R_k)$
+          \Comment*{Making $([L_0..R_0], \ell_0)$ right-branching}
+        \textbf{output} $\tau = ([L_0..R_0], \ell_0)$ 
+        \Comment*{A maximal repeat is found}
+      }
+      \For %(\CM{})
+          {$i \in [k]$}
+      {
+         Compute the $i$-th SA-range $[L_i..R_i]$ from $[L_0..R_0]$ by backward search with character $a_i$\;  
+        %% Decide if $\tau$ is left-branching by SA and ISA (\cref{lem:leftmaximal:character})\; 
+        \TDBW$([L_i..R_i])$\; 
+      }%%For 
+  }
+  \end{algorithm}
+}  
+%%%%%%%%%%%%%%%%%
+
+The algorithm \TDBW{} starts with the SA-range $[1..n]$ corresponding to the empty string $\eps$ as the root. Suppose that the current pair is $\tau_0 = ([L_0..R_0], \ell_0)$ representing  a substring $U \in Substr(S)$.
+Given the SA-range $[L_0..R_0]$, it first computes the sequence of $k\ge 1$ mutually distinct characters $a_1, \dots, a_k \in \Sigma$ such that $a_1 U, \dots a_k U \in Substr(S)$ in $O(1)$ time per character, using the colored range query structure (CRQ) with $O(n)$ space by Muthukrishnan~\cite{muthukrishnan2002efficient}%
+\footnote{It is also known as the range distinct query (RDQ) structure.}.
+%%% 
+Next, it computes the sequence of SA-ranges $[L_1..R_1], \dots, [L_k..R_k]$ for the substrings $a_1 U, \dots a_k U$, respectively, in $O(\log\sigma)$ time per symbol $a_i$ for all $i \in [k]$, using the LF-mapping supported by the Wavelet tree with $BWT$ in $O(n/\log_\sigma n)$ space, by the method of Ferragina and Manzini~\cite{Ferragina05:FM}.
+
+By construction, we can see that this algorithm follows atomic Weiner links reading their character labels one by one. Since it is shown that the Weiner tree for a string of length $n$ contains $\Theta(n)$ atomic Weiner edges. Hence, we conclude: 
+
+%% \begin{remark}[Beller, Berger, and Ohlebusch~\cite{beller:berger2012space:efficient:bbo}]
+\begin{remark}[Beller \textit{et al.}~\cite{beller:berger2012space:efficient:bbo}]
+\label{rem:lb:tdbw}    
+  The algorithm \TDBW{} requires $\Theta(n\log\sigma)$ time to compute all maximal repeats in a string of length $n$, regardless of $e_R \le n$. 
+\end{remark}
+
+Belazzougui and Cunial~\cite{belazzougui2015space:unusual} improved the time complexity of the procedure \TDBW{} to run in $O(n)$ time retaining $O(n/\log_\sigma n)$ space by removing $O(\log\sigma)$ factor. However, it still requires the running time $\Theta(n)$. 

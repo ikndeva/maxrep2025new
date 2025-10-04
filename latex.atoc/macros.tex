@@ -1,0 +1,453 @@
+% macros.tex
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% reference with [] in environment 
+\def\refbox(#1){$\mbox{\bf ({#1}) }$}
+%% \newcommand{\mysubsubsection}[2][{.\hspace{0.125em}}]{\textbf{#2}#1}%%
+%% \newcommand{\myfootnote}[1]{\hspace{-0.25em}\footnote{#1}}
+%\newcommand{\inlmysubsubsection}[1]{\textbf{#1}}%% camera
+%% \newcommand{\mysubsection}[1]{\subsection*{#1}}
+
+%% notation
+%%%
+%% \newcommand{\MR}{\idrm{MR}} 
+%% \newcommand{\MAW}{\idrm{MAW}} 
+%% \newcommand{\MUS}{\idrm{MUS}} 
+%% \newcommand{\EBF}{\idrm{EBF}} 
+%% \newcommand{\MRW}{\idrm{MRW}}
+%% \newcommand{\MRWK}[1][k]{\mbox{$#1$-\idrm{MRW}}}
+\newcommand{\MRWS}[1][k]{\idrm{MRW}_{#1}}
+\newcommand{\MRWK}[1][k]{\MRWS[k]}
+%% \newcommand{\MRWS}[2][S]{\idsf{MRW}_{#2}({#1})}
+
+%%% spire2024
+\newcommand{\subword}[1][\SA]{\idtt{subword}_{#1}}
+\newcommand{\brep}[1][]{\mbox{\rm\texttt{bi-rep}}_{#1}}
+%%\newcommand{\Procedure}{\textbf{procedure}\hspace{0.375em}}
+\newcommand{\mr}{\mu}
+\newcommand{\eL}{e}
+\newcommand{\eR}{e\rev}
+%% %% \newcommand{\npos}[1][T]{\idrm{\sharp pos}_{#1}} 
+%% \newcommand{\AW}[1][T]{\idsf{AW}({#1})}
+%% %\newcommand{\WW}[1][k]{\idsf{W}_k(T)}
+%% \newcommand{\MR}[1][T]{\idsf{MR}({#1})}
+%% \newcommand{\MAW}[1][T]{\idsf{MAW}({#1})}
+%% \newcommand{\MUS}[1][T]{\idsf{MUS}({#1})}
+%% \newcommand{\MRW}[1][T]{\idsf{MRW}({#1})}
+%% \newcommand{\MRWS}[2][T]{\idsf{MRW}_{#2}({#1})}
+%% \newcommand{\W}{\idsf{W}}%
+
+%% \newcommand{\MF}[1][k]{\idsf{MF}_{=#1}(T)}
+%% \newcommand{\MFO}[1][k]{{\idsf{MF}}_{\le #1}(T)}
+
+
+%%% end:spire2025
+
+%%% data structures
+\newcommand{\stree}{\idrm{STree}}%exp
+\newcommand{\weiner}{\idrm{Weiner}}%exp
+%% \newcommand{\CDAWG}{\idrm{CDAWG}}
+%% %% \newcommand{\S}{\id{S}}
+%% \newcommand{\SA}{\id{SA}}
+%% \newcommand{\ISA}{\id{ISA}}
+%% \newcommand{\BWT}{\id{BWT}}
+%% \newcommand{\LCP}{\id{LCP}}
+%% \newcommand{\LCE}[1][T]{\idrm{LCE}_{#1}}
+%%%
+%% \newcommand{\rk}[1]{^{(#1)}} %%alias 
+%% \newcommand{\idx}[3]{_{#1=#2}^{#3}} %%alias
+\newcommand{\btw}[3]{{#2}\le {#1}\le {#3}} %%alias
+\newcommand{\Fac}{\idrm{Fac}}
+\newcommand{\Pref}{\idrm{Pref}}
+\newcommand{\prefix}{\Pref}
+\newcommand{\Suf}{\idrm{Suf}}
+%%%
+%% \newcommand{\Spos}[1][{\hat S}]{\id{Spos}_{#1}}
+%% \newcommand{\Epos}[1][{\hat S}]{\id{Epos}_{#1}}
+%% \newcommand{\Occ}[1][{\hat S}]{\id{Occ}_{#1}}
+%% \newcommand{\spos}[1][S]{\Spos[#1]}
+%% \newcommand{\epos}[1][S]{\Epos[#1]}
+%% \newcommand{\occ}[1][S]{\Occ[#1]}
+
+%% \newcommand{\LSigma}[1][{\hat S}]{\idrm{L\Sigma}_{#1}}
+%% \newcommand{\RSigma}[1][{\hat S}]{\idrm{R\Sigma}_{#1}}
+%% \newcommand{\getfactor}[1][{\SA, S}]{\op{W}_{#1}} 
+%% \newcommand{\getfactor}[1][{\SA, S}]{\op{getFactor}_{#1}} 
+%% \newcommand{\isLeftBranching}[1][{\SA, \ISA, S}]{\proc{isLeftBranching}_{#1}}\newcommand{\RREP}{\mathcal{RP}}  %% TDSA
+ 
+
+%%% algo
+%% \newcommand{\MREnum}{\textsf{EnumMR}}  %% TDSA
+%% \newcommand{\MRRec}{\textsf{RecMR}}  %% TDSA
+%% \newcommand{\GenChildren}[1][{\LCP, \SA, S}]{\textsf{GenChildren}_{#1}}  
+%% \newcommand{\ColoredRange}[1][{\BWT,RMQ}]{\textsf{ColoredRange}_{#1}}  
+%% \newcommand{\append}{\op{append}}
+
+
+%% private macros: cdawg
+%% class names
+%% \newcommand{\substr}{\id{Substr}}
+%% \newcommand{\Suf}{\suffix}
+\newcommand{\Substr}{\substr}
+%%% 
+%% \newcommand{\lext}[1]{\overleftarrow{#1}} 
+%% \newcommand{\rext}[1]{\overrightarrow{#1}} 
+%% \newcommand{\mext}[1]{\overleftrightarrow{#1}}
+%% \newcommand{\str}{\op{str}}
+%% maximal 
+%% \newcommand{\RM}{\sig{RM}}
+%% \newcommand{\LM}{\sig{LM}}
+%% \newcommand{\M}{\sig{M}}
+%%%%
+\newcommand{\rstate}[1]{[{#1}]_{\equiv_R}}
+\newcommand{\lstate}[1]{[{#1}]_{\equiv_L}}
+%%%
+\newcommand{\BUSA}{\textsf{BUSA}} 
+%% \newcommand{\TDSA}{\textsf{TDSA}} 
+\newcommand{\TDBW}{\textsf{TDBW}}
+%%%%
+%%%
+\newcommand{\repr}{\op{repr}}
+\newcommand{\intr}{\op{SA\textrm{-}Int}}
+\newcommand{\lcpmin}{\op{lcpmin}}
+%%%%
+\newcommand{\set}[1]{\{\kern0.05em#1\kern0.05em\}}
+\newcommand{\sete}[1]{\{\kern0.2em#1\kern0.2em\}}
+\newcommand{\liste}[1]{[\kern0.2em#1\kern0.2em]}
+
+%%%%
+%\newcommand{\mywspace}[1][R]{O(\sigma^2\log e_{#1})}
+%% \newcommand{\td}{\idsf{Td}}
+%% \newcommand{\bu}{\idsf{Bu}}
+%% \newcommand{\fw}{\idsf{Fwd}}
+%% \newcommand{\bw}{\idsf{Bwd}}
+\newcommand{\td}{\idsf{T}}
+\newcommand{\bu}{\idsf{B}}
+\newcommand{\fw}{\idsf{F}}
+\newcommand{\bw}{\idsf{B}}
+\newcommand{\tdfw}{\mbox{\td\fw}}
+\newcommand{\tdbw}{\mbox{\td\bw}}
+\newcommand{\bufw}{\mbox{\bu\fw}}
+\newcommand{\bubw}{\mbox{\bu\bw}}
+\newcommand{\tdfwd}{\tdfw}%% obsolute 
+\newcommand{\tdbwd}{\tdbw}%% obsolute 
+\newcommand{\bufwd}{\bufw}%% obsolute 
+\newcommand{\bubwd}{\bubw}%% obsolute 
+% %%% 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{yhmath}%% for neat wide tilde
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% basis 
+\renewcommand{\-}{\mbox{\textit{-}}}
+
+%% symbols
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\rat}{\mathbb{R}}
+\newcommand{\zat}{\mathbb{Z}}
+\renewcommand{\leq}{\leqslant}%override
+\renewcommand{\le}{\leqslant}%override
+\renewcommand{\preceq}{\preccurlyeq}%override
+\newcommand{\rev}{^\fn{rev}}
+
+%% typeface 
+\newcommand{\proc}[1]{\mbox{\textsf{#1}}}
+\newcommand{\algo}[1]{\mbox{\textsf{#1}}}
+\newcommand{\fn}[1]{\ensuremath{\mathrm{#1}}} 
+\newcommand{\mb}[1]{\mathbb{#1}}
+\newcommand{\name}[1]{\textit{#1}}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\daller}{\$} %$
+\renewcommand{\sharp}{\#} %$
+\newcommand{\mathdaller}{\mbox{`$\daller$'}} %$
+\newcommand{\centsymbol}{\mbox{\textcentoldstyle}} %$
+\DeclareMathOperator{\polylog}{\mathrm{polylog}}
+
+\newcommand{\kw}[1]{\textbf{#1}}
+\newcommand{\sig}[1]{\mathcal{#1}}
+\newcommand{\ty}[1]{\texttt{#1}}
+%% \newcommand{\op}[1]{\mathtt{#1}}
+%% \renewcommand{\-}{\mbox{-}}
+\newcommand{\mop}[1]{\mbox{\rm\texttt{#1}}}%%exp
+\newcommand{\op}[1]{\mathtt{#1}}
+
+
+%% math: general 
+\newcommand{\by}{\times}
+\renewcommand{\bar}[1]{\overline{#1}}
+\newcommand{\ceil}[1]{\lceil #1\rceil}
+\newcommand{\floor}[1]{\lfloor #1\rfloor}
+%\newcommand{\Implies}{\:\:}
+\renewcommand{\iff}{\mathbin{\,\Leftrightarrow\,}}%override
+\newcommand{\iffdef}{\mathbin{\,\stackrel{\textrm{def}}{\iff}\,}}
+\newcommand{\Implies}{\mathbin{\,\Rightarrow\,}}%override
+\newcommand{\To}{\Implies}%override
+%% \newcommand{\iffshort}{\Leftrightarrow} %%short
+\newcommand{\indicator}[1]{\mathbb{I}\kern-0.1em\left[\kern0.1em{#1}\kern0.1em\right]}
+\newcommand{\pair}[1]{\langle #1\rangle}
+%% \renewcommand{\mid}{\,:\,}
+\newcommand{\infrac}[2]{{#1}\,/\,{#2}} %inline frac
+
+%% not used 
+\newcommand{\pow}[1]{2^{#1}}
+\newcommand{\rng}[3]{_{#1=#2}^{#3}}
+%% \renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\rk}[1]{^{(#1)}}
+\newcommand{\rkk}[1]{^{\kern.5pt\textrm{#1}}}
+
+
+%%% tentative
+\DeclareMathOperator{\pd}{..}
+%%% tex hack: ".."コマンドを作成する
+%%% https://tex.stackexchange.com/questions/4216/how-to-typeset-correctly
+% \mathchardef\ordinarycolon\mathcode`\.
+%%% raise: http://www.math.kobe-u.ac.jp/HOME/kodama/tips-latex-math-margin.html#raise 
+\mathcode`\.=\string"8000
+\begingroup \catcode`\.=\active
+  \gdef.{\hbox{\hskip1pt\raise-2pt\hbox{$\cdot$\hskip1pt}}}
+\endgroup
+%%% end tex hack
+
+
+%% %%% setting: algorithm2e %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \newcommand{\algoopts}{%
+%% %%% RULES
+%% %boxed,%good
+%% %boxruled,%
+%% %algoruled,%good
+%% ruled,%
+%% %tworuled,%
+%% %%% CODE TYPESETTING
+%% %% hangingcomment,%
+%% %% opthanginginout,%
+%% %% noalgohanging,%obsolute 
+%% %%% BLOCKS DISPLAY
+%% %noline,%
+%% vlined,%L-tyle
+%% %lined,%I-style
+%% %%%
+%% linesnumbered%
+%% }
+%% %%\usepackage[\algoopts]{algorithm2e} 
+%% \usepackage[ruled,vlined,linesnumbered]{algorithm2e} 
+
+%% \makeatletter
+%% \renewcommand{\@algocf@capt@plain}{above}% formerly {bottom}
+%% \makeatother
+%% %%% algorithm2e
+%% \newcommand{\comblk}[1]{\hfill$\rhd$\ \textit{#1}}
+%% \newcommand{\Commentblock}[1]{\comblk{#1}}
+%% \newcommand{\Commentblockl}[1]{\kern0.5em$\rhd$\ \textit{#1}\ $\lhd$}
+%% \newcommand{\CM}[1]{\comblk{#1}}
+%% %% \SetArgSty{textrm}%arguments for e.g., if, else, while etc. 
+%% %% \SetCommentSty{textit}%arguments for comments
+%% \SetKwComment{Comment}{$\rhd$}{} 
+%% \SetKwInput{KwInput}{Input}
+%% \SetKwInput{KwOutput}{Output}
+%% \SetKwInput{KwNotes}{Notes}
+%% %%%
+%% \SetKwInput{KwPreproc}{Preprocess}
+%% \SetKwInput{KwRuntime}{Runtime}
+%% \SetKwInput{KwGiven}{Given}
+%% \SetKwInput{KwGlobal}{Global}
+%% \SetKwInput{KwWork}{Working}
+%% \SetKwInput{KwMethod}{Method}
+%% \SetKwInput{KwPrecond}{Pre-condition}
+%% \SetKwInput{KwPostcond}{Post-condition}
+%% \SetArgSty{textrm}%arguments for e.g., if, else, while etc. 
+%% \SetCommentSty{textit}%arguments for comments
+%% \newcommand{\iIf}[2]{\textbf{if} {#1} \textbf{then}\hspace{0.125em}{\relax #2}}
+%% \newcommand{\iElseIf}[2]{\textbf{else if} {#1} \textbf{then}\hspace{0.125em}{\relax #2}}
+%% \newcommand{\iElse}[1]{\textbf{else} {\relax #1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%%% 
+%% \newcommand{\up}{--}
+\newcommand{\up}{{\mbox{--}}}
+\newcommand{\dw}{+}
+\newcommand{\down}{\dw}%% for compatibility 
+%% \newcommand{\up}{\idrm{up}}
+%% \newcommand{\down}{\idrm{dw}}
+
+%% private macros: cdawg
+\newcommand{\inv}{^{-1}}
+\newcommand{\anc}{\idrm{anc}}
+\newcommand{\lex}{\idrm{lex}}
+\newcommand{\len}{\idrm{len}}
+%% \newcommand{\pos}{\idrm{pos}}
+%% \newcommand{\no}{\idrm{no}}
+%% \newcommand{\idx}{\op{idx}}
+%% \newcommand{\val}{\op{val}}
+%%
+%% \newcommand{\Path}[1][(G)]{\idtt{Path}{#1}}%exp
+
+%%% 
+\renewcommand{\S}{\mathcal{S}} 
+%%\renewcommand{\S}{\mathcal{U}} 
+\newcommand{\U}[1][\delta]{\mathcal{U}_{#1}} 
+\newcommand{\PS}[1][\delta]{\idtt{Path}_{#1}} 
+\newcommand{\R}{\mathcal{D}}
+\renewcommand{\SS}[1][\le_\pos]{\S^{#1}} %% orig:\S := 'section'
+%% \newcommand{\RR}[1][\preceq]{\R^{#1}}
+%%% an edge 
+%% \newcommand{\lab}{\op{lab}}
+%% \newcommand{\src}{\op{src}}%%tail
+%% \newcommand{\dst}{\op{dst}}%%head
+%% \newcommand{\tail}{\src}%%tail
+%% \newcommand{\head}{\dst}%%head
+%% \newcommand{\tl}{\tail}%%tail
+%% \newcommand{\hd}{\head}%%head
+%%% 
+\newcommand{\fstchar}{\mop{fstchar}}
+\newcommand{\elen}{\mop{len-edge}}
+%%% canonical suffix 
+\newcommand{\cano}[1][\delta]{\op{cano}_{#1}}
+%% \newcommand{\cano}{\op{cano}}
+\newcommand{\spath}[1][]{\op{SP}_{#1}}
+%% \newcommand{\spath}{\op{SP}}
+\newcommand{\precsym}{\op{precsym}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Pos}{\op{pos}}
+\newcommand{\Rnk}{\op{rnk}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% canonical suffix 
+\newcommand{\COBJ}[3]{\mathrm{#1}_{#3}(T, {\lequp}, {#2})}
+\newcommand{\CS}[1][\delta]{\sig{CS}_{#1}(G)}
+\newcommand{\SP}[1][\delta]{\sig{SP}_{#1}(G)}
+\newcommand{\CE}[1][\delta]{\sig{CE}_{#1}}
+%% \newcommand{\Cert}[1][\delta]{\mathrm{Cert}_{#1}(T)}
+%% \newcommand{\CE}{\sig{CE}}
+\newcommand{\RSA}{\mathsf{SA}}%%
+\newcommand{\comp}[1]{\overline{#1}}%%
+%%
+\newcommand{\vobj}[2][\delta]{\bm{#2}_{#1}}%virtual object
+\newcommand{\trivcsuf}[1][\delta]{\vobj[#1]{S}}
+\newcommand{\trivsuf}[1][\delta]{\vobj[#1]{S}}
+\newcommand{\trivedge}[1][\delta]{\vobj[#1]{f}}
+\newcommand{\trivnode}[1][\delta]{\vobj[#1]{\bot}}
+%%%%%% 
+\newcommand{\SPath}[1][\lequp]{\mathit{SPath}(G,{#1})}
+\newcommand{\RSPath}[1][\leqdw]{\mathit{RSPath}(G,{#1})}
+%% \newcommand{\CS}{\CSuf}%obsolute
+\newcommand{\csuf}{\op{csuf}}%
+\newcommand{\csufup}{\op{csuf}_{\up}}%
+\newcommand{\csufdw}{\op{csuf}_{\dw}}%
+\newcommand{\cspath}{\op{cspath}}%obsolute
+%%%
+\newcommand{\dom}{\op{dom}}%exp
+\newcommand{\codom}{\op{co\-dom}}%exp
+%%%
+\newcommand{\BIrrPos}{\idrm{IrrPos}(T)}
+\newcommand{\BIrrRnk}{\idrm{IrrRnk}(T)}
+\newcommand{\QIrrPos}[1][\leqdw]{\idrm{QIrrPos}(T, {#1})}
+\newcommand{\QIrrRnk}[1][\leqdw]{\idrm{QIrrRnk}(T, {#1})}
+\newcommand{\BIrr}{BIrrXXX}
+\newcommand{\QIrr}{QIrrXXX}
+\newcommand{\Irr}{IrrXXX}
+%%% 
+\newcommand{\interp}{\op{interpolate}}
+\newcommand{\Parse}{\op{parse}}%lncs3
+%% up and down
+%% terminals
+%% \renewcommand{\up}{\idrm{up}}
+%% \renewcommand{\dw}{\idrm{dw}}
+%% path ordering 
+\newcommand{\less}{<}%%for compatibility
+\newcommand{\leqp}[1][\delta]{\mathbin{\preceq_{#1}}}
+\newcommand{\lessp}[1][\delta]{\mathbin{\prec_{#1}}}
+\DeclareMathOperator{\lequp}{\mbox{$\leqp[\up]$}}
+\DeclareMathOperator{\lessup}{\mbox{$\lessp[\up]$}}
+\DeclareMathOperator{\leqdw}{\mbox{$\leqp[\down]$}}
+\DeclareMathOperator{\lessdw}{\mbox{$\lessp[\down]$}}
+\DeclareMathOperator{\leqdown}{\leqdw}
+%%% pos and lex 
+\DeclareMathOperator{\leqpos}{\leqp[\pos]}
+\DeclareMathOperator{\lesspos}{\lessp[\pos]}
+\DeclareMathOperator{\leqlex}{\leqp[\lex]}
+\DeclareMathOperator{\lesslex}{\lessp[\lex]}
+%%% edge order 
+\newcommand{\leqedge}{\leq^E}
+\newcommand{\lessedge}{<^E}
+%% \DeclareMathOperator{\lessedge}{<^E}
+\newcommand{\leqe}[1][\delta]{{\leqedge_{#1}}}
+\newcommand{\leqein}{\leqe[-]}
+\newcommand{\leqeout}{\leqe[+]}
+\newcommand{\lesse}[1][\delta]{{\lessedge_{#1}}}
+\newcommand{\lessein}{{\lesse_{-}}}
+\newcommand{\lesseout}{{\lesse_{+}}}
+%%% edge 
+\newcommand{\leqa}[1][\delta]{{\leqedge_{#1}}}
+\newcommand{\leqepos}[1][-]{\leq^{E}_{#1,\pos}}%up:dw \leqepos[-]
+\newcommand{\leqelex}[1][+]{\leq^{E}_{#1,\lex}}%dw only \leqelex[+]
+\newcommand{\lessepos}[1][-]{<^{E}_{#1,\pos}}%up:dw \lessepos[-]
+\newcommand{\lesselex}[1][+]{<^{E}_{#1,\lex}}%dw only \lesselex[+]
+%%%
+\DeclareMathOperator{\leqeoutlex}{{\leq^E_{+,\lex}}}
+\DeclareMathOperator{\lesseoutlex}{{<^E_{+,\lex}}}
+\DeclareMathOperator{\leqeinpos}{{\leq^E_{--,\pos}}}
+\DeclareMathOperator{\lesseinpos}{{<^E_{--,\pos}}}
+%% total orders 
+\newcommand{\isprimary}[1][\delta]{\mop{is-primary}_{#1}}
+\newcommand{\shortest}[1][\delta]{\mop{shortest}_{#1}}
+%%% representative: 
+\newcommand{\nleaves}{\mop{nleaves}}%\#\U[+]
+\newcommand{\leftmostrank}{\mop{leftmost-rank}}%
+%%% spanning tree
+\newcommand{\TU}{\sig{T}_\up} %%forward tree = donward spanning tree
+\newcommand{\TD}{\sig{T}_\dw} %%reverse tree = upward spanning tree
+%%%%%%
+
+\newcommand{\mypreceq}{{\leqdw}}%exp
+\newcommand{\myprec}{{\lessdw}}%exp
+\newcommand{\qir}[1]{{\widetilde{#1}}}
+\newcommand{\bir}[1]{{\widehat{#1}}}
+\newcommand{\GLPF}{\idit{GLPF}}
+\newcommand{\GLPFd}{\GLPF_{\scriptsize\mypreceq}}%exp
+\newcommand{\GLPFdq}[1][\leqdw]{\qir{\idit{GLPF}}_{\scriptsize #1}}
+\newcommand{\GLPnF}{GLPnF}
+\newcommand{\IPOS}[1][\preceq]{\mathcal{IRR}_{#1}}
+\newcommand{\F}[1][]{\mathcal{F}_{#1}}
+\newcommand{\V}[1][]{\mathcal{V}_{#1}}
+\newcommand{\E}[1][]{\mathcal{E}_{#1}}
+\renewcommand{\root}{\id{root}}% 
+%% \newcommand{\sink}{\id{sink}}% 
+\newcommand{\suf}{\id{suf}}% 
+%%% edges and neigbors
+\newcommand{\N}[1][\delta]{N_{#1}}
+%% \newcommand{\In}{\N[-]}
+%% \newcommand{\Out}{\N[+]}
+%% \newcommand{\In}{N_{-}}
+%% \newcommand{\Out}{N_{+}}
+%% \newcommand{\In}{\op{In}}
+%% \newcommand{\Out}{\op{Out}}
+%% \newcommand{\EEE}[2]{\mbox{$\mathcal{E}_{\scriptsize #1}^{\scriptsize #2}$}}
+%% \newcommand{\EEE}[3]{\mbox{$\mathcal{#1}_{\scriptsize #3}^{\scriptsize (#2)}$}}
+%% \newcommand{\EE}[2]{\mbox{$\mathcal{E}_{\scriptsize #2}^{\scriptsize (#1)}$}}
+\newcommand{\EE}[2]{\mbox{$\mathcal{E}_{#2}^{#1}$}}
+\newcommand{\EP}[1][\delta]{\EE{\star}{#1}}
+\newcommand{\ES}[1][\delta]{\overline{\EE{\star}{#1}}}
+\newcommand{\ESX}[1][\delta]{\ES[#1]\cup\set{\trivedge[#1]}}
+\newcommand{\T}[1][\delta]{\sig T_{#1}}
+%% \newcommand{\EP}[1][\delta]{\EE{1}{#1}}
+%% \newcommand{\ES}[1][\delta]{\EE{2}{#1}}
+\newcommand{\EPU}[1][]{\EP[\up]}
+\newcommand{\ESU}[1][]{\ES[\up]}
+\newcommand{\EPD}[1][]{\EP[\dw]}
+\newcommand{\ESD}[1][]{\ES[\dw]}
+%% \newcommand{\EPU}[1][]{\EE{1{#1}}{\up}}
+%% \newcommand{\ESU}[1][]{\EE{2{#1}}{\up}}
+%% \newcommand{\EPD}[1][]{\EE{1}{\down #1}}
+%% \newcommand{\ESD}[1][]{\EE{2}{\down #1}}
+\newcommand{\Emin}{E_{\preceq}^{\min}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% helper
+\newcommand{\nofbox}[1]{#1}
+
+%% EOF
+

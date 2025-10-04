@@ -1,0 +1,74 @@
+// main.cpp
+//
+#include "../index/app.h"
+#include "../index/dot_printer.h"
+#include "stree.h"
+#include "conv_stree2cdawg.h"
+#include "comp_rank.h"
+#include "comp_esuf.h"
+#include "conv_wtree.h"
+
+#define TRACE (true)
+
+
+
+int main( int argc, char* argv[] ){
+  App<ENode,EEdge<ENode>> driver;
+
+  if (TRACE) printf("\n#allocating objects...\n"); 
+  STree *G = new STree(); 
+  DotPrintable<ENode,EEdge<ENode>> *DP = new DotPrinter<ENode,EEdge<ENode>>();
+
+  //preprocess
+  if (TRACE) printf("\n#building the Stree...\n"); 
+  driver.readOptions(argc, argv, *G, *DP);
+  driver.readAndInsert(G);
+  
+  //exp: Gのノードの順位区間を計算する => Cにもコピーする
+  if (DEBUG) printf("\n@exp: compute node ranks...\n");
+  ComputeRank cr;
+  cr.compute_node_ranks(G, G->get_src());
+
+  //conversion
+  if (TRACE) printf("\n#converting the Stree to the CDAWG...\n"); 
+  ConvStreeToCDAWG conv;
+  CDAWG *C = conv.convert(G); 
+
+  // printing a string 
+  std::string textstr = C->get_substring(0, INT_MAX);
+  int n = textstr.length(); 
+  if (TRACE) printf("text: len:%d\nidx: %s \nstr:'%s'\n",
+                    n, C->str_idx_list(n).c_str(), textstr.c_str());
+  
+  //buiding arrays
+  if (TRACE) printf("\n#constructing arrays form the CDAWG...\n");
+  if (TRACE) printf("\n#- enumerating upward paths in posorder...\n");
+  C->enumerate_upward_paths_in_posorder(C->get_sink());
+
+  if (TRACE) printf("\n#- enumerating downward paths in posorder...\n");
+  C->enumerate_downward_paths_in_posorder(C->get_src());
+
+  //Weiner tree
+  if (TRACE) printf("\n#- constructing the Weiner links...\n");
+  CompESufLink ces; 
+  std::map<ENode*, bool> VISITED;
+  ces.visit(C, C->get_src(), nullptr, VISITED);
+
+  //配列索引を構築する
+  Array *A = new Array(G->text);
+  if (TRACE) A->repo(); 
+  A->build();
+  if (TRACE) A->repo(); 
+  
+  // 描画する
+  if (G->TO_DRAW_SOFT_WEINER_LINKS == true) {
+    C = C->convert_to_CDAWG_with_weiner_links(); 
+  }
+
+  // printing dot files
+  driver.print_graph(C, DP, A); //printing
+
+  return 0;
+}; //main
+ 
+ 

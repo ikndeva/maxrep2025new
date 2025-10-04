@@ -1,0 +1,51 @@
+%%% setting: algorithm2e %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\algoopts}{%
+%%% RULES
+%boxed,%good
+%boxruled,%
+%algoruled,%good
+ruled,%
+%tworuled,%
+%%% CODE TYPESETTING
+%% hangingcomment,%
+%% opthanginginout,%
+%% noalgohanging,%obsolute 
+%%% BLOCKS DISPLAY
+%noline,%
+vlined,%L-tyle
+%lined,%I-style
+%%%
+linesnumbered%
+}
+%%\usepackage[\algoopts]{algorithm2e} 
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e} 
+
+\makeatletter
+\renewcommand{\@algocf@capt@plain}{above}% formerly {bottom}
+\makeatother
+%%% algorithm2e
+\newcommand{\comblk}[1]{\hfill$\rhd$\ \textit{#1}}
+\newcommand{\Commentblock}[1]{\comblk{#1}}
+\newcommand{\Commentblockl}[1]{\kern0.5em$\rhd$\ \textit{#1}\ $\lhd$}
+\newcommand{\CM}[1]{\comblk{#1}}
+%% \SetArgSty{textrm}%arguments for e.g., if, else, while etc. 
+%% \SetCommentSty{textit}%arguments for comments
+\SetKwComment{Comment}{$\rhd$}{} 
+\SetKwInput{KwInput}{Input}
+\SetKwInput{KwOutput}{Output}
+\SetKwInput{KwNotes}{Notes}
+%%%
+\SetKwInput{KwPreproc}{Preprocess}
+\SetKwInput{KwRuntime}{Runtime}
+\SetKwInput{KwGiven}{Given}
+\SetKwInput{KwGlobal}{Global}
+\SetKwInput{KwWork}{Working}
+\SetKwInput{KwMethod}{Method}
+\SetKwInput{KwPrecond}{Pre-condition}
+\SetKwInput{KwPostcond}{Post-condition}
+\SetArgSty{textrm}%arguments for e.g., if, else, while etc. 
+\SetCommentSty{textit}%arguments for comments
+\newcommand{\iIf}[2]{\textbf{if} {#1} \textbf{then}\hspace{0.125em}{\relax #2}}
+\newcommand{\iElseIf}[2]{\textbf{else if} {#1} \textbf{then}\hspace{0.125em}{\relax #2}}
+\newcommand{\iElse}[1]{\textbf{else} {\relax #1}}
+

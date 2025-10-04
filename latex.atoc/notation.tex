@@ -1,0 +1,90 @@
+%%% notation.tex
+
+
+%%%% new atoc 
+\newcommand{\Sub}{\idsf{Sub}}
+%% \newcommand{\Suf}{\idsf{Suf}}
+%% \newcommand{\Pref}{\idsf{Pref}}
+\newcommand{\LPF}{\idrm{LPF}}
+
+\newcommand{\SA}{\idrm{SA}}
+\newcommand{\ISA}{\idrm{ISA}}
+\newcommand{\LCP}{\idrm{LCP}}
+\newcommand{\BWT}{\idrm{BWT}}
+
+%%%%
+
+%%% algo
+\newcommand{\Rec}{\textsf{RecVisit}}  %% TDSA
+
+\newcommand{\MREnum}{\textsf{Enum}}  %% TDSA
+\newcommand{\GenChildren}[1][{\LCP, \SA, S}]{\textsf{GenChildren}_{#1}}  
+\newcommand{\ColoredRange}[1][{\BWT,RMQ}]{\textsf{ColoredRange}_{#1}}  
+\newcommand{\append}{\op{append}}
+
+\newcommand{\LSigma}[1][S]{\idrm{LChar}_{#1}}
+\newcommand{\RSigma}[1][S]{\idrm{RChar}_{#1}}
+\newcommand{\getfactor}[1][{\SA, S}]{\op{Fact}_{#1}} 
+\newcommand{\isLeftBranching}[1][{\SA, \ISA, S}]{\proc{isLeftBranching}_{#1}}\newcommand{\RREP}{\mathcal{RP}}  %% TDSA
+
+%%%
+%% \newcommand{\rk}[1]{^{(#1)}} %%alias 
+%% \newcommand{\idx}[3]{_{#1=#2}^{#3}} %%alias
+%% \newcommand{\btw}[3]{{#2}\le {#1}\le {#3}} %%alias
+%% \newcommand{\Suf}{\idrm{Suf}}
+%% \newcommand{\Fac}{\idrm{Fac}}
+
+%%%%  orig
+\newcommand{\lab}{\idtt{label}}
+\newcommand{\src}{\idtt{src}}
+\newcommand{\dst}{\idtt{dst}}
+\newcommand{\str}{\idtt{str}}
+\newcommand{\Spos}[1][S]{\idtt{Spos}_{#1}}
+\newcommand{\Epos}[1][S]{\idtt{Epos}_{#1}}
+\newcommand{\eqspos}[1][S]{\equiv^{#1}_{spos}}
+\newcommand{\eqepos}[1][S]{\equiv^{#1}_{epos}}
+%% \newcommand{\In}[1][G]{E^\idrm{in}_{#1}}
+%% \newcommand{\Out}[1][G]{E^\idrm{out}_{#1}}
+\newcommand{\In}[1][G]{\idrm{In}_{#1}}
+\newcommand{\Out}[1][G]{\idrm{Out}_{#1}}
+%%%
+\newcommand{\CDAWG}[1][S]{\idrm{CDAWG}}
+\newcommand{\LPT}[1][]{\idsf{LPT}_{#1}}
+\newcommand{\LPTplus}{\LPT[+]}
+\newcommand{\LPTminus}{\LPT[-]}
+\newcommand{\source}[1][G]{\idrm{source}_{#1}}
+\newcommand{\sink}[1][G]{\idrm{sink}_{#1}}
+\newcommand{\Path}[1][G]{\idsf{Path}_{#1}}
+\newcommand{\String}[1][G]{\idsf{String}_{#1}}
+\newcommand{\para}[2][]{\idsc{#2}_{#1}}
+\newcommand{\snd}[2][]{{#2}^\idrm{snd}_{#1}}
+%% \newcommand{\Esnd}[1][]{E^\idrm{2nd}_{#1}}
+\newcommand{\Esnd}[1][]{\snd[LPF]{E}}
+\newcommand{\PATHsnd}[1][]{\snd[LPF]{Path}}
+
+\newcommand{\svalue}[1][]{\idtt{value}_{#1}}
+\newcommand{\ReplPref}[1][]{\idtt{value}^\idrm{pref}_{#1}}
+\newcommand{\ReplSuf}[1][]{\idtt{value}^\idrm{suf}_{#1}}
+\newcommand{\ReplPath}[1][]{\idsc{Path}^\idrm{repl}_{#1}}
+%% \newcommand{\ReplPref}[1][]{\idsc{pref}^\idrm{repl}_{#1}}
+%% \newcommand{\ReplSuf}[1][]{\idsc{suf}^\idrm{repl}_{#1}}
+%% \newcommand{\ReplPath}[1][]{\idsc{Path}^\idrm{repl}_{#1}}
+
+\newcommand{\pos}[1][]{\idtt{pos}_{#1}}
+\newcommand{\val}[1][]{\idtt{val}_{#1}}
+%%% 
+\newcommand{\lext}[1]{\overleftarrow{#1}} 
+\newcommand{\rext}[1]{\overrightarrow{#1}} 
+\newcommand{\mext}[1]{\overleftrightarrow{#1}}
+\newcommand{\MR}{\textsf{MR}}
+\newcommand{\RM}{\textsf{RM}}
+\newcommand{\LM}{\textsf{LM}}
+\newcommand{\M}{\MR}%%
+\newcommand{\EQCspos}[1]{[{#1}]_{\eqspos}}
+\newcommand{\EQCepos}[1]{[{#1}]_{\eqepos}}
+\newcommand{\RR}[1][S]{\idcal{R}_{#1}}
+\newcommand{\Parent}[1][S]{\idtt{Parent}_{#1}}
+%%%%
+
+\newcommand{\mysubsubsection}[1]{\textbf{#1}.\hspace{0.125em}}%% camera
+\newcommand{\myfootnote}[1]{\hspace{-0.25em}\footnote{#1}}

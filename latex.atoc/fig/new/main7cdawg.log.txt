@@ -1,0 +1,137 @@
+echo abcadabcabc\$ | main7cdawg.exe -L -f 18  -g -d main7cdawg 
+
+#allocating objects...
+
+#building the Stree...
+@debug: update: node[5] this->posbeg=4 old_branch->ch_suf=a
+@debug: update: node[8] this->posbeg=6 old_branch->ch_suf=a
+@debug: update: node[10] this->posbeg=7 old_branch->ch_suf=b
+@debug: update: node[14] this->posbeg=9 old_branch->ch_suf=a
+@debug: update: node[16] this->posbeg=10 old_branch->ch_suf=b
+@debug: update: node[18] this->posbeg=11 old_branch->ch_suf=c
+
+#converting the Stree to the CDAWG...
+debug: copy_edges_for_cdawg: node[5] suf=[1] src->ch_suf='a' src_new->ch_suf='a'
+debug: copy_edges_for_cdawg: node[5] suf=[1] src->ch_suf='a' src_new->ch_suf='a'
+debug: copy_edges_for_cdawg: node[14] suf=[1] src->ch_suf='c' src_new->ch_suf='c'
+debug: copy_edges_for_cdawg: node[8] suf=[5] src->ch_suf='c' src_new->ch_suf='c'
+debug: copy_edges_for_cdawg: node[8] suf=[5] src->ch_suf='c' src_new->ch_suf='c'
+debug: copy_edges_for_cdawg: node[14] suf=[1] src->ch_suf='c' src_new->ch_suf='c'
+text: len:12
+idx: 01234567891011 
+str:'abcadabcabc$'
+
+#constructing arrays form the CDAWG...
+
+#- enumerating upward paths in posorder...
+@ans: pos:  0, plcp:  4, rnk: -1, eid: 23, prim=1,0, len: 12, suf:'abcadabcabc$'
+@ans: pos:  3, plcp:  1, rnk: -1, eid: 26, prim=0,0, len:  9, suf:'adabcabc$'
+@ans: pos:  4, plcp:  0, rnk: -1, eid: 30, prim=0,0, len:  8, suf:'dabcabc$'
+@ans: pos:  5, plcp:  3, rnk:  2, eid: 24, prim=1,0, len:  7, suf:'abcabc$'
+@ans: pos:  8, plcp:  0, rnk:  1, eid: 27, prim=1,0, len:  4, suf:'abc$'
+@ans: pos:  9, plcp:  0, rnk:  1, eid: 28, prim=0,0, len:  3, suf:'bc$'
+@ans: pos: 10, plcp:  0, rnk:  1, eid: 29, prim=0,0, len:  2, suf:'c$'
+@ans: pos: 11, plcp:  0, rnk:  0, eid: 31, prim=0,0, len:  1, suf:'$'
+
+#- enumerating downward paths in posorder...
+@ans: pos: 11, bwt:c, rnk: -1, eid: 20, prim=0,1, len:  1, suf:'$'
+@ans: pos:  8, bwt:c, rnk: -1, eid: 21, prim=0,1, len:  4, suf:'abc$'
+@ans: pos:  5, bwt:d, rnk: -1, eid: 22, prim=0,1, len:  7, suf:'abcabc$'
+@ans: pos:  3, bwt:c, rnk: -1, eid: 26, prim=0,0, len:  9, suf:'adabcabc$'
+@ans: pos:  9, bwt:a, rnk:  1, eid: 28, prim=0,0, len:  3, suf:'bc$'
+@ans: pos: 10, bwt:b, rnk:  1, eid: 29, prim=0,0, len:  2, suf:'c$'
+@ans: pos:  4, bwt:a, rnk: -1, eid: 30, prim=0,0, len:  8, suf:'dabcabc$'
+
+#- constructing the Weiner links...
+T  : n=12 : 'abcadabcabc$'
+SA : n=0 : []
+BWT: n=0 : ''
+LCP: n=0 : []
+print all suffixes in the lexicographic-order...
+done.
+print all suffixes in the lexicographic-order...
+size: n=0: 
+T	size: n=0: 
+done.
+build: enter
+build_sa: enter
+build_sa: exit
+build_bwt: enter
+build_bwt: exit
+build_lcp: enter
+build_lcp: exit
+build_plcp: enter
+build_plcp: exit
+T  : n=12 : 'abcadabcabc$'
+SA : n=12 : [11 8 5 0 3 9 6 1 10 7 2 4]
+BWT: n=12 : 'ccd$caaabbba'
+LCP: n=12 : [0 0 3 4 1 0 2 3 0 1 2 0]
+print all suffixes in the lexicographic-order...
+rank	SA	BWT	LCP	SH	suff	size: n=12: 
+0	11	c	0	1	'$'	
+1	8	c	0	0	'abc$'	
+2	5	d	3	1	'abcabc$'	
+3	0	$	4	1	'abcadabcabc$'	
+4	3	c	1	1	'adabcabc$'	
+5	9	a	0	1	'bc$'	
+6	6	a	2	0	'bcabc$'	
+7	1	a	3	0	'bcadabcabc$'	
+8	10	b	0	1	'c$'	
+9	7	b	1	0	'cabc$'	
+10	2	b	2	0	'cadabcabc$'	
+11	4	a	0	1	'dabcabc$'	
+done.
+print all suffixes in the lexicographic-order...
+size: n=12: 
+pos	T	PLCP	TH	size: n=12: 
+0	a	4	1	'abcadabcabc$'	
+1	b	3	0	'bcadabcabc$'	
+2	c	2	0	'cadabcabc$'	
+3	a	1	1	'adabcabc$'	
+4	d	0	1	'dabcabc$'	
+5	a	3	1	'abcabc$'	
+6	b	2	0	'bcabc$'	
+7	c	1	0	'cabc$'	
+8	a	0	0	'abc$'	
+9	b	0	1	'bc$'	
+10	c	0	1	'c$'	
+11	$	0	1	'$'	
+done.
+build: exit
+T  : n=12 : 'abcadabcabc$'
+SA : n=12 : [11 8 5 0 3 9 6 1 10 7 2 4]
+BWT: n=12 : 'ccd$caaabbba'
+LCP: n=12 : [0 0 3 4 1 0 2 3 0 1 2 0]
+print all suffixes in the lexicographic-order...
+rank	SA	BWT	LCP	SH	suff	size: n=12: 
+0	11	c	0	1	'$'	
+1	8	c	0	0	'abc$'	
+2	5	d	3	1	'abcabc$'	
+3	0	$	4	1	'abcadabcabc$'	
+4	3	c	1	1	'adabcabc$'	
+5	9	a	0	1	'bc$'	
+6	6	a	2	0	'bcabc$'	
+7	1	a	3	0	'bcadabcabc$'	
+8	10	b	0	1	'c$'	
+9	7	b	1	0	'cabc$'	
+10	2	b	2	0	'cadabcabc$'	
+11	4	a	0	1	'dabcabc$'	
+done.
+print all suffixes in the lexicographic-order...
+size: n=12: 
+pos	T	PLCP	TH	size: n=12: 
+0	a	4	1	'abcadabcabc$'	
+1	b	3	0	'bcadabcabc$'	
+2	c	2	0	'cadabcabc$'	
+3	a	1	1	'adabcabc$'	
+4	d	0	1	'dabcabc$'	
+5	a	3	1	'abcabc$'	
+6	b	2	0	'bcabc$'	
+7	c	1	0	'cabc$'	
+8	a	0	0	'abc$'	
+9	b	0	1	'bc$'	
+10	c	0	1	'c$'	
+11	$	0	1	'$'	
+done.
+dot -Tpdf main7cdawg.dot > main7cdawg.pdf
+rm main7cdawg.dot

@@ -1,0 +1,16 @@
+%%% narrowmargin.tex
+%%% begin: papersize with narrower margins
+\usepackage{calc}
+\newlength{\marginwidth} %% 
+\newlength{\contentswidth} %% lncs
+\newlength{\contentsheight} %% lncs
+\newlength{\mypaperwidth} %% paper
+\newlength{\mypaperheight} %% paper
+\setlength{\marginwidth}{20mm} %% 
+\setlength{\contentswidth}{145mm} %% lncs
+\setlength{\contentsheight}{225mm} %% lncs
+\setlength{\mypaperwidth}{\contentswidth+\marginwidth} %% paper
+\setlength{\mypaperheight}{\contentsheight+\marginwidth} %% paper
+\usepackage[papersize={\mypaperwidth,\mypaperheight},margin=\marginwidth]{geometry} 
+%%% end: papersize 
+%%% EOF

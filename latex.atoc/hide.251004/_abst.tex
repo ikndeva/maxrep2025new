@@ -1,0 +1,10 @@
+%%% abst.tex
+\begin{abstract}
+  In this paper, we consider enumeration of classes of unusual words, namely, \textit{minimal absent words} (MAW), \textit{minimal unique substrings} (MUSs), and their generalization, called \textit{mininimal rare words} (MRWs). In general, an unusual word is a short string whose frequency in a given string $S$ as substrings is siginificantly deviated from those of its proper subwords. 
+  The current fastest algorithms for finding such unusual words 
+  uses as a substrait array-based structures, such as the suffix array or the Burrows-Wheeler transform of $S$ combined with small auxiliary data structures, rather than space inefficient data structures such as the suffix tree.
+  However, these algorithms are not \textit{output-sensitive} since they always grow linearly in the length $n$ of innput $S$ even when the number of solutions is sublinear in $n$.
+  In this paper, we present a new algorithm that, based on the suffix array, the inverse suffix arrays, longest common prefix array, and an input string, computes the set $MRW(S)$ of all minimal rare words in a string $S$ in $O(e + occ)$ time, where $occ$ denotes the number $|MRW(S)|$ of solusions, and  $e = e_L + e_R$ denotes the sum of the numbers of left- and right-extensions of maximal repeats in $S$. For any string $S$ of length $n$, $e_R$ is linear in $n$, and can be sublinear in $n$, up to logarithmic, for highly repetitive strings such as collection of human genomes. A key to our algorithm is efficient enumeration of all maximal repeats in a string $S$ in $O(e_R)$ time using the suffix array and other indexing structures based on a novel search strategy. 
+  We also show how to modify the proposed algorithms for computation of other classes of unusual words.
+\end{abstract}
+

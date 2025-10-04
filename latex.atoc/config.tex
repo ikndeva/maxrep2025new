@@ -1,0 +1,228 @@
+%%% config.tex
+
+%%======================================
+\usepackage{graphicx}
+%% \usepackage{amsmath,amssymb}
+%% \usepackage{mathtools}
+%% \mathtoolsset{showonlyrefs=false} %% 参照している式参照のみ表示
+%% \mathtoolsset{showonlyrefs=true} %% 参照している式参照のみ表示
+%% \usepackage{cite}
+\usepackage{caption}    %%for subfigure
+\usepackage[skip=0.5ex]{subcaption} %%for subfigure
+\captionsetup{aboveskip=0.0\baselineskip}
+\captionsetup{belowskip=0.0\baselineskip}
+%%%
+%%\usepackage{titlesec}
+%% \titlespacing*{\section}{0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
+%% \titlespacing*{\subsection}{0pt}{5.5ex plus 1ex minus .2ex}{4.3ex plus .2ex}
+
+%%% table
+%% \usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{array}
+
+% private macros by others 
+\usepackage{url}
+\usepackage{bm}
+\usepackage{textcomp}%%for cent
+%\usepackage[margin=1.75in]{geometry}
+%\usepackage[margin=1.0in]{geometry}
+%% \usepackage{subfig}
+%% \usepackage{natbib}
+
+%%% private %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% private macros by arim@ist
+\input{jsvmac}
+%%\input{arimmacro} %%privatemacro
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%xsavebox
+\usepackage{xsavebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% above and below float figure table
+\setlength\intextsep{0.5\baselineskip}
+\setlength\abovecaptionskip{0.0\baselineskip}
+\setlength\belowcaptionskip{0.5\baselineskip}
+%% \setlength\intextsep{18pt}
+
+%%%%%%%%%%%%%%%%%%
+%% latex native savebox and lrbox
+\newenvironment{savethm}[1]{\begin{lrbox}{#1}\begin{minipage}[t]{1.0\textwidth}}{\end{minipage}\end{lrbox}}
+
+\newcommand{\putthm}[1]{
+%% \smallskip
+\noindent 
+\usebox{#1}
+\medskip}
+
+%%sample
+%% \newsavebox{\thmbox}
+%% \begin{lrbox}{\thmbox}
+%% \begin{minipage}[t]{1.0\textwidth}
+%% \begin{theorem}\label{thm:algbwt:main}
+%% ....
+%% \end{theorem}
+%% \end{minipage}
+%% \end{lrbox}
+
+
+%% \putthm{\thmbox}
+
+
+%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%comment out a paragraph
+\newsavebox{\cmbox}
+\newenvironment{commbox}{
+  \begin{lrbox}{\cmbox}
+    \begin{minipage}{.9\textwidth}
+}{\end{minipage}
+  \end{lrbox}
+  %\framebox{\usebox{\cmbox}}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%% empty environment 
+% \newenvironment{myempty}{\begin{commbox}}{\end{commbox}}
+% %%% proof environment 
+% \newenvironment{myproof}{\begin{proof}}{\end{proof}} %default
+% \newenvironment{myfullproof}{\begin{proof}}{\end{proof}} %default
+% \newenvironment{myfullproofempty}{\begin{myempty}}{\end{myempty}} %default
+
+%% replace an enviroment #1 with #2
+\newcommand{\myenvironmentreplace}[2]{\renewenvironment{#1}{\begin{#2}}{\end{#2}}}
+
+%% claim %%
+\newenvironment{myclaim}[1][]{\bgroup\parskip=0mm\par (\textit{Claim{#1}})}{(\textit{End of Claim})\par\egroup}  
+\newenvironment{proofofclaim}{\bgroup\parindent=1em\parskip=0mm\par (\textit{Proof for the claim})}{(\textit{End of the proof for the claim})\par\egroup}  
+\newenvironment{proofofclaimempty}{\begin{myempty}}{\end{myempty}}
+
+%% \newenvironment{proofofclaim}{\bgroup\parskip=0mm\par (Proof for the claim)}{(End of the proof for the claim)\par\egroup}  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% %% switch catcode of '&' between 4 and 9
+% \newenvironment{inalign}{\begin{math}\catcode`&=9}{\catcode`&=4\end{math}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% lipics predefined
+
+%% send a proof to the appendix
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}{Remark}
+\newtheorem{fact}{Fact}
+
+% \newtheorem{example}[example]{Example}[section]
+% \newtheorem{conjecture}{Conjecture}
+% %% dammy
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% cleveref
+\usepackage{cleveref}
+\crefname{section}{Sec.}{Sections}
+\crefname{chapter}{Chapter}{Chapters}
+%%
+\crefname{algorithm}{Algorithm}{Algorithms}
+\crefname{table}{Table}{Tables}
+\crefname{figure}{Fig.}{Figures}
+%% 
+\crefname{definition}{Definition}{Definitions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{proposition}{Prop.}{Propositions}
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{remark}{Remark}{Remarks}
+\crefname{fact}{Fact}{Facts}
+\crefname{problem}{Problem}{Problems}
+\crefname{observation}{Observation}{Observations}
+%% \crefname{lemma}{Lemma}{Lemmas}
+\crefname{equation}{Eq.}{Equations}
+%%% fix of a bug in Algorithm
+\newcommand{\aref}[1]{Algorithm\kern0.25em\ref{#1}} 
+%%%%%%
+
+% %% send a proof to the appendix
+\usepackage{apxproof}
+% \newtheoremrep{definition}{Definition}[section]
+\newtheoremrep{lemma}[theorem]{Lemma}[section]
+\newtheoremrep{proposition}[proposition]{Proposition}[section]
+\newtheoremrep{theorem}[theorem]{Theorem}[section]
+\newtheoremrep{corollary}[theorem]{Corollary}[section]
+% \newtheoremrep{remark}[theorem]{Remark}
+
+%% \newtheoremrep{example}[example]{Example}[section]
+%% \newtheoremrep{conjecture}{Conjecture}
+%% %% dammy
+%% \newcommand{\resetrep}{}
+%% rest 
+%% \newcommand{\resetreptext}{{\rm\textsf{in draft}}}
+%% \newcommand{\getfollow}[1][{}]{{\rm\textsf{(*{#1})}}\ }
+
+%% \newcommand{\resetrep}{%% resetting all rep-style environments
+%% %% \renewenvironment{lemmarep}{\begin{lemma}\getfollow}{\end{lemma}}
+%% \renewenvironment{lemmarep}{\begin{lemma}\getfollow}{\end{lemma}}
+%% \renewenvironment{propositionrep}{\begin{proposition}\getfollow}{\end{proposition}}
+%% \renewenvironment{theorem}{\begin{theorem}\getfollow}{\end{theorem}}
+%% \renewenvironment{corollaryrep}{\begin{corollary}\getfollow}{\end{corollary}}
+%% \renewenvironment{examplerep}{\begin{example}\getfollow}{\end{example}}
+%% \renewenvironment{remarkrep}{\begin{remark}\getfollow}{\end{remark}}
+%% \renewenvironment{conjecturerep}{\begin{conjecture}\getfollow}{\end{conjecture}}
+%% \renewenvironment{toappendix}{}{}
+%% }
+
+%%%%% 
+\newenvironment{statement}[1]{\begin{trivlist}\item[]$\blacktriangleright\:$\textbf{#1}\ }{\end{trivlist}}
+\newenvironment{notoappendix}{}{} %% the empty version of toappendix
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% enumitem: smart enumerate and itemize
+%% the vspace above list = \topsep + \parskip + \partopsep
+%% the vspace between items = \itemsep + \Parsep 
+%% the vspace between paragraphs = \Parsep 
+\usepackage[inline,shortlabels]{enumitem} %enumerate
+\setlist{noitemsep}
+\setlist{%
+topsep = 0.25\baselineskip,
+parsep = 0.125\baselineskip
+}%exp
+\setlist[enumerate]{ labelsep=.25pc, leftmargin=1.5pc } 
+%% \setlist[enumerate]{ labelsep=.25pc, leftmargin=1.5pc } 
+\setlist[enumerate,1]{ label= (\arabic*), ref=\arabic*}
+\setlist[enumerate,2]{ label= (\roman*),ref  = \roman*}
+\setlist[enumerate,3]{ label= (\alph*), ref  = (\alph*)}
+%\setlist[itemize]{ leftmargin=1.5pc }
+\setlist[description]{ font=\sffamily\bfseries }
+%% end macros
+%%% switch
+%% \newenvironment{myenumerate}{\begin{enumerate}}{\end{enumerate}}
+\newenvironment{myenumerate}{\begin{enumerate*}}{\end{enumerate*}}
+%% end macros
+
+%%
+
+%% %% 目次のハイパーリンク: 印刷時は念の為コメントアウト（本来出ない）
+%% \usepackage[%
+%% %dvipdfmx,%
+%% colorlinks=true,%
+%% linkcolor=blue,%
+%% anchorcolor=black,%
+%% citecolor=blue,%
+%% urlcolor=blue%
+%% ]{hyperref} %注意：パッケージの最後に読み込むこと
+
+%%%%
+
+%% EOF
