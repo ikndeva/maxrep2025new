@@ -18,12 +18,12 @@
 \newcommand{\Rec}{\textsf{RecVisit}}  %% TDSA
 
 \newcommand{\MREnum}{\textsf{Enum}}  %% TDSA
-\newcommand{\GenChildren}[1][{\LCP, \SA, S}]{\textsf{GenChildren}_{#1}}  
+\newcommand{\GenChildren}[1][{\LCP}]{\textsf{GenChildren}_{#1}}  
 \newcommand{\ColoredRange}[1][{\BWT,RMQ}]{\textsf{ColoredRange}_{#1}}  
 \newcommand{\append}{\op{append}}
 
-\newcommand{\LSigma}[1][S]{\idrm{LChar}_{#1}}
-\newcommand{\RSigma}[1][S]{\idrm{RChar}_{#1}}
+\newcommand{\LChar}[1][S]{\idrm{LChar}_{#1}}
+\newcommand{\RChar}[1][S]{\idrm{RChar}_{#1}}
 \newcommand{\getfactor}[1][{\SA, S}]{\op{Fact}_{#1}} 
 \newcommand{\isLeftBranching}[1][{\SA, \ISA, S}]{\proc{isLeftBranching}_{#1}}\newcommand{\RREP}{\mathcal{RP}}  %% TDSA
 
@@ -49,6 +49,7 @@
 \newcommand{\Out}[1][G]{\idrm{Out}_{#1}}
 %%%
 \newcommand{\CDAWG}[1][S]{\idrm{CDAWG}}
+\newcommand{\Stree}[1][S]{\idrm{Stree}}
 \newcommand{\LPT}[1][]{\idsf{LPT}_{#1}}
 \newcommand{\LPTplus}{\LPT[+]}
 \newcommand{\LPTminus}{\LPT[-]}
@@ -72,10 +73,11 @@
 
 \newcommand{\pos}[1][]{\idtt{pos}_{#1}}
 \newcommand{\val}[1][]{\idtt{val}_{#1}}
+\newcommand{\Value}[1][S]{\idtt{value}_{#1}}
 %%% 
-\newcommand{\lext}[1]{\overleftarrow{#1}} 
-\newcommand{\rext}[1]{\overrightarrow{#1}} 
-\newcommand{\mext}[1]{\overleftrightarrow{#1}}
+\newcommand{\lext}[2][S]{\overleftarrow{#2}^{#1}} 
+\newcommand{\rext}[2][S]{\overrightarrow{#2}^{#1}} 
+\newcommand{\mext}[2][S]{\overleftrightarrow{#2}^{#1}}
 \newcommand{\MR}{\textsf{MR}}
 \newcommand{\RM}{\textsf{RM}}
 \newcommand{\LM}{\textsf{LM}}
@@ -87,4 +89,4 @@
 %%%%
 
 \newcommand{\mysubsubsection}[1]{\textbf{#1}.\hspace{0.125em}}%% camera
-\newcommand{\myfootnote}[1]{\hspace{-0.25em}\footnote{#1}}
+\newcommand{\myfootnote}[1]{\hspace{-0.125em}\footnote{#1}}
