@@ -383,6 +383,7 @@ Generation of the set $Children(\tau)$ can be done as follows.
 \end{enumerate*}
 \end{lemma}
 
+%%%%%%%%%%%%%%%%%%%
 {
 %% \setlength{\interspacetitleruled}{0pt}%
 \setlength{\algotitleheightrule}{0pt}%
@@ -559,6 +560,84 @@ From \cref{lem:leftmaximal:character}, we can implement the procedure $\isLeftBr
 \subsection{Merging dammy leaves to branching nodes (TBD)}
 %%%
 (This subsection is incomplete, and the complexity of merging is  still open.)
+
+%%%%%%
+\begin{figure}[t]
+\centering
+%\fbox{}
+\includegraphics[height=0.4\textwidth]{fig3.pdf}
+\vspace{.5\baselineskip}
+\caption{Computation of suffix links}\label{fig:example:arrays}
+\end{figure}
+%%%%%%
+
+%%%%%%%%%%%%%%%%%%%
+{
+%% \setlength{\interspacetitleruled}{0pt}%
+\setlength{\algotitleheightrule}{1pt}%
+\begin{algorithm}[p]
+  \caption{The procedure for transforming the LPT$_+$ tree $L = (\sig V, \sig E, root)$ for a string $S$ into its CDAWG by computing the suffix links for primary nodes and merge non-primary nodes with the equivalent primary nodes. 
+  }\label{algo:genchildren}
+  \KwWork{A priority queue $B$, which stores pairs $\pair{s, v}$ of a node $v$ with its string depth $s = v.\op{strdep} := |\str(v)|$. 
+    $suf: \sig V\setminus\set{root} \to \sig V$; 
+    $wlink: \sig V\times\Sigma \to (\sig V\cup \sig E)$; 
+  }
+\textbf{Procedure} $\textsf{MakeSuffixLinks}$\;   
+%$B \gets \sete{\pair{0, \idrm{root}}}$;
+$B \gets\emptyset$;
+$suf \gets \emptyset$; 
+$wlink \gets \emptyset$\;
+\For{ arc $f = (u, \alpha, w)$ in $\op{Outarc}(root)$ }{
+  $B.\op{insert}( \pair{ f, \op{strdep}(w) } )$\Comment*{$\op{insert}(value, key)$}
+}%For
+%\Comment{string label $\alpha[1..|\alpha|] \in \Sigma^+$}
+\While{ $B \not= \emptyset$ }{
+  $\pair{f, strdep} \gets B.\op{deletemin}()$\;
+  $(u, \alpha, w) \gets f$
+  \Comment*{target arc $f$ with string label $\alpha[1..|\alpha|] \in \Sigma^+$} 
+  %\For { }{
+    \uIf{ $u$ is the root }{
+      $v_0 \gets u$; 
+      $\alpha \gets \alpha[2..|\alpha|]$
+      %\Comment*{Delete the first character}
+      \Comment*{Starting at the root}
+    %% $b_0 \gets \alpha[2] \in \Sigma$;
+    %% $\ell_* \gets |\alpha|-1$\;
+    }
+    \Else (\comblk{$u$ is a branching node})
+    {
+      $v_0 \gets \id{suf}(u)$\Comment*{Starting at target of the suffix link}
+    }
+    $\ell_* \gets |\alpha|$;
+    $b \gets \alpha[1] \in \Sigma$;
+    $\ell \gets 0$; 
+    $i \gets 0$\;
+    \While {$\ell < \ell_*$}{
+      \Comment{Selecting an outgoing arc $g_i$ by branching character $b \in \Sigma$}
+      $g_i = (v_i, \beta_i, v_{i+1}) \gets \op{Outarc}(v_i, b)$\;
+      $\idrm{Wlink}(v_i, a) \gets f$ \Comment*{Add an implicit W-link}
+      $b \gets \alpha[\ell + 1]$\Comment*{branching character $b$}
+      $\ell \gets \ell + |\beta_i|$\Comment*{processed length}
+      $i \gets i+1$\;
+      \For{ arc $f' = (v_{i+1}, \alpha', w')$ in $\op{Outarc}(v_{i+1})$ }{
+        $B.\op{insert}( \pair{ f', \op{strdep}(w') } )$\;
+      }
+    }%whle
+    $k \gets i - 1$; $v \gets v_k$\;
+    \uIf{$v$ has exactly one outgoing $\id{wlink}$}{
+      Merge $v$ into $w$ by re-directing all incoming arcs to $v$ into $w$\; 
+    }
+    \Else{
+      $suf(w) \gets v$\;
+      $\id{wlink}(v, a) \gets w$ \Comment*{Add an explicit W-link}
+    }
+    %$B.\op{insert}(\pair{v.\op{strdep}, v})$\; 
+  %}%for
+}%While
+\Return $G = (\sig V, \sig E, suf, wlink, root)$\; 
+\end{algorithm}
+}
+%%%%%%%%%%%%%%%%%
 
 At \cref{line:main:merge} in \cref{algo:main}, we merge all dammy leaves in $\Delta(S)$ for non-maximal factors into the associated equivalence classes of branching nodes in $\sig V$.
 
