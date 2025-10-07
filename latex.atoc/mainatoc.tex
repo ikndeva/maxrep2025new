@@ -151,9 +151,11 @@ We also assume the knowledge of the suffix arrays (SA) and its inverse array (IS
 %%%%%%
 \begin{figure}[t]
 \centering  
-\includegraphics[width=0.70\textwidth]{fig1.pdf}
+\includegraphics[height=0.39\textwidth]{fig1.pdf}
+\includegraphics[height=0.39\textwidth]{fig7.pdf}
 \vspace{.5\baselineskip}
-\caption{An example of indexing arrays of a string $S[1..10] = aabaababb\daller$ of length $n = 10$ over alphabet $\Sigma = \set{a, b}$, whose index starts at $0$, where the left endmarker $S[0]=\#$ and the related suffixes are omitted. 
+\caption{An example of indexing arrays $SA, LCP, BWT, ISA$ (left) and the CDAWG $G$ (right) of a string $S[1..10] = aabaababb\daller$ of length $n = 10$ over alphabet $\Sigma = \set{a, b}$, whose index starts at $0$. In $S$, the left endmarker $S[0]=\#$ and the related suffixes are omitted. In $G$, nodes $0$ and $1$ indicate a virtual master node and the root, respectively. Black and red arrows indicates the goto edges and suffix links, respectively. 
+  We observe that branching nodes $1, 3,14,12$, and $6$ of $G$ correspond to maximal repeats of $S$, namely, $\eps$, $a$, $b$, $ab$, and $aaba$. 
 %%   Inside and to the right of the panel for sorted suffixes, each bold rectangle $R = [i..j]\times [0..\ell-1]$ and square bracket
 %% indicate a rich representation $(i..j, \ell)$ of a repeat of $S$ and 
 %% the associated SA-interval $i..j$, respectively. 
@@ -557,9 +559,9 @@ From \cref{lem:leftmaximal:character}, we can implement the procedure $\isLeftBr
 %% \end{remark}
 %% \end{toappendix}
 
-\subsection{Merging dammy leaves to branching nodes (TBD)}
+%% \subsection{Merging dammy leaves to branching nodes (TBD)}
+\subsection{Transforming LPT$_+$ tree to CDAWG}
 %%%
-(This subsection is incomplete, and the complexity of merging is  still open.)
 
 %%%%%%
 \begin{figure}[t]
@@ -567,112 +569,195 @@ From \cref{lem:leftmaximal:character}, we can implement the procedure $\isLeftBr
 %\fbox{}
 \includegraphics[height=0.4\textwidth]{fig3.pdf}
 \vspace{.5\baselineskip}
-\caption{Computation of suffix links}\label{fig:example:arrays}
+\caption{Computation of suffix and Weiner links by skip-and-count technique}\label{fig:three:suffix:link}
 \end{figure}
 %%%%%%
 
-%%%%%%%%%%%%%%%%%%%
-{
-%% \setlength{\interspacetitleruled}{0pt}%
-\setlength{\algotitleheightrule}{1pt}%
-\begin{algorithm}[p]
-  \caption{The procedure for transforming the LPT$_+$ tree $L = (\sig V, \sig E, root)$ for a string $S$ into its CDAWG by computing the suffix links for primary nodes and merge non-primary nodes with the equivalent primary nodes. 
-  }\label{algo:genchildren}
-  \KwWork{A priority queue $B$, which stores pairs $\pair{s, v}$ of a node $v$ with its string depth $s = v.\op{strdep} := |\str(v)|$. 
-    $suf: \sig V\setminus\set{root} \to \sig V$; 
-    $wlink: \sig V\times\Sigma \to (\sig V\cup \sig E)$; 
-  }
-\textbf{Procedure} $\textsf{MakeSuffixLinks}$\;   
-%$B \gets \sete{\pair{0, \idrm{root}}}$;
-$B \gets\emptyset$;
-$suf \gets \emptyset$; 
-$wlink \gets \emptyset$\;
-\For{ arc $f = (u, \alpha, w)$ in $\op{Outarc}(root)$ }{
-  $B.\op{insert}( \pair{ f, \op{strdep}(w) } )$\Comment*{$\op{insert}(value, key)$}
-}%For
-%\Comment{string label $\alpha[1..|\alpha|] \in \Sigma^+$}
-\While{ $B \not= \emptyset$ }{
-  $\pair{f, strdep} \gets B.\op{deletemin}()$\;
-  $(u, \alpha, w) \gets f$
-  \Comment*{target arc $f$ with string label $\alpha[1..|\alpha|] \in \Sigma^+$} 
-  %\For { }{
-    \uIf{ $u$ is the root }{
-      $v_0 \gets u$; 
-      $\alpha \gets \alpha[2..|\alpha|]$
-      %\Comment*{Delete the first character}
-      \Comment*{Starting at the root}
-    %% $b_0 \gets \alpha[2] \in \Sigma$;
-    %% $\ell_* \gets |\alpha|-1$\;
-    }
-    \Else (\comblk{$u$ is a branching node})
-    {
-      $v_0 \gets \id{suf}(u)$\Comment*{Starting at target of the suffix link}
-    }
-    $\ell_* \gets |\alpha|$;
-    $b \gets \alpha[1] \in \Sigma$;
-    $\ell \gets 0$; 
-    $i \gets 0$\;
-    \While {$\ell < \ell_*$}{
-      \Comment{Selecting an outgoing arc $g_i$ by branching character $b \in \Sigma$}
-      $g_i = (v_i, \beta_i, v_{i+1}) \gets \op{Outarc}(v_i, b)$\;
-      $\idrm{Wlink}(v_i, a) \gets f$ \Comment*{Add an implicit W-link}
-      $b \gets \alpha[\ell + 1]$\Comment*{branching character $b$}
-      $\ell \gets \ell + |\beta_i|$\Comment*{processed length}
-      $i \gets i+1$\;
-      \For{ arc $f' = (v_{i+1}, \alpha', w')$ in $\op{Outarc}(v_{i+1})$ }{
-        $B.\op{insert}( \pair{ f', \op{strdep}(w') } )$\;
-      }
-    }%whle
-    $k \gets i - 1$; $v \gets v_k$\;
-    \uIf{$v$ has exactly one outgoing $\id{wlink}$}{
-      Merge $v$ into $w$ by re-directing all incoming arcs to $v$ into $w$\; 
-    }
-    \Else{
-      $suf(w) \gets v$\;
-      $\id{wlink}(v, a) \gets w$ \Comment*{Add an explicit W-link}
-    }
-    %$B.\op{insert}(\pair{v.\op{strdep}, v})$\; 
-  %}%for
-}%While
-\Return $G = (\sig V, \sig E, suf, wlink, root)$\; 
-\end{algorithm}
-}
-%%%%%%%%%%%%%%%%%
 
-At \cref{line:main:merge} in \cref{algo:main}, we merge all dammy leaves in $\Delta(S)$ for non-maximal factors into the associated equivalence classes of branching nodes in $\sig V$.
+%%, we merge all dammy leaves in $\Delta(S)$ for non-maximal factors into the associated equivalence classes of branching nodes in $\sig V$.
 
-Consider the extended LPT tree of $S$, $\LPT[+](S) = (\sig V_+(S), \sig E_+(S), \eps)$. We introduce the set $\sig W(S)$ of Weiner-links as follows. 
-For any node $\underline u \in \sig V_+(S)$ with string labels $u$, and any character $a \in \Sigma$, if $v = au$ is a factor of $S$, $au \in \Sub(S)$, we put the (either soft or hard) Weiner link $g = (\underline u, \underline v)$ from $\underline u$ to the locus $\underline v$ of $v$ with character label $\lab(g) = a$ in $\LPT[+](S)$. Then, we say that $u$ is the parent of $v$, and $v$ is a child of $u$ w.r.t.~$\sig W(S)$. 
-Moreover, the link $g$ is \textit{hard} if $\underline v$ is a real (right branching) node, and \textit{soft} otherwise (that is, $\underline v$ is a locus on an arc).
-%% 
-We can easily show that the total number of hard and soft Weiner links are upperbounded by the number $e_L$ of left-extensions of maximal repeats of $S$. 
+We present the algorithm for transforming the LPT$_+$ tree $G = (\sig V(G), \sig E(G), root_G)$ for a string $S$ into its CDAWG  used at \cref{line:main:merge} in \cref{algo:main}. 
+The algorithm traverses all arcs of $\sig E(G)$ by using a priority queue $B$ for storing a set of unprocessed arcs to visit next. During the computation, we eventually insert all edges of $\sig E(G)$ into a priority queue $B$. Then, we make the following assumption. 
 
-Without loss of generality, we identify the triples and the nodes of $\LPT[+](S)$. Based on the above definition of $\sig W(S)$ and its parent-child relation, we show the next lemma, which is the dual of \cref{lem:prune:leftbranch}. 
+\textit{Assumption}: By induction on the structure of $G$, we assume that whenever an edge $f \in \sig E(G)$ is extracted from the queue $B$, its source $u = \src(f)$ satisfies that: 
+\begin{enumerate}[(a)]
+\item Either (i) the source $u$ is the root of $G$, or (ii) $u$ has the suffix link $v = \id{suf}(u)$ with some $v \in \sig V(G)$.
 
-\begin{lemma}\label{lem:prune:rightbranch}
-Suppose that a triple $\pi$ is the parent of a triple $\tau$ with respect to the Weiner links in $\sig W(S)$. If the substring $au$ defined by $\tau$ is right-branching, the substring $u$ defined by $\pi$ is also right-branching. 
-\end{lemma}
+\item The string lengths $\op{strdep}(u) = |\Value(u)|$ and $\op{shortdep}(u)$ of the longest and shortest paths from the root to $u$ are already computed, where
+  \begin{align}
+  \op{strdep}(u) &= \max \sete{ |\str(\pi)| : \pi \in Path(root, u) }
+  \\
+  \op{shortdep}(u) &= \min \sete{ |\str(\pi)| : \pi \in Path(root, u) }.
+  \end{align}
+  
+\end{enumerate}
+
+During the traversal, it extracts an unprocessed arc $f$ from $B$. By induction hypothesis, it is ensured that the source $u = au' = \src(f)$ of $f$ is either the root or already processed primary node, whereas its target node $t = at' = \dst(f)$ is either a primary or a non-primary node, where
+$a \in \Sigma$ is a character and $u, u', t, t' \in \Sigma^*$ are some factors of $S$. 
+%%corresponding to a node in the CDAWG.
+
+Then, it computes the suffix link of and an explicit W-link to , and additionally all the incoming inplicit W-links into all type-2 locuses. Moreover, in the case that
+
+Specifically, we present the psuedo code of the algorithm below. 
+
+\begin{enumerate}[(1)]
+\item Initialization: $B \gets\emptyset$, $suf \gets \emptyset$, and $wlink \gets \emptyset$. 
+  Insert all outgoing arcs
+  $f$
+  %% $f = (root, \alpha, v)$
+  of the root into $B$ with weight $w = \op{strdep}(\dst(f))$.
+\item We process all arcs in $\sig E(G)$ by executing the following steps while $B \not= \emptyset$: 
+  \begin{enumerate}
+  \item 
+    Extract from the priority queue $B$ a new edge $f = (u, \alpha, t)$ with the minimum weight $w = \op{strdep}(t)$, whose string label is $\alpha[1..|\alpha|] \in \Sigma^+$\;
+
+  \item 
+    Select the initial node $v$ as follows. If the source of $f$, $u = \src(f)$, is not the root, select the target $v = \id{suf}(u)$ of the suffix link of $u$; Otherwise, we select $u$ as the initial node $v$, and we shrink the label of $\alpha$ by $\alpha \gets \alpha[2..|\alpha|]$; 
+ \;
+  \item 
+    Then, we traverse the path $\pi = (g_1, \dots, g_k)$ from the initial node $v$ in $G$ by selecting consecutive arcs $g_1, \dots, g_k$ one by one for all $i = 0, 1, \dots, k-1$ with some $k\ge 1$, scanning the string label $\alpha$ such that $\alpha = \lab(g_1)$ $\cdots$ $\lab(g_k)$.
+
+    This traversal can be done in $O(k)$ time using constant time per arc, by the skip-and-count technique as follows (see \cref{fig:three:suffix:link}).
+    To do this, we execute the following steps for the stages $i = 1, \dots, k$. 
+   \begin{enumerate}
+     \item 
+   At stage $i=0$, we initialize the target length by $\ell_* \gets |\alpha|$, set $i \gets 0$, $\ell \gets 0$, and $v_0 \gets v$. 
+   \item 
+     At stage $i\ge 1$, we select the arc $g_i = (v_{i-1}, \beta_i, v_i)$ outgoing from the previous node $v_{i-1}$ with the new branching character $b_i = \alpha[\ell + 1] \in \Sigma$. We add the edge $g_i$ to $B$ with the weight $w = \op{strdep}(\dst(g_i))$ to be processed later.     
+
+     If the processed length $\ell$ reaches the target length $\ell_*$, i.e., $\ell = \ell_*$, then we exit the loop.
+
+     Otherwise, execute the following steps. 
+     We add a new implicit W-link from $v_i$ to arc $f$ by $\id{wlink}(v_i, a) = f$. 
+     Then, we update variables $\ell$ and $i$ with 
+      $\ell \gets \ell + |\beta_i|$ and 
+     $i \gets i+1$. Go to the stage $i+1$. 
+  \end{enumerate}
+
+ \item After exiting the loop, Let $v \gets v_{i+1}$ be the target of the last arc.
+   \begin{enumerate}[(a)]
+   \item If $v$ has exactly one outgoing $\id{wlink}$, then merge $v$ into $t$ by re-directing all incoming arcs of $v$ into $t$. Moreover, we update the length of the shortest path to $t$ by $\op{shortdep}(t) \gets \min\{\op{shortdep}(t), \op{shortdep}(v)\}$. 
+
+   \item Otherwise, add an explicit W-link by $\id{wlink}(v, a) \gets t$, and a suffix link by $suf(t) \gets v$. 
+
+   \item Finally, in both cases, we add all arcs $f'$ outgoing from $v$ into $B$ with the weight $w = \op{strdep}(\dst(f'))$.
+   \end{enumerate}
+  \end{enumerate}
+  \item Return the revised graph $G = (\sig V, \sig E, root, \id{wlink}, \id{suf})$. 
+\end{enumerate}
+
+\begin{remark} In (2) (iii) (b), This search for a $b_i$-arc always succeeds. 
+\end{remark}
 
 \begin{proof}
-  By symmetry, the lemma follows from the proof of \cref{lem:prune:leftbranch}. 
-  %% If $v = au$ for some $a \in \Sigma$, we can easily show that
-  %% $\RChar(au) \subseteq \RChar(u)$, and thus that $|\RChar(au)| \le |\RChar(u)|$. On the other hand $au$ is right-brancing in $S$ if and only if $2\le |\RChar(au)|$. It immediately follows that $2 \le |\RChar(u)|$ meaning that $u$ is right-brancing in $S$. This shows the lemma. 
+  We can show the next claim by construction of $\LPT[+](S)$. 
+  
+  \textit{Claim~1.} Consider $a u \in L(G)$ for some $a \in \Sigma$ and $u \in \Sigma^*$. If $u \not\in L(G)$, then there exists some factorization $u = pq$ with some $p, q \in \Sigma^*$ such that prefix $p$ is equivalent to $ap$, i.e., $\Epos(ap) = \Epos(p)$. (End of Claim~1)
+
+In Claim~1, the prefix $p$ is not left-brancing since we have a left-extension $ap$ of $p$ with the same end-positions. Therefore, the traversal from the initial node $v$ to $u = pq$ terminates at the locus of $p$ when the mergi of $\loc p$ into $\loc {ap}$ happened. 
 \end{proof}
 
-Recall that $\sig V$ is the set of nodes for all maximal repeats in $\MR(S)$ and $\eps \in \sig V$. 
-We let $\sig W$ to be the set of all Weiner links $g = (\underline u, \underline{au})$ that connect elements of $\sig V$ with a character $a \in \Sigma$, that is, $\set{u, au} \subseteq \MR(S)$.
+%% %%%%%%%%%%%%%%%%%%%
+%% {
+%% %% \setlength{\interspacetitleruled}{0pt}%
+%% \setlength{\algotitleheightrule}{1pt}%
+%% \begin{algorithm}[p]
+%%   \caption{The procedure for transforming the LPT$_+$ tree $L = (\sig V, \sig E, root)$ for a string $S$ into its CDAWG by computing the suffix links for primary nodes and merge non-primary nodes with the equivalent primary nodes. 
+%%   }\label{algo:genchildren}
+%%   \KwWork{A priority queue $B$, which stores pairs $\pair{s, v}$ of a node $v$ with its string depth $s = v.\op{strdep} := |\str(v)|$. 
+%%     $suf: \sig V\setminus\set{root} \to \sig V$; 
+%%     $wlink: \sig V\times\Sigma \to (\sig V\cup \sig E)$; 
+%%   }
+%% \textbf{Procedure} $\textsf{MakeSuffixLinks}$\;   
+%% %$B \gets \sete{\pair{0, \idrm{root}}}$;
+%% $B \gets\emptyset$;
+%% $suf \gets \emptyset$; 
+%% $wlink \gets \emptyset$\;
+%% \For{ arc $f = (u, \alpha, w)$ in $\op{Outarc}(root)$ }{
+%%   $B.\op{insert}( \pair{ f, \op{strdep}(w) } )$\Comment*{$\op{insert}(value, key)$}
+%% }%For
+%% %\Comment{string label $\alpha[1..|\alpha|] \in \Sigma^+$}
+%% \While{ $B \not= \emptyset$ }{
+%%   $\pair{f, strdep} \gets B.\op{deletemin}()$\;
+%%   $(u, \alpha, w) \gets f$
+%%   \Comment*{target arc $f$ with string label $\alpha[1..|\alpha|] \in \Sigma^+$} 
+%%   %\For { }{
+%%     \uIf{ $u$ is the root }{
+%%       $v_0 \gets u$; 
+%%       $\alpha \gets \alpha[2..|\alpha|]$
+%%       %\Comment*{Delete the first character}
+%%       \Comment*{Starting at the root}
+%%     %% $b_0 \gets \alpha[2] \in \Sigma$;
+%%     %% $\ell_* \gets |\alpha|-1$\;
+%%     }
+%%     \Else (\comblk{$u$ is a branching node})
+%%     {
+%%       $v_0 \gets \id{suf}(u)$\Comment*{Starting at target of the suffix link}
+%%     }
+%%     $\ell_* \gets |\alpha|$;
+%%     $b \gets \alpha[1] \in \Sigma$;
+%%     $\ell \gets 0$; 
+%%     $i \gets 0$\;
+%%     \While {$\ell < \ell_*$}{
+%%       \Comment{Selecting an outgoing arc $g_i$ by branching character $b \in \Sigma$}
+%%       $g_i = (v_i, \beta_i, v_{i+1}) \gets \op{Outarc}(v_i, b)$\;
+%%       $\idrm{Wlink}(v_i, a) \gets f$ \Comment*{Add an implicit W-link}
+%%       $b \gets \alpha[\ell + 1]$\Comment*{branching character $b$}
+%%       $\ell \gets \ell + |\beta_i|$\Comment*{processed length}
+%%       $i \gets i+1$\;
+%%       \For{ arc $f' = (v_{i+1}, \alpha', w')$ in $\op{Outarc}(v_{i+1})$ }{
+%%         $B.\op{insert}( \pair{ f', \op{strdep}(w') } )$\;
+%%       }
+%%     }%whle
+%%     $k \gets i - 1$; $v \gets v_k$\;
+%%     \uIf{$v$ has exactly one outgoing $\id{wlink}$}{
+%%       Merge $v$ into $w$ by re-directing all incoming arcs to $v$ into $w$\; 
+%%     }
+%%     \Else{
+%%       $suf(w) \gets v$\;
+%%       $\id{wlink}(v, a) \gets w$ \Comment*{Add an explicit W-link}
+%%     }
+%%     %$B.\op{insert}(\pair{v.\op{strdep}, v})$\; 
+%%   %}%for
+%% }%While
+%% \Return $G = (\sig V, \sig E, suf, wlink, root)$\; 
+%% \end{algorithm}
+%% }
+%% %%%%%%%%%%%%%%%%%
 
-Now, we define the \textit{Weiner-link counterpart} of $\LPT[+](S)$, denoted by $\LPT[-](S) = (\sig V_-, \sig W_-, \eps)$ as follows.
-\begin{itemize}
-\item $\sig F_- = \sete{ g = (\underline u, \underline au) \mid u\in\MR(S), u\not\in \MR(S) }$ is the set of all Weiner links $g = (\underline u, \underline au)$ that connect maximal nodes of $\sig V$ to non-maximal nodes. 
-  %%, that is, $u\in\MR(S)$ and $u\not\in \MR(S)$.
-\item Let $\sig V_- = \sig V \cup \Delta_-$, 
-  where $\Delta_- = \sete{\underline{au} \not\in\sig V \mid g = (\underline u, \underline{au}) \in \sig F_-}$ be the set of non-maximal nodes reachable from $\sig V$ by arcs of $\sig F_-$.
+
+%% Consider the extended LPT tree of $S$, $\LPT[+](S) = (\sig V_+(S), \sig E_+(S), \eps)$. We introduce the set $\sig W(S)$ of Weiner-links as follows. 
+%% For any node $\underline u \in \sig V_+(S)$ with string labels $u$, and any character $a \in \Sigma$, if $v = au$ is a factor of $S$, $au \in \Sub(S)$, we put the (either soft or hard) Weiner link $g = (\underline u, \underline v)$ from $\underline u$ to the locus $\underline v$ of $v$ with character label $\lab(g) = a$ in $\LPT[+](S)$. Then, we say that $u$ is the parent of $v$, and $v$ is a child of $u$ w.r.t.~$\sig W(S)$. 
+%% Moreover, the link $g$ is \textit{hard} if $\underline v$ is a real (right branching) node, and \textit{soft} otherwise (that is, $\underline v$ is a locus on an arc).
+%% %% 
+%% We can easily show that the total number of hard and soft Weiner links are upperbounded by the number $e_L$ of left-extensions of maximal repeats of $S$. 
+
+%% Without loss of generality, we identify the triples and the nodes of $\LPT[+](S)$. Based on the above definition of $\sig W(S)$ and its parent-child relation, we show the next lemma, which is the dual of \cref{lem:prune:leftbranch}. 
+
+%% \begin{lemma}\label{lem:prune:rightbranch}
+%% Suppose that a triple $\pi$ is the parent of a triple $\tau$ with respect to the Weiner links in $\sig W(S)$. If the substring $au$ defined by $\tau$ is right-branching, the substring $u$ defined by $\pi$ is also right-branching. 
+%% \end{lemma}
+
+%% \begin{proof}
+%%   By symmetry, the lemma follows from the proof of \cref{lem:prune:leftbranch}. 
+%%   %% If $v = au$ for some $a \in \Sigma$, we can easily show that
+%%   %% $\RChar(au) \subseteq \RChar(u)$, and thus that $|\RChar(au)| \le |\RChar(u)|$. On the other hand $au$ is right-brancing in $S$ if and only if $2\le |\RChar(au)|$. It immediately follows that $2 \le |\RChar(u)|$ meaning that $u$ is right-brancing in $S$. This shows the lemma. 
+%% \end{proof}
+
+%% Recall that $\sig V$ is the set of nodes for all maximal repeats in $\MR(S)$ and $\eps \in \sig V$. 
+%% We let $\sig W$ to be the set of all Weiner links $g = (\underline u, \underline{au})$ that connect elements of $\sig V$ with a character $a \in \Sigma$, that is, $\set{u, au} \subseteq \MR(S)$.
+
+%% Now, we define the \textit{Weiner-link counterpart} of $\LPT[+](S)$, denoted by $\LPT[-](S) = (\sig V_-, \sig W_-, \eps)$ as follows.
+%% \begin{itemize}
+%% \item $\sig F_- = \sete{ g = (\underline u, \underline au) \mid u\in\MR(S), u\not\in \MR(S) }$ is the set of all Weiner links $g = (\underline u, \underline au)$ that connect maximal nodes of $\sig V$ to non-maximal nodes. 
+%%   %%, that is, $u\in\MR(S)$ and $u\not\in \MR(S)$.
+%% \item Let $\sig V_- = \sig V \cup \Delta_-$, 
+%%   where $\Delta_- = \sete{\underline{au} \not\in\sig V \mid g = (\underline u, \underline{au}) \in \sig F_-}$ be the set of non-maximal nodes reachable from $\sig V$ by arcs of $\sig F_-$.
   
-\item $\sig W_+$ be the union of $\sig W$ and $\sig F_-$. 
-\end{itemize}
+%% \item $\sig W_+$ be the union of $\sig W$ and $\sig F_-$. 
+%% \end{itemize}
 
-Then, the extend LPT tree w.r.t.~Weiner links in $\sig W$ is the rooted tree $\LPT[-](S) = (\sig V_-, \sig W_-, \eps)$. 
+%% Then, the extend LPT tree w.r.t.~Weiner links in $\sig W$ is the rooted tree $\LPT[-](S) = (\sig V_-, \sig W_-, \eps)$. 
 
 
 
