@@ -14,7 +14,7 @@ MAIN=main
 
 CHAPTERS=
 ## pack
-PJNAME=maxrep2025iwoca
+PJNAME=maxrep2025latin
 # PJNAME=cdawg2023slide
 PACKDIR=~/PUB
 
