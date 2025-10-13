@@ -740,7 +740,6 @@ We observe that the algorithm $\RecLPT$ only traverses the suffix tree starting 
 
 %% \subsection{Merging dammy leaves to branching nodes (TBD)}
 
-\newpage
 %%%%%%%%%%%%%%%%%%
 \section{Transforming \LPTrm-tree to CDAWG}
 \label{sec:lpt:to:cdawg}
@@ -780,7 +779,7 @@ In the following subsections, we first explain its subroutines. Finally, we pres
 $B \gets \emptyset$, $\id{suf} \gets \emptyset$, and $wlink \gets \emptyset$\;
 Compute the table $\ldep$ by DFS of $T$\; 
 \For{each $u \in V(G)$}{
-  $\op{nlchar}(u)=|\LChar(\Value(u))|$\Comment*{from the triple of $u$} 
+  $\op{isLB}(u)=|\LChar(\Value(u))|$\Comment*{from the triple of $u$} 
   $EQ(u) = \set{u}$\Comment*{the singleton class}
 }
 \For{each $f = (u, \alpha, w) \in E(G)$}{
@@ -796,7 +795,7 @@ Compute the table $\ldep$ by DFS of $T$\;
     \label{step:algo2:skip:and:count}
     \Comment{Maintaining links and equivalence class of $v$}
     \uIf (\comblk{Merging two equivalence classes})
-         {$\op{nlchar}(v) = 1$}
+         {$\op{isLB}(v) = 1$}
          %% {$|\wlink(v)| = 0$}
          {
       \Comment{$v$ has no incoming suffix links.}
@@ -869,7 +868,7 @@ Then, we have
 From \cref{lem:ldep:sdep:rec}, the total computation can be done in $O(e_R(S)+e_L(S))$ time and $O(\mu(S))$ working space on the CDAWG of $S$. 
 We remark that \cref{lem:ldep:sdep:rec} holds even for a partial CDAWG $G$ whenever the current node $u$ has been merged to all of its equivalent nodes and all ancestors have been processed so far.
 
-  We assume that the Boolean flag $\op{nlchar}(v) \iffdef |\LChar(\Value(v))|\ge 2$ is attached to each explicit node $v$ in $T$. This can be  computed from the triple for $\Value(v)$ by $\isLeftBranching(i..j, \ell)$ of \cref{lem:leftmaximal:character} in the procedure $\RecLPT$. 
+  We assume that the Boolean flag $\op{isLB}(v) \iffdef |\LChar(\Value(v))|\ge 2$ is attached to each explicit node $v$ in $T$. This can be  computed from the triple for $\Value(v)$ by $\isLeftBranching(i..j, \ell)$ of \cref{lem:leftmaximal:character} in the procedure $\RecLPT$. 
 
 
 
@@ -935,12 +934,31 @@ The procedure $\FindNonEquivLocus(u, \alpha; G, \sdep, \ldep)$ that computes the
 \subsection{Analysis}
 %% \subsection{The proof of \cref{lem:main:lpt:to:cdawg}}
 
-Consider the psuedo code of the procedure $\RecCDAWG$ in \cref{algo:rec:cdawg}.
+Consider the psuedo code of the procedure $\RecCDAWG$ in \cref{algo:rec:cdawg}. To prove its correctness, we define  
+  $\eqepos[\preceq w]$ and $[u]^{\prec w}_{\equiv}$ to be the restriction of
+  the equivalence relation $\eqepos[]$ and class $\eqepos[\prec w]$
+  onto the subset of nodes $v$ such that $\ldep(v) \le \ldep(w)$.
+  Similarly, we use subscript $\cdot^{\prec w}$ for the version of $\ldep(v) < \ldep(w)$.
+
 
 \begin{lemmarep}[correctness]\label{lem:cdawg:correctness}
   Let $T$ be the $\LPT(S)$ of a string $S$ of length $n$. 
-  We assume that $\op{nlchar}(v) = |\LChar(\Value(v))|$ is attached to each explicit node $v$ in $T$. Then, \cref{algo:rec:cdawg} correctly computes $\CDAWG(S)$ from $T$ and $S$. 
+  We assume that the Boolean flag $\op{isLB}(v)$ is attached to each explicit node $v$ in $T$. Then, \cref{algo:rec:cdawg} correctly computes $\CDAWG(S)$ from $T$ and $S$. 
 \end{lemmarep}
+
+\begin{proofsketch}
+  The proof is done by induction on the iteration of the while-loop of \cref{algo:rec:cdawg} and target $w$ of a new arc $f = (u, \alpha, w)$ extracted from queue $B$ at Line 10. 
+  We let $v$ be the deepest node in $V\rk{\prec w}(T)$ such that $[v]^{\prec w}_{\equiv} \not= [w]^{\prec w}_{\equiv}$ and $\beta \succeqsuf \beta'$ (*) in the beginning of the while-loop, where $\beta = \Value(w)$ and $\beta' = \Value(v)$.
+  Such a $v$ always exists for $v = root(T)$, and 
+  can be found by $\FindNonEquivLocus$ from \cref{lem:find:ne:locus}. 
+  There are two cases (a) and (b) to maintain the current $\eqepos[\preceq w]$:
+\begin{enumerate*}[(a)]
+\item The case that $\beta \eqepos[\preceq w] \beta'$ holds, and $|\LChar(\beta')| = \op{isLB}(v) \ge 2$, detected at Line 10. Then, two equivalence classes must be merged into a new class. 
+  %% the equivalence classes $[w]^{\prec w}_{\equiv}$ and $[v]^{\prec w}_{\equiv}$ of $\beta$ and $\beta'$, respectively, must be merged into the new class $[w]^{\preceq w}_{\equiv}$. This is done by the code for Lines 11--13. 
+\item The case that $\beta \not\eqepos[\preceq w] \beta'$ holds, and $|\LChar(\beta')| = \op{isLB}(v) = 1$, detected at Line 14. Then, the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
+\end{enumerate*}
+Therefore, Lines~12--19 correctly update the equivalence class $EQ(w)$ for $[w]^{\prec w}_{\equiv}$, $\id{suf}$, and $\id{wlink}$. If \cref{algo:rec:cdawg} exits the while-loop, the resulting DAG $G$ with $EQ, \id{suf}$, and $\id{wlink}$ becomes $\CDAWG(S)$. Hence, the correctness is proved. 
+\end{proofsketch}
 
 \begin{proof}
 Suppose that initialization of Lines 2--6 are done. 
@@ -977,10 +995,10 @@ From \cref{lem:find:ne:locus}, we can find the locus $v$ by calling $\FindNonEqu
 Let $\beta$ and $\beta'$ be the string labels of $w$ and $v$, respectively. Then, we can show that $\beta'$ is the longest suffix of $\beta$ such that $\Epos(\beta) \not= \Epos(\beta')$.
 There are two cases (a) and (b) below on the current equivalence relation $\eqepos[\preceq w]$ instead of $\eqepos[\prec w]$. 
 \begin{enumerate}[(a)]
-\item If $\beta \eqepos[\preceq w] \beta'$ holds, since $\beta \succsuf \beta'$, we can show that this condition is equivalent to $|\LChar(\beta')| = \op{nlchar}(v) \ge 2$, which can be correctly detected at Line 10. 
+\item If $\beta \eqepos[\preceq w] \beta'$ holds, since $\beta \succsuf \beta'$, we can show that this condition is equivalent to $|\LChar(\beta')| = \op{isLB}(v) \ge 2$, which can be correctly detected at Line 10. 
   the equivalence classes $[w]^{\prec w}_{\equiv}$ and $[v]^{\prec w}_{\equiv}$ of $\beta$ and $\beta'$, respectively, must be merged into the new class $[w]^{\preceq w}_{\equiv}$. This is done by the code for Lines 11--13. 
   
-\item Otherwise, $\beta \not\eqepos[\preceq w] \beta'$ holds. By the same argument as (a), this condition is equivalent to $|\LChar(\beta')| = \op{nlchar}(v) = 1$, which can be correctly detected at Lines 10 and 14.
+\item Otherwise, $\beta \not\eqepos[\preceq w] \beta'$ holds. By the same argument as (a), this condition is equivalent to $|\LChar(\beta')| = \op{isLB}(v) = 1$, which can be correctly detected at Lines 10 and 14.
   the equivalence classes $[w]^{\prec w}_{\equiv} = [w]^{\preceq w}_{\equiv}$ and $[v]^{\prec w}_{\equiv} = [v]^{\preceq w}_{\equiv}$  of $\beta$ and $\beta'$, respectively, must remain separated, and the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
   This is correct because $[v]^{\prec w}_{\equiv}$ is the predecessor of $[w]^{\prec w}_{\equiv}$ w.r.t.~the suffix relation $\succsuf$ on their values.
 \end{enumerate}
@@ -997,7 +1015,7 @@ Next, we consider the time complexity.
 
 \begin{proof}
 Let us denote by $\mu = \mu(S), e_R = e_R(S)$, and $e_L = e_L(S)$, where $\mu \le \min\{e_R, e_L\}$.
-In the initialization for the tables $EQ$, $\ldep$, $B$ for Lines 2--8 can be done in $O(e_R)$ total time. The precomputation of the table $\op{nlchar}$ at Lines 7--8 can be done in $O(e_L)$ total time by computing $\LChar(\tau)$ with the associated triple $\tau$ stored in $u$. 
+In the initialization for the tables $EQ$, $\ldep$, $B$ for Lines 2--8 can be done in $O(e_R)$ total time. The precomputation of the table $\op{isLB}$ at Lines 7--8 can be done in $O(e_L)$ total time by computing $\LChar(\tau)$ with the associated triple $\tau$ stored in $u$. 
 In each iteration of the while-loop, $\op{deletemin}$ on the priority queue requires $O(\mu \log \mu)$ total time over all of $\mu$ nodes using $O(\mu)$ space on the standard heap.
 From \cref{lem:find:ne:locus}, the call of $\FindNonEquivLocus$ at Line~9 requires $O(e_R + e_L)$ total time. Redirection of all incoming arcs of $v$ into $w$ at Line 13 can be done in $O(e_R)$ since $v$ has exactly once suffix link since it is equivalent to $w$, and thus it is not left-branching.
 Additions of the suffix and Weiner links for Lines 18--19 can be executed at most the number of suffix links, and are bouned in $O(e_L)$ time.
