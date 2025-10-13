@@ -1006,7 +1006,9 @@ There are two cases (a) and (b) below on the current equivalence relation $\eqep
 Combining the above arguments, at the end of the while-loop, we have correctly maintained the equivalence relation $\eqepos[\preceq w]$ and the associated equivalence clases on the updated domain $V\rk{\preceq w}(T) = V\rk{\prec w}(T) \cup \set{w}$.
 \end{proof}
 
-Next, we consider the time complexity. 
+Combining the above discussion, we give the proof for main results. 
+
+%% Next, we consider the time complexity. 
 
 \begin{lemmarep}[time and space complexity]\label{lem:cdawg:complexity}
   Given $\LPT(S)$ of a string of length $n$, 
@@ -1023,16 +1025,16 @@ Additions of the suffix and Weiner links for Lines 18--19 can be executed at mos
 
 \begin{trivlist}\item[]
   \textbf{Proof of \cref{lem:main:lpt:to:cdawg}:}
-  Combining \cref{lem:cdawg:correctness} and \cref{lem:cdawg:complexity}, \cref{lem:main:lpt:to:cdawg} immediately follows.
+  From \cref{lem:cdawg:correctness} and \cref{lem:cdawg:complexity}. 
 \qed   
 \end{trivlist}
 
 \begin{trivlist}\item[]
   \textbf{Proof for \cref{thm:main:index:cdawg}}.
-  Combining 
+  From 
   \cref{lem:main:from:lpt:to:cdawg:correct:time}
   and
-  \cref{lem:main:lpt:to:cdawg}, we can show \cref{thm:main:index:cdawg}. 
+  \cref{lem:main:lpt:to:cdawg}. 
 \qed
 \end{trivlist}
 
