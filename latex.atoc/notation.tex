@@ -15,7 +15,10 @@
 %%%%
 
 %%% algo
-\newcommand{\Rec}{\textsf{RecVisit}}  %% TDSA
+\newcommand{\RecLPT}{\textsf{RecLPT}}  %% TDSA
+\newcommand{\RecCDAWG}{\textsf{RecCDAWG}}  %% TDSA
+\newcommand{\SkipAndCount}{\textsf{SkipAndCount}}  %% TDSA
+\newcommand{\FindNonEquivLocus}{\textsf{FindLongestPrefixPath}}  %% TDSA
 
 \newcommand{\MREnum}{\textsf{Enum}}  %% TDSA
 \newcommand{\GenChildren}[1][{\LCP}]{\textsf{GenChildren}_{#1}}  
@@ -29,7 +32,7 @@
 
 %%%
 %% \newcommand{\rk}[1]{^{(#1)}} %%alias 
-%% \newcommand{\idx}[3]{_{#1=#2}^{#3}} %%alias
+\newcommand{\idx}[3]{_{#1=#2}^{#3}} %%alias
 %% \newcommand{\btw}[3]{{#2}\le {#1}\le {#3}} %%alias
 %% \newcommand{\Suf}{\idrm{Suf}}
 %% \newcommand{\Fac}{\idrm{Fac}}
@@ -44,14 +47,24 @@
 \newcommand{\Epos}[1][S]{\idtt{Epos}_{#1}}
 \newcommand{\eqspos}[1][S]{\equiv^{#1}_{spos}}
 \newcommand{\eqepos}[1][S]{\equiv^{#1}_{epos}}
+\newcommand{\EQCspos}[1]{[{#1}]_{\eqspos}}
+\newcommand{\EQCepos}[1]{[{#1}]_{\eqepos}}
 %% \newcommand{\In}[1][G]{E^\idrm{in}_{#1}}
 %% \newcommand{\Out}[1][G]{E^\idrm{out}_{#1}}
 \newcommand{\In}[1][G]{\idrm{In}_{#1}}
 \newcommand{\Out}[1][G]{\idrm{Out}_{#1}}
+\newcommand{\ldep}{\op{ldep}}
+\newcommand{\sdep}{\op{sdep}}
+\renewcommand{\suf}{\id{suf}}
+\newcommand{\wlink}{\id{wlink}}
+\newcommand{\succeqsuf}{\succeq^\idrm{suf}}
+\newcommand{\succsuf}{\succ^\idrm{suf}}
+
 %%%
 \newcommand{\CDAWG}[1][S]{\idrm{CDAWG}}
 \newcommand{\Stree}[1][S]{\idrm{Stree}}
-\newcommand{\LPT}[1][]{\idsf{LPT}_{#1}}
+\newcommand{\LPT}[1][+]{\idsf{LPT}_{#1}}
+\newcommand{\LPTrm}[1][+]{LPT$_{#1}$}
 \newcommand{\LPTplus}{\LPT[+]}
 \newcommand{\LPTminus}{\LPT[-]}
 \newcommand{\source}[1][G]{\idrm{source}_{#1}}
@@ -83,9 +96,7 @@
 \newcommand{\RM}{\textsf{RM}}
 \newcommand{\LM}{\textsf{LM}}
 \newcommand{\M}{\MR}%%
-\newcommand{\EQCspos}[1]{[{#1}]_{\eqspos}}
-\newcommand{\EQCepos}[1]{[{#1}]_{\eqepos}}
-\newcommand{\RR}[1][S]{\idcal{R}_{#1}}
+\newcommand{\RR}[1][S]{\idcal{P}_{#1}}
 \newcommand{\Parent}[1][S]{\idtt{Parent}_{#1}}
 %%%%
 
