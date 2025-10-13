@@ -666,7 +666,6 @@ We show the correctness and computational complexity of the procedure $\RecLPT$ 
 
 \begin{lemmarep}[correctness and time complexity]\label{lem:main:from:lpt:to:cdawg:correct:time}
   Let $T$ be the $\LPT(S)$ of a string $S$ of length $n$. 
-  We assume that $\op{nlchar}(v) = |\LChar(\Value(v))|$ is attached to each explicit node $v$ in $T$.
   The procedure $\RecLPT$ in \cref{algo:rec:cdawg} computes $T = \LPT(S)$ from the static index $\sig I = (\SA, \ISA, LCP)$ and the read-only copy of $S$
   in $O(e_R(S) + e_L(S))$ time using $O(\max\{e_R(S), e_L(S), \sigma\log n\})$ space. 
 \end{lemmarep}
@@ -868,7 +867,10 @@ Then, we have
 \end{lemma}
 
 From \cref{lem:ldep:sdep:rec}, the total computation can be done in $O(e_R(S)+e_L(S))$ time and $O(\mu(S))$ working space on the CDAWG of $S$. 
-We remark that \cref{lem:ldep:sdep:rec} holds even for a partial CDAWG $G$ whenever the current node $u$ has been merged to all of its equivalent nodes and all ancestors have been processed so far. 
+We remark that \cref{lem:ldep:sdep:rec} holds even for a partial CDAWG $G$ whenever the current node $u$ has been merged to all of its equivalent nodes and all ancestors have been processed so far.
+
+  We assume that the Boolean flag $\op{nlchar}(v) \iffdef |\LChar(\Value(v))|\ge 2$ is attached to each explicit node $v$ in $T$. This can be  computed from the triple for $\Value(v)$ by $\isLeftBranching(i..j, \ell)$ of \cref{lem:leftmaximal:character} in the procedure $\RecLPT$. 
+
 
 
 %%%%%%%%%
