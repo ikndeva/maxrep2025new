@@ -1,13 +1,22 @@
-##
+## 251013 LATIN2026
 
-251014
+LATIN 2026, Apr 13, 2026 - Apr 17, 2026, Florianópolis-Brazil
+Abstract Registration Due	Oct 13, 2025
+Submission Deadline	Oct 20, 2025
+Notification Due	Jan 9, 2026
+Final Version Due	Feb 1, 2026
+URL: https://latin2026.ufsc.br/
 
-## title
 
-Converting Suffix Array into Compact Directed Acyclic Word Graph
+## title: 
+
+title: Converting Suffix Array into Compact Directed Acyclic Word Graph
 
 ### Authors:
 
+Ananymous (Hiroki Arimura (1), Shunsuke Inenaga (2), Yuta Tsuruzono (1))
+
+#### for registration
 Hiroki Arimura
 Hokkaido University, Japan
 arim@ist.hokudai.ac.jp
@@ -20,6 +29,8 @@ Yuta Tsuruzono
 Hokkaido University, Japan
 turuzono.yuta.y9@elms.hokudai.ac.jp
 
+
+October 20, 2025: Paper submission
 
 
 ## abstract
@@ -39,24 +50,4 @@ Repetition-aware Text Indexing
 Suffix Array
 CDAWG
 Maximal Repeats
-
-
-Compacted Directed Acyclic Word Graph (CDAWG)
-
-Repetition-aware Index
-
-Suffix Array (SA)
-
-Maximal Repeats
-
-String Algorithms (文字列アルゴリズム)
-
-Text Indexing (テキストインデックス作成)
-
-
-sequence analysis,
-maximal repeats,
-suffix array,
-longest prefix array,
-bioinformatcs
-
+====
