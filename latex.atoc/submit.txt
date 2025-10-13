@@ -1,0 +1,62 @@
+##
+
+251014
+
+## title
+
+Converting Suffix Array into Compact Directed Acyclic Word Graph
+
+### Authors:
+
+Hiroki Arimura
+Hokkaido University, Japan
+arim@ist.hokudai.ac.jp
+
+Shunsuke Inenaga
+Kyushu University, Japan
+inenaga.shunsuke.380@m.kyushu-u.ac.jp
+
+Yuta Tsuruzono
+Hokkaido University, Japan
+turuzono.yuta.y9@elms.hokudai.ac.jp
+
+
+
+## abstract
+
+In this paper, we consider the problem of transforming the Suffix Array ($\SA$) of a string $S$ of length $n$ into its Compact Directed Acyclic Word Graph (CDAWG) $G$. We aim to achieve this transformation using time and working space bounds sensitive to the size of $G$, the numbers of maximal repeats, right- and left-extensions, denoted by $\mu(S)$, $e_R(S)$ and $e_L(S)$, respectively. This work extends the classic problem of constructing a suffix tree from a Suffix Array within the context of repetition-aware text indexes.
+Our main result is a simple and efficient algorithm that solves this problem in $O(e_R(S) + e_L(S) + \mu(S)\log \mu(S))$ time and
+$O(e_R(S) + e_L(S))$ space. This requires $O(e_R(S) + e_L(S))$ probes to an index structure $\sig I$ consisting of the $\SA$, $\ISA$, and $\LCP$ arrays (of $O(n)$ size), where the $\LCP$ array is augmented with a Range Minimum Query (RMQ) structure.
+As an application, we demonstrate that this leads to an $O(e\cdot\polylog(n))$ time and space algorithm for constructing the CDAWG of S directly from the \textit{r-index}, proposed by Gagie, Navarro, and Prezza (J.~ACM, 67:1, 2020), which has a size of $O(r\cdot\polylog(n))$.
+To achieve the above results, we devise two novel methods that may be of independent interest:
+(ii) A method for enumerating all maximal repeats in $O(e_R(S) + e_L(S))$ time, requiring only $O(\sigma \log n)$ auxiliary working space in addition to the space of $\sig I$. 
+(ii) A method for computing the suffix links from the CDAWG of S without suffix links (or its $\LPT$-tree, the extended longest prefix tree) in $O(e_R(S) + e_L(S))$ time and space.
+
+### Keywords:
+
+String Algorithms
+Repetition-aware Text Indexing
+Suffix Array
+CDAWG
+Maximal Repeats
+
+
+Compacted Directed Acyclic Word Graph (CDAWG)
+
+Repetition-aware Index
+
+Suffix Array (SA)
+
+Maximal Repeats
+
+String Algorithms (文字列アルゴリズム)
+
+Text Indexing (テキストインデックス作成)
+
+
+sequence analysis,
+maximal repeats,
+suffix array,
+longest prefix array,
+bioinformatcs
+

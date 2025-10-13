@@ -948,7 +948,12 @@ Consider the psuedo code of the procedure $\RecCDAWG$ in \cref{algo:rec:cdawg}. 
 
 \begin{proofsketch}
   The proof is done by induction on the iteration of the while-loop of \cref{algo:rec:cdawg} and target $w$ of a new arc $f = (u, \alpha, w)$ extracted from queue $B$ at Line 10. 
-  We let $v$ be the deepest node in $V\rk{\prec w}(T)$ such that $[v]^{\prec w}_{\equiv} \not= [w]^{\prec w}_{\equiv}$ and $\beta \succeqsuf \beta'$ (*) in the beginning of the while-loop, where $\beta = \Value(w)$ and $\beta' = \Value(v)$.
+  We let $v$ be the deepest node in $V\rk{\prec w}(T)$ such that
+  $\beta \not\eqepos[\prec w] \beta'$
+  %$[v]^{\prec w}_{\equiv} \not= [w]^{\prec w}_{\equiv}$
+  and $\beta \succeqsuf \beta'$ (*)
+  with $\beta = \Value(w)$ and $\beta' = \Value(v)$ 
+  in the beginning of the while-loop. This (*) means that the equivalence classes of $w$ and $v$ are different. 
   Such a $v$ always exists for $v = root(T)$, and 
   can be found by $\FindNonEquivLocus$ from \cref{lem:find:ne:locus}. 
   There are two cases (a) and (b) to maintain the current $\eqepos[\preceq w]$:
@@ -957,7 +962,7 @@ Consider the psuedo code of the procedure $\RecCDAWG$ in \cref{algo:rec:cdawg}. 
   %% the equivalence classes $[w]^{\prec w}_{\equiv}$ and $[v]^{\prec w}_{\equiv}$ of $\beta$ and $\beta'$, respectively, must be merged into the new class $[w]^{\preceq w}_{\equiv}$. This is done by the code for Lines 11--13. 
 \item The case that $\beta \not\eqepos[\preceq w] \beta'$ holds, and $|\LChar(\beta')| = \op{isLB}(v) = 1$, detected at Line 14. Then, the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
 \end{enumerate*}
-Therefore, Lines~12--19 correctly update the equivalence class $EQ(w)$ for $[w]^{\prec w}_{\equiv}$, $\id{suf}$, and $\id{wlink}$. If \cref{algo:rec:cdawg} exits the while-loop, the resulting DAG $G$ with $EQ, \id{suf}$, and $\id{wlink}$ becomes $\CDAWG(S)$. Hence, the correctness is proved. 
+Therefore, Lines~12--19 correctly update the equivalence class $EQ(w)$ for $[w]^{\prec w}_{\equiv}$, $\id{suf}$, and $\id{wlink}$. If \cref{algo:rec:cdawg} exits the while-loop, the resulting DAG $G$ with $EQ, \id{suf}$, and $\id{wlink}$ becomes $\CDAWG(S)$. Hence, the result is proved. 
 \end{proofsketch}
 
 \begin{proof}
