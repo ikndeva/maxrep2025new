@@ -2,7 +2,7 @@
 \begin{abstract}
   In this paper, we consider the problem of transforming the Suffix Array ($\SA$) of a string $S$ of length $n$ into its Compact Directed Acyclic Word Graph (CDAWG) $G$.
   %% We aim to achieve this transformation using time and working space bounds sensitive to the size of $G$, the numbers of maximal repeats, right- and left-extensions, denoted by $\mu(S)$, $e_R(S)$ and $e_L(S)$, respectively.
-  This work extends the classic problem of constructing a suffix tree from a Suffix Array in the context of output-sensitive computation on a repetition-aware text index.
+  This work extends the classic problem of transforming the Suffix Array of $S$ into its suffix tree in the context of output-sensitive computation on repetition-aware text indexes
   Our main result is a simple and efficient algorithm that solves this problem in
   $O(e_R(S) + e_L(S))$ time and
   %% $O(e_R(S) + e_L(S) + \mu(S)\log \mu(S))$ time and
@@ -47,7 +47,10 @@ Although both structures, given a string $S$ of length $n$, compactly%
 \myfootnote{In recent literature, an index structure for a string is commonly called compact if it stores a string S of length n using $O(n \log\sigma)$ bits, where $\sigma$ is the size of the underlying alphabet. However, throughout this article, we use the term compact in the context of graph-based indexes, such as suffix trees or DAWGs. A structure is defined as \textit{compact} if it employs path-compression to represent all $O(n^2)$ possible factors of $S$ in $O(n)$ or fewer words (see, e.g., Crochemore, Hancart, and Lecroq~\cite{crochemore2007algorithms:on:strings}).  
 }
 %%%%
-store all of $O(n^2)$ factors in linear or less words of space supporting a similar set of operations efficiently, the latter compresses the former by reducing its space from $O(n)$ to $O({e_R(S) + e_L(S)})$, where ${e_R(S) + e_L(S)}$ is a parameter that measures the compressibility of a string. The parameter ${e_R(S) + e_L(S)}$ is defined as the sum of the the numbers $e_R$ and $e_L$ of all right- and left-extensions of the maximal repeats of the string.
+store all of $O(n^2)$ factors in linear or less words of space supporting a similar set of operations efficiently, the latter compresses the former by reducing its space from $O(n)$ to $O({e_R(S) + e_L(S)})$, where $e_R(S)$ and $e_L(S)$ are parameters that measure the compressibility of a string, defined as the numbers of all right- and left-extensions of maximal repeats of $S$, respectively.
+Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} showed that both of $e_R(S)$ and $e_L(S)$ upperbounds the size $z(S)$ of the LZ-parse and the number $r(S)$ of runs of BWT of $S$.
+
+%% where ${e_R(S) + e_L(S)}$ is a parameter that measures the compressibility of a string. The parameter ${e_R(S) + e_L(S)}$ is defined as the sum of the the numbers $e_R$ and $e_L$ of all right- and left-extensions of the maximal repeats of the string.
 
 %%%%%%
 \begin{figure}[t]
@@ -96,24 +99,24 @@ The \textit{RMQ query on LCP} asks, given any ssubrange $i..j \subseteq 1..n$, t
 }
 \end{itemize}
 
-
+All of the above structures occupy $O(n)$ words of space, and can be constructed in $O(n)$ time from a string $S$ over an integer alphabet in preprocessing (for details, see the textbook or survey article by Navarro~\cite{navarro2016cds:book,navarro2021indexing:ii}).
 \cref{fig:example:problem} shows an example of input and output of the problem.
-In an application senario in, e.g., a human genome repository, the structure $\sig I$ will be constructed once, reside on memory using $O(n)$ space, and be used many times for the generation of the CDAWG in $O({e_R(S) + e_L(S)})$ time and working space per execution, and other purposes, such as the standard string search.
-For the preprocessing, all of the above structures occupy $O(n)$ words of space, and can be constructed in $O(n)$ time from a string $S$ over an integer alphabet in preprocessing (for details, see the textbook or survey article by Navarro~\cite{navarro2016cds:book,navarro2021indexing:ii}).
 
-Finally, we introduce a class of the repetitiveness measures for a string $S$ according to Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}. $\mu(S)$, $e_R(S)$, and $e_L(S)$ are the numbers of all maximal repeats, all right- and all left-extensions of maximal repeats, respectively.
+An intended application scenario for the above problem, such as in bioinformatics databases or text repositories, is as follows: the structure $\sig I$ is constructed once, resides in memory using $O(n)$ space, and will be used repeatedly for tasks including CDAWG generation and string searching spending $o(n)$ time. 
+
+%% n intended application senario of the above question, e.g., in bioinformatics databases or text repositories, is as follows: the structure $\sig I$ is constructed once, resides on memory using $O(n)$ space, and will be used many times for CDAWG generation, and other tasks such as the string search.
+
+%Finally, we introduce a class of the repetitiveness measures for a string $S$ according to Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}. $\mu(S)$, $e_R(S)$, and $e_L(S)$ are the numbers of all maximal repeats, all right- and all left-extensions of maximal repeats, respectively.
+
+
 %% Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} showed that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$ from above, that is, $\max\{z(S), r(S)\} \le e_R$, where $z(S)$ and $r(S)$ are the numbers of \textit{phrases of the Lemple-Ziv parse} of $S$ and \textit{equi-letter runs of the Burrows-Wheeler transform} of a string~$S$. 
-Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}
-It was shown that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$, namely, the size of \textit{Lemple-Ziv parse} and the number of \textit{runs of BWT} of $S$. 
-Moreover, in practice, these parameters can often be much smaller for real-world strings, ranging from about $1/10$ to $1/100$ of the input length $n = |S|$~\cite{navarro2021indexing:ii}. Furthermore, they are shown to be logarithmic to $n$ for the classes of Fibonacci and Thue-Morse words~\cite{radoszewski:rytter2012structure:cdawg:thuemorse}.
-
 %% We remark that these parameters $e_R(S)$ and $e_L(S)$ can be $\Theta(n)$ in the worst case, while they can be logarithmically smaller than $n = |S|$ for some classes of strings, e.g., Fibonacci and Thue-Morse words.
 
 
 
 \subsection{Results}
 %%% 
-Under the problem setting explained above, we then show the main result of this paper. 
+Under the problem setting above, we show the main results of this paper. 
 
 \begin{theorem}[main result]\label{thm:main:index:cdawg}
   Let $S$ be any string of length $n$ over an integer alphabet $\Sigma$ of size $\sigma \ge 2$, and
@@ -129,40 +132,50 @@ Under the problem setting explained above, we then show the main result of this 
   probing at most $O(e_R(S) + e_L(S))$ cells of $\sig I$ and $S$. 
 \end{theorem}
 
-From \cref{thm:main:index:cdawg} above, the proposed algorithm improves the time and space complexity $\Theta(n)$ of the straightforward algorithms via suffix tree construction to asymptotic time and space complexity $O(e_R(S)+e_L(S)$ for classes of repetitive texts with $\max\set{e_R(S), e_L(S)} = o(n)$.
+From \cref{thm:main:index:cdawg} above, the proposed algorithm improves the time and space complexity $\Theta(n)$ of the straightforward algorithms via suffix tree construction~\cite{raffinot2001maximal} to asymptotic time and space complexity $O(e_R(S)+e_L(S)$ for classes of repetitive texts with $\max\set{e_R(S), e_L(S)} = o(n)$.
 %%
-Since our algorithm uses a subprocedure for computing the set $\MR(S)$ of all distinct maximal repeats of a string $S$, we have the next corollary.
+%% Since it solves computaton of the set $\MR(S)$ of all distinct maximal repeats of $S$, we have the next corollary.
+On enumeration of the set $\MR(S)$ of all distinct maximal repeats of $S$, we have the next result. 
 
 
-\begin{corollary}\label{cor:main:index:maxrep}
+\begin{theorem}\label{cor:main:index:maxrep}
   Under the same assumption to \cref{thm:main:index:cdawg}, 
   the set $\MR(S)$ of all distinct maximal repeats of a string $S$ can be enumerated in $O(e_R(S)+e_L(S))$ time and $O(\sigma \log n)$ working space using $O(e_R(S) + e_L(S))$ probes to $\sig I$ and $S$, where $n = |S|$ is the length of $S$. 
-\end{corollary}
+\end{theorem}
 
 \mysubsubsection{Application to compressed text indexes}
 %%%
-Recently, repetition-aware indexes have attracted much attention. A recent compressed index, called \textit{r-index}, proposed by Gagie, Navarro, and Prezza~\cite{gagie:navarro:prezza2020fully}, as well as its latest version~\cite{nishimoto2022optimaltime:rlbwt:construction}, that occuppies $O(r(S)\polylog(n))$ space with supporting the similar functionality of the afoementioned classic array index $\sig I$ and $S$. 
-Since our algorithm makes read-only probes to a limited number of cells of $\sig I$ and $S$, the next theorem immediately follows from \cref{thm:main:index:cdawg} above. 
+Recently, repetition-aware indexes have attracted much attention. A recent compressed index, called \textit{r-index}, proposed by Gagie, Navarro, and Prezza~\cite{gagie:navarro:prezza2020fully} as well as a variant by Nishimoto and Tabei~\cite{nishimoto2022optimaltime:rlbwt:construction} occuppy $O(r(S)\polylog(n))$ space and covers the functionality of the afoementioned index $\sig I$ and $S$. In this setting, we have the next theorem from \cref{thm:main:index:cdawg}. 
 
 
-\begin{theorem}\label{thm:compressed:index:cdawg}
-There exists an algorithm that can transform the r-index $\sig R$ of a string $S$ of length $n$ over an integer alphabet into the CDAWG $G$ of $S$
-  in $O((e_R(S) + e_L(S) + \mu(S)\log\mu(S))\cdot \polylog(n))$ time
-  using
-  $O(r(S)\cdot \polylog(n) + O(e_R(S) + e_L(S))$ working space,
-  where the algorithm probes at most $O(e_R(S) + e_L(S))$ cells of the r-index $\sig R$ of $O(r(S)\cdot\polylog(n))$ size. 
+\begin{theorem}[compressed computation]\label{thm:rindex:all}
+  Let $S$ be any string of length $n$ over an integer alphabet $\Sigma$ of size $\sigma \ge 2$. There exist algorithms that solve each of the problems below in $O((e_R(S) + e_L(S))\cdot \polylog(n))$ time and 
+  $O(e_R(S) + e_L(S))$ words of working space,
+  based on the r-index $\sig R$  of $O(r(S)\cdot\polylog(n))$ space
+  by probing $O(e_R(S) + e_L(S))$ cells of $\sig R$ and $S$: 
+\begin{enumerate*}[(1)]
+\item Construction of the CDAWG of $S$; 
+\item Enumeration of all distinct maximal repeats in $\MR(S)$,  
+\end{enumerate*}
 \end{theorem}
 
-By applying \cref{thm:compressed:index:cdawg} to enumeration of maximal repeats based on the r-index of a string, we have the next corollary. 
+%% \begin{theorem}\label{thm:compressed:index:cdawg}
+%% There exists an algorithm that can transform the r-index $\sig R$ of a string $S$ of length $n$ over an integer alphabet into the CDAWG $G$ of $S$
+%%   in $O((e_R(S) + e_L(S))\cdot \polylog(n))$ time
+%%   using $O(r(S)\cdot \polylog(n) + O(e_R(S) + e_L(S))$ working space,
+%%   where the algorithm probes at most $O(e_R(S) + e_L(S))$ cells of the r-index $\sig R$ of $O(r(S)\cdot\polylog(n))$ size. 
+%% \end{theorem}
 
-\begin{corollary}[maximal repeats enumeration on the r-index]\label{cor:main:index:maxrep}
-  There exists an algorithm that can enumerate the set $\MR(S)$ of all distinct maximal repeats of a string $S$ in 
-  $O((e_R(S)+e_L(S))\cdot \polylog(n))$ time 
-  and $O(\sigma \log n)$ working space,
-  by probing  $O(e_R(S) + e_L(S))$ cells of the r-index $\sig R$ of $S$.
-  %%with $O(r(S)\cdot\polylog(n))$ size. 
-\end{corollary}
 
+%% By applying \cref{thm:compressed:index:cdawg} to enumeration of maximal repeats based on the r-index of a string, we have the next corollary. 
+
+%% \begin{corollary}[maximal repeats enumeration on the r-index]\label{cor:main:index:maxrep}
+%%   There exists an algorithm that can enumerate the set $\MR(S)$ of all distinct maximal repeats of a string $S$ in 
+%%   $O((e_R(S)+e_L(S))\cdot \polylog(n))$ time 
+%%   and $O(\sigma \log n)$ working space,
+%%   by probing  $O(e_R(S) + e_L(S))$ cells of the r-index $\sig R$ of $S$.
+%%   %%with $O(r(S)\cdot\polylog(n))$ size. 
+%% \end{corollary}
 
 
 From the corollary, our method can be an alternative to the repetition-aware algorithm (namely, the r-enum) for distinct maximal repeats by Nishimoto and Tabei~\cite{nishimoto:cpm2021enum}.
@@ -180,7 +193,7 @@ From the corollary, our method can be an alternative to the repetition-aware alg
 \nofbox{\includegraphics[height=1.0\textwidth]{fig2b.pdf}}
 \end{minipage}
 %% \vspace{.5\baselineskip}
-\caption{An example of the \LPTrm-tree $T$ of a string $S = aabaababb\daller$ in \cref{fig:example:problem}.
+\caption{An example of an intemediate structure, called the \LPTrm-tree, $T$ of a string $S = aabaababb\daller$ in \cref{fig:example:problem}.
 Circles and boxes indicate branching nodes and leaves. Black thick, black thin, and red dashed arrows, respectively, indicate solid and non-solid edges, and suffix links.
   A collection of nodes connected by double dotted arrows indicates a congruence class w.r.t.~the end-positions, which will be merged into a node in the CDAWG. 
   %% Sets of nodes connected by double dotted arrows, namely, $\set{3\rk 1, 3\rk 2, 3\rk 3}$ and $\set{4\rk 1, \dots, 4\rk 6}$ form a congruence class of $\eqepos$ w.r.t.~end-positions, and is merged into a node in the CDAWG of $S$. 
@@ -188,8 +201,7 @@ Circles and boxes indicate branching nodes and leaves. Black thick, black thin, 
 \end{figure}
 %%%%%%
 
-
-\subsection{Related work}
+\mysubsection{Related work}
 %%%
 It is well-known (see, e.g., ~\cite{crochemore2021book125problems:chap:satostree}) that the problem of transforming the suffix array (SA) of a string $S$ into its suffix tree $T$ can be solved in $O(n)$ time and space using the LCP array with auxiliary stack, which is done by simulation of traversal of the suffix tree based on either the bottom-up traversal of by Kasai \textit{et al.}~\cite{kasai:lee2001lcp:linear},
 or the top-down traversal by Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing}.
@@ -200,6 +212,11 @@ Recently, Cleary and Dood~\cite{cleary2023constructing} proposed an algorithm fo
 
 The relationship between the size of the CDAWG and the parameter ${e_R(S) + e_L(S)}$ was first studied by Raffinot~\cite{raffinot2001maximal}, and the use of ${e_R(S) + e_L(S)}$ as a compression parameter was proposed by Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}.
 
+\mysubsubsection{Organization of this paper}
+\cref{sec:prelim} introducing some definitions and notation. 
+\cref{sec:sa:to:lpt} first presents how to transform the suffix array of a string $S$ to its \LPTrm-tree in $O(e_R + e_L\log n)$ time, and  
+\cref{sec:lpt:to:cdawg} presents how to transform the \LPTrm-tree into the final CDAWG of $S$. Combining these results, \cref{sec:analysis} shows a final algorithm for converting the suffix array of $S$ into its CDAWG. 
+Finally, \cref{sec:concl} show conclusion and future work.
 
 %%%%
 \section{Preliminaries}
@@ -225,10 +242,28 @@ In what follows, we denote by $\Fac$ and $\Suf$ the \textit{sets of all factors}
 
 %% \subsection{Maximal repeats}
 %% %%% 
-A \textit{maximal repeat} of a string $S$ is a maximal factor $u$ of $S$ that cannot be extended rightward or leftward without losing its occurrences in $S$. A \textit{right-extension} (resp.~a \textit{left-extension}) of a maximal repeat $u$ of $S$ is a string $ua$ (resp.~$au$) that is also a factor of $S$, namely, $ua \in \Fac$ (resp.~$ua \in \Fac$), with some character $b \in \Sigma$. Then, the character $c$ is called a right-branching (resp.~a left-branching) character of $u$. We denote the set of right- (resp.~left) branching characters of $u$ by $\RChar(u) = \sete{ c \in \Sigma \mid uc \in \Fac }$ (resp.~$\LChar(u) = \sete{ c \in \Sigma \mid cu \in \Fac }$). 
+A \textit{right-extension} (resp.~a \textit{left-extension}) of a factor $u$ of $S$ is a string $ub$ (resp.~$au$) that is also a factor of $S$
+%namely, $ua \in \Fac$ (resp.~$ua \in \Fac$),
+with some $a,b \in \Sigma$.
+%% Then, the character $c$ is called a right-branching (resp.~a left-branching) character of $u$.
+Then, we define the sets of right- and left-characters of $u$ by $\RC(u) = \sete{ c \in \Sigma \mid uc \in \Fac }$ and $\LC(u) = \sete{ c \in \Sigma \mid cu \in \Fac }$, respectively. A factor $u$ of $S$ is said to be right-branching (resp.~left-branching) if $|\RC(u)|\ge 2$ (resp.~$|\LC(u)|\ge 2$). The next lemma is frequently used in this paper, which says that the class of right-branching (resp.~left-branching) factors is closed under suffixes (resp.~prefixes). 
 
-The parameters $\mu = \mu(S)$, $e_R = e_R(S)$, and $e_L = e_L(S)$ of a string $S$ are defined to be the numbers of the maximal repeats, their right-extensions, and left-extensions of $S$, respectively. It is known that $\mu(S) \le \max\{e_R(S), e_L(S)\} \le 2n - 2$ for any string $S$ of length $n$ (Blumer \textit{et al.}~\cite{blumer1987complete}).
-%% Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} showed that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$ from above, that is, $\max\{z(S), r(S)\} \le e_R$, where $z(S)$ and $r(S)$ are the numbers of \textit{phrases of the Lemple-Ziv parse} of $S$ and \textit{equi-letter runs of the Burrows-Wheeler transform} of a string~$S$. 
+\begin{lemma}\label{lem:closure:branching}
+  Let $u, v \in \Fac(S)$ be any factor of $S$.
+\begin{itemize}
+\item If $v$ is right-branching in $S$ and $u$ is a suffix of $v$, then so is $u$. 
+\item If $v$ is left-branching in $S$ and $u$ is a prefix of $v$, then so is $u$. 
+\end{itemize}
+\end{lemma}
+
+A \textit{maximal repeat} of a string $S$ is any factor $u$ that is both right-branching and left-branching in $S$. In other words, it is a maximal factor that cannot be extended rightward or leftward without losing its occurrences in $S$. 
+The parameters $\mu(S)$, $e_R(S)$, and $e_L(S)$ of a string $S$ are defined to be the \textit{numbers of the maximal repeats}, their \textit{right-extensions}, and \textit{left-extensions} in $S$, respectively. It is known that $\mu(S) \le \max\{e_R(S), e_L(S)\} \le 2n - 2$ for any string $S$ of length $n$ (Blumer \textit{et al.}~\cite{blumer1987complete}).
+
+
+%% Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}
+%% It was shown that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$, namely, the size of \textit{Lemple-Ziv parse} and the number of \textit{runs of BWT} of $S$. 
+%% Moreover, in practice, these parameters can often be much smaller for real-world strings, ranging from about $1/10$ to $1/100$ of the input length $n = |S|$~\cite{navarro2021indexing:ii}. Furthermore, they are shown to be logarithmic to $n$ for the classes of Fibonacci and Thue-Morse words~\cite{radoszewski:rytter2012structure:cdawg:thuemorse}.
+
 
 \subsection{Indexing structures for a string}
 %%% 
@@ -253,7 +288,8 @@ Briefly, $SA[1..n]$ stores the start positions of lexicographically sorted suffi
 $S[SA[1]..] \prec_\lex \dots \prec_\lex S[SA[n]..]$. 
 $\ISA$ is the inverse of $\SA$, namely, $\ISA[\SA[i]] = i$ for all $\btw i1n$.
 $\LCP$ is the array defined by $\LCP[1] = 0$ and $\LCP[i] = lcp(S[SA[i]..], S[SA[i-1]..]) \ge 0$ for all rank $\btw i1n$. 
-$BWT[i]$ is $S[SA[i]-1]$ if $SA[i]>1$ and $\daller$ otherwise. 
+$BWT[i]$ is $S[SA[i]-1]$ if $SA[i]>1$ and $\daller$ otherwise.
+%% The BWT of $S$ is defined $BWT[i] = S[SA[i]-1]$ if $SA[i] > 1$ and $BWT[i]=\daller$ otherwise
 \end{toappendix}
 
 
@@ -262,77 +298,58 @@ $BWT[i]$ is $S[SA[i]-1]$ if $SA[i]>1$ and $\daller$ otherwise.
 %% \section{Notes}
 %% \label{sec:notes}
 
+%% \section{Outline of the Proposed Algoritm}
+%% %\section{Top-level Structure of Algoritm}
+%% %%%% 
 
+%% In this section, we present an $O(e_R(S) + e_L(S) + \mu(S)\log \mu(S))$-time solution over an integer alphabet.
+%% %% \subsection{Outline of the algorithm}
+%% %% %%%
+%% Let $\Sigma$ be an alphabet with $|\Sigma(S)| \ge 2$ characters. 
 
+%% %% \subsection{The recursive procedure $\RecLPT$}
+%% \subsection{Top-level structure of algorithm}
+%% %%%%
+%% In \cref{algo:main}, we show the top-level structure of our algorithm for transforming the suffix array of a string $S$ with auxiliary structures with length $n$ into the CDAWG $G$ of the string as follows, where $\pair{1..n, 0}$ indicates the root of the CDAWG to be constructed in a representation introduced later in \cref{sec:constant:size:rep}. 
+%% %%%%
+%% {
+%% % \setlength{\interspacetitleruled}{0pt}%
+%% \setlength{\algotitleheightrule}{0pt}%
+%% \begin{algorithm}[h]
+%%   \caption{Transforming $SA$ and $S$ into its CDAWG $G$.
+%%     %% Transforming the suffix array of a string $S$ with auxiliary structures with length $n$ into the CDAWG $G$ of the string.
+%%   }\label{algo:main}
+%% \KwPreproc{Construct an index $\sig I = (\SA, \ISA, \LCP_{RMQ})$ from $SA$ and $S$.}  
+%% \KwRuntime{Perform the following steps on request}
+%% \Begin{
+%%     $T \gets \RecLPT(\pair{1..n, 0}, \sig I, S)$
+%%       \Comment*{Compute $\LPT(S)$ from $\sig I$}
+%%     $G \gets \RecCDAWG(T, S)$
+%%       \Comment*{Compute $\CDAWG(S)$ from the $\LPT(S)$} \label{line:main:merge}
+%%       %%  obtained from $\LPT(S)$ by merging non-maximal nodes to maximal nodes
+%%     Return $G$\; 
+%% }
+%% \end{algorithm}
+%% }
+%% %%%%%%%%%
 
-\section{Outline of the Proposed Algoritm}
-%\section{Top-level Structure of Algoritm}
-%%%% 
+%% In preprocessing, an index structure $\sig I = (\SA, \ISA, \LCP, S)$ is constructed from an input string~$S$ of length $n$ over $\Sigma$ in linear time using appropriate construction algorithms~\cite{navarro2016cds:book,navarro2021indexing:ii}.
+%% In runtime, the CDAWG $G$ of $S$ is constructed on $\sig I$ through construction an intermediate structure $\LPT(S)$, called the extended longest common prefix tree of $S$.
 
-In this section, we present an $O(e_R(S) + e_L(S) + \mu(S)\log \mu(S))$-time solution over an integer alphabet.
-%% \subsection{Outline of the algorithm}
-%% %%%
-Let $\Sigma$ be an alphabet with $|\Sigma(S)| \ge 2$ characters. 
+%% To describe our algorithm, we introduce a virtual rooted tree $\LPT(S)$ as follows according to \cite{belazzougui:nunial:gagie:prezza:raffinot2015composite,inenaga2024computing}. 
 
-%% \subsection{The recursive procedure $\RecLPT$}
-\subsection{Top-level structure of algorithm}
-%%%%
-In \cref{algo:main}, we show the top-level structure of our algorithm for transforming the suffix array of a string $S$ with auxiliary structures with length $n$ into the CDAWG $G$ of the string as follows, where $\pair{1..n, 0}$ indicates the root of the CDAWG to be constructed in a representation introduced later in \cref{sec:constant:size:rep}. 
-%%%%
-{
-% \setlength{\interspacetitleruled}{0pt}%
-\setlength{\algotitleheightrule}{0pt}%
-\begin{algorithm}[h]
-  \caption{Transforming $SA$ and $S$ into its CDAWG $G$.
-    %% Transforming the suffix array of a string $S$ with auxiliary structures with length $n$ into the CDAWG $G$ of the string.
-  }\label{algo:main}
-\KwPreproc{Construct an index $\sig I = (\SA, \ISA, \LCP_{RMQ})$ from $SA$ and $S$.}  
-\KwRuntime{Perform the following steps on request}
-\Begin{
-    $T \gets \RecLPT(\pair{1..n, 0}, \sig I, S)$
-      \Comment*{Compute $\LPT(S)$ from $\sig I$}
-    $G \gets \RecCDAWG(T, S)$
-      \Comment*{Compute $\CDAWG(S)$ from the $\LPT(S)$} \label{line:main:merge}
-      %%  obtained from $\LPT(S)$ by merging non-maximal nodes to maximal nodes
-    Return $G$\; 
-}
-\end{algorithm}
-}
-%%%%%%%%%
+%% \begin{definition}[informal]\rm 
+%% The \textit{extended longest common prefix tree} (or the \LPTrm-tree) of a string $S$, denoted $\LPT(S) = (\sig V, \sig E, \eps)$, is an edge-compacted rooted tree obtained from the CDAWG $G = (V(G), E(G), \eps)$ of $S$ by cutting all non-primary arcs in $E(G)$ to separate them from maximal repeats, and replacing their targets with newly created nodes.
+%% $\sig V = V(G)\uplus\Delta(S)$ is a node set,%
+%% %%
+%% \footnote{Belazzougui~\textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} introduced the \LPTrm-tree of $S$ to show that the parameters $r(S)$ and $z(S)$ are upperbounded by $O(e_R(S) + e_L(S))$, where the set $\V(G)$ and $\Delta(S)$ are written as $\sig E$ and $\sig F$, and each element of $\sig F$ is called a \textit{fringe}. Inenaga et al.~\cite{inenaga2024computing} used \LPTrm-tree to compute all distinct minimal absent words of a string $S$ in output linear time. 
+%% }
+%% %%
+%% where the set $V(G)$ correspoind to all maximal repeats and $\Delta(S)$ corresponds to all new nodes representing non-maximal repeats.
+%% \end{definition}
 
-In preprocessing, an index structure $\sig I = (\SA, \ISA, \LCP, S)$ is constructed from an input string~$S$ of length $n$ over $\Sigma$ in linear time using appropriate construction algorithms~\cite{navarro2016cds:book,navarro2021indexing:ii}.
-In runtime, the CDAWG $G$ of $S$ is constructed on $\sig I$ through construction an intermediate structure $\LPT(S)$, called the extended longest common prefix tree of $S$.
+%%   $\LPT(S)$ can be stored in $O(e_R)$ words, and can be easily converted into the CDAWG $G$ in $O(e_R)$ time.
 
-To describe our algorithm, we introduce a virtual rooted tree $\LPT(S)$ as follows according to \cite{belazzougui:nunial:gagie:prezza:raffinot2015composite,inenaga2024computing}. 
-
-\begin{definition}[informal]\rm 
-The \textit{extended longest common prefix tree} (or the \LPTrm-tree) of a string $S$, denoted $\LPT(S) = (\sig V, \sig E, \eps)$, is an edge-compacted rooted tree obtained from the CDAWG $G = (V(G), E(G), \eps)$ of $S$ by cutting all non-primary arcs in $E(G)$ to separate them from maximal repeats, and replacing their targets with newly created nodes.
-$\sig V = V(G)\uplus\Delta(S)$ is a node set,%
-%%
-\footnote{Belazzougui~\textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} introduced the \LPTrm-tree of $S$ to show that the parameters $r(S)$ and $z(S)$ are upperbounded by $O(e_R(S) + e_L(S))$, where the set $\V(G)$ and $\Delta(S)$ are written as $\sig E$ and $\sig F$, and each element of $\sig F$ is called a \textit{fringe}. Inenaga et al.~\cite{inenaga2024computing} used \LPTrm-tree to compute all distinct minimal absent words of a string $S$ in output linear time. 
-}
-%%
-where the set $V(G)$ correspoind to all maximal repeats and $\Delta(S)$ corresponds to all new nodes representing non-maximal repeats.
-\end{definition}
-
-  $\LPT(S)$ can be stored in $O(e_R)$ words, and can be easily converted into the CDAWG $G$ in $O(e_R)$ time.
-
-\subsection{Constant-size Representation of factors}
-\label{sec:constant:size:rep}
-%%% 
-%% We encode any factor, including maximal repeats, of $S$ in a constant-sized representation as follows so that it can be operated in constant time.
-We introduce a representation of any factor of $S$ in constant space so that it can be manupilated in constant time. 
-The \textit{rich representation} of a factor $u$ of $S$ is a triple $\tau = (i, j, \ell) \in [n]^3$, denoted by $\pair{i..j, \ell}$, consisting of 
-\begin{itemize}
-\item the pair $(i, j)$ with $1\le i\le j\le n$ represents the \textit{SA-range} $i..j\subseteq 1..n$ of $u$ that is the maximal range
-  %% w.r.t.~set-inclusion
-  consisting of all suffixes of $S$ prefixed by $u$, and  
-  
-\item the integer $\ell\ge 0$ represents the length of the factor $u$, namely, $\ell = |u|$. 
-\end{itemize}
-
-We denote by $\RR$ the set of the rich-representation of all factors of $S$.
-We used the constant-sized representation of factors of $S$ \cref{sec:sa:to:lpt} in the followings. 
 
 
 %%%%%%%%%%%%%%%%
@@ -342,187 +359,179 @@ We used the constant-sized representation of factors of $S$ \cref{sec:sa:to:lpt}
 In this section, we present the first algorithm $\RecLPT$ for transforming the suffix array for a string $S$ into its \LPTrm-tree used at \cref{line:main:merge} in \cref{algo:main}.
 
 
-\subsection{Outline}
-%% \subsection{Recursive subprocedure}
-%%%% 
-In \cref{algo:rec}, we show the recursive subprocedure $\RecLPT$ that given the triple $\pair{1..n, 0}$ for the empty string $\eps$, recursively constructs the extended LPT tree $T = \LPT(S)$ of a string $S$ on an index structure~$\sig I$. It systematically enumerates the set $\MR(S)$ of all maximal repeats, a class of special factors of $S$, in top-down manner from shorter to longer. In the procedure $\RecLPT$, each maximal repeat $u$ is encoded as the triple $\pair{i, j, \ell} = \pair{i..j, \ell}$, called the rich-representation, or simply the \textit{triple} of $u$, where $i..j$ is its SA-range of $u$ in $SA$ and $\ell = |u|$ is its length.
-
-The procedure $\RecLPT$ works as follows: 
-%%where maximal repeats are a class of special factors of $S$. 
-\begin{itemize}
-\item It starts with the triple $\op{rep}(\eps)$ of the shortest maximal repeat, i.e., $\eps$, and the initial DAG $G = (\set{\eps}, \emptyset{}, \eps)$. 
-  
-\item At each iteration with the triple $\op{rep}(u) = \pair{i..j, \ell}$ of a maximal repeat $u \in \MR(S)$, it generates the triples of a maximal repeat $v_b$ in $\MR(S)\setminus{\eps}$ as a children of $u$ for possible character $b\in\Sigma$, and then, recursively call itself with $v$ and $G$ as arguments. The generation of children of the parent $u$ will be described in the later subsections. 
-\end{itemize}
-
-To show the correctness and time complexity, we will show that $\RecLPT$ simulate a top-down traversal of $\LPT(S)$ by visiting all of $O(\mu(S))$ members of $\MR(S)$, following $O(e_R(S))$ arcs, and backtracking when it eventually reaches a non-member of $\MR(S)$.
-In the following subsections, we will explain more details of the above procedure. 
-
-%% The tree $\LPT(S)$ is rooted at the empty string $\eps$ as the shortest maximal repeat, and whose edge set $\sig E = \sig E \cup \sig F$ consists of the set $\sig E$ of all edges connecting maximal repeats, and additionally contains a set $\sig F$ of edges that are associated with the failure of traversal. 
-
 \subsection{Enumeraton of maximal repeats of $S$}  
 \label{sec:enum:maxrep}
 %%% 
-The tentative goal here is to generate all maximal repeats without duplicates in amortized constant time per solusion. For the purpose, we introduce the LPT tree of $S$, $\LPT(S)$, which will be shown later to be a subgraph of the suffix tree of $S$, denoted by $\Stree(S)$. Then, we give a high-level description of our algorithm.
-
-\subsubsection{Relationship between $\Stree(S)$ and $\CDAWG(S)$}
-%%%
-Consider the suffix tree $\Stree(S) = (V, E, \underline\eps)$ of a string $S$. 
-%% Recall that $\underline u$ is the locus of a factor $u$ such that $\str(\underline u) = u$. 
-In $\Stree(S)$, we observe that all branching nodes correspond the loci $\underline u$ of all right-branching factors $u$ of $S$, while all leaves correspond to the loci $\underline s$ of all suffixes $s$ of $S$.
-
-\begin{remark}\label{remark:one:primary}
-  For any factor $u \in \Sigma^*$ of $S$, the conditions (1)--(3) are equivalent:
-  \begin{enumerate}[(1)]
-  \item The locus $\underline{u}$ of $u$ in the CDAWG of $S$ is a branching node and $u$ is the string label of the longest path from the source to $\underline{u}$. 
-  \item The locus $\underline{u}$ of $u$ in the suffix tree of $S$ is a branching node and has two or more incoming suffix links. 
-  \item The string label $u$ is a maximal repeat of $S$, i.e., $u \in \MR(S)$. 
-  \end{enumerate}
-\end{remark}
-
-
-%%%%%%%%%%%%%5
-\begin{algorithm}[t]
-  \caption{
-    A subprocedure $\RecLPT$ for constructing the extended LPT-tree $\LPT(S)$ of the string $S$ on an index $\sig I = (\SA, \ISA, \LCP, S)$.
-    %% for enumerating the set $\MR(S)$ of all maximal reepeats of the string $S$ prefixed by the word $u := \getfactor(i..j, \ell)$. 
-}\label{algo:rec}
-%%%\medskip
-  \KwInput{
-    A triple $\pi = \pair{i..j, \ell} \in \RR$ and a rooted tree $T = (\sig V(T), \sig E(T), \eps)$. 
-  }
-  \KwOutput{
-    A subgraph $T = (\sig V(T), \sig E(T), \eps)$ of $\LPT(S)$. 
-  }
-  \textbf{procedure} \RecLPT$(\pi, T)$\;
-  \Begin{
-      \Comment{Pre-condition: $\pi = \pair{i..j, \ell}$ represents a maximal repeat $u$ in $\MR(S)$.}
-      %% $Children \gets \emptyset$\; 
-      $Children \gets \GenChildren(i..j, \ell, \op{undef})$\Comment*{See \cref{lem:genchildren}}
-      \label{line:recmr:for:begin}
-      \For {each child $(c, \tau_c = \pair{i_c..j_c, \ell_c})$ in $Children$}{
-             \Comment{Post-condition:
-               $c \in \RChar(u)$ is a branching character and 
-               $\tau_c$ represents
-               an $c$-child $\rext{uc} \in \MR(S)$ of $u$. 
-             }
-             $\sig V(T) \gets \sig V(T) \cup\set{ \tau_c }$
-             \Comment*{Adding a node to $\sig V(T) = \MR(S)\cup\Delta(S)$}
-             $\pair{p, q} \gets \pair{SA[k] + \ell, SA[k] + \ell_c - 1}$ for arbitrary $k \in i_c..j_c$\; 
-             $f = (\pi, \pair{p, q}, \tau_c)$\Comment*{arc $f$with $\lab(f) = S[p..q]$} 
-             $\sig E(T) \gets \sig E(T) \cup\set{ f }$
-             \Comment*{Adding an arc to $\sig E(T) = \sig E\cup\sig F$}
-             \uIf (\comblk{See \cref{lem:leftmaximal:character}}) {$\isLeftBranching(i_c..j_c, \ell_c)$}{
-               $\RecLPT(\tau_c, T)$
-               \Comment*{A node $\tau_c \in \sig M$ for a maximal repeat}
-               \label{line:recmr:for:end}
-             } %% If
-             \Else{
-               $\rhd$ do not recurse
-               \Comment*{A dammy leaf $\tau_c \in \Delta$ and $(\pi, \tau_c) \in \sig F$, resp.}
-             } %% Else
-       } %% for 
-    }
-\end{algorithm}
-%%%%%%%%%%%%%%%%%
-
-
-
+The tentative goal here is to generate all maximal repeats without duplicates. 
 We need a few technical definitions. 
-For any factor $u \in \Fac$, we define the \textit{right-closure} of $u$, denoted $\rext{u}$, to be the string obtained from $u$ by maximally extending $u$ rightwards while the occurrence of the resulting factor does not change, i.e., $\Spos(\rext{u}) = \Spos(u)$ holds.
-Similarly, we can define the \textit{left-closure} of $u$, denoted $\lext{u}$ by symmetry. 
-%%
-For example, consider a string  $S[1..n] = \mathtt{aabaababb\$}$ of length $10$. For a factor $aa$ with $\Spos(aa) = \set{1, 4}$, its right-closure is $\rext{aa} = aaba$. On the other hand, for a factor $a$ with $\Spos(a) = \set{1,2,4,5,7}$, its right-closure is $\rext{a} = a$. 
+For any factor $u \in \Fac$, we define the \textit{right-closure} of $u$, denoted $\rext{u}$, to be the factor $v$ of $S$ obtained from $u$ by maximally extending it rightwards while $\Spos(v) = \Spos(u)$ holds. 
+Similarly, we define the \textit{left-closure} of $u$, denoted $\lext{u}$ by symmetry. 
 
-%% %%This definition is well-defined since the longest path is closed under prefix.
-%% Next, in the suffix tree $T$ of $S$, with a slight abuse of terminology, a (unique) path $\pi$ from the root to a node $\underline v$ is said to be \textit{primary} if its corresponding path in $G$ is primary. Again, a primary path is closed under prefix. Then, any arc $f = (\underline u, \underline v)$ in $T$ is said to be \textit{primary} if it is included in a primary path $\pi$ to $\underline v$, and \textit{non-primary} otherwise. 
+For example, we consider the string  $S = \mathtt{aabaababb\$}$ of length $10$ in \cref{fig:example:problem}. For a factor $aa$ with $\Spos(aa) = \set{1, 4}$, its right-closure is $\rext{(aa)} = aaba$. On the other hand, for a factor $a$ with $\Spos(a) = \set{1,2,4,5,7}$, its right-closure is $\rext{a} = a$.
 
-%% From the equivalence shown in \cref{remark:one:primary}, we introduce the primary arcs in the CDAWG $G$ and suffix tree $T$ of $S$. In $G = \CDAWG(S)$,  any arc $f = (\underline u, \underline v)$ is said to be \textit{primary} if it is included in the longest path from the root to node $\underline v$, and \textit{non-primary} (or secondary) otherwise.
-%% %%This definition is well-defined since the longest path is closed under prefix.
-%% Next, in the suffix tree $T$ of $S$, with a slight abuse of terminology, a (unique) path $\pi$ from the root to a node $\underline v$ is said to be \textit{primary} if its corresponding path in $G$ is primary. Again, a primary path is closed under prefix. Then, any arc $f = (\underline u, \underline v)$ in $T$ is said to be \textit{primary} if it is included in a primary path $\pi$ to $\underline v$, and \textit{non-primary} otherwise. 
+Next, we introduce  as follows. It will be shown that $\sig L(S)$ coincides a subgraph of the suffix tree of $S$, called the longest prefix tree, introduced by Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} and Inenaga \textit{et al.}~\cite{inenaga:iwoca2024computing:maw}. 
 
-\subsubsection{The extended longest common prefix tree of $S$}
-%%%
-We introduce subgraphs $\LPT(S)$ and $\LPT(S)$ of $\Stree(S)$ in the followings. First, we define the subsets of nodes $\sig V(S), \Delta(S) \subseteq V$ and the subsets  of arcs $\sig E(S), \Delta(S)\subseteq E$ as follows: 
-\begin{itemize}
-\item $\sig V$ is the subset of the nodes corresponding to all maximal repeats, that is, $\sig V = \set{ \underline u \mid u \in \MR(S) }$. 
-  
-\item $\sig E \subseteq E$ is the subset of all arcs $f = (u, v)$ in $E$ that connect maximal repeats in $\MR(S)$, that is, $\sig E = \sete{ (\underline u, \underline v) \in E \mid \set{u, v} \subseteq \MR(S) }$.
+%% the LPT tree of $S$, $\LPT(S)$, which will be shown later to be
+For enumeration of maximal repeats of $S$, we employ the technique of the \textit{reverse search} for designing enumeration algorithms for a set of complex objects, proposed by Avis and Fukuda~\cite{avis1996reverse}, explained as follows.  In the reverse search, we first design a spanning tree $\sig L(S)$ for all objects, namely, all maximal repeats of $S$. To do this, we define the \textit{parent function} $\sig P: \MR(S)\setminus\set{eps} \to \MR(S)$ for all non-empty maximal repeats; We define the \textit{parent} of any non-empty maximal repeat $v$, denoted $\sig P(v)$, to be the longest prefix $u$ of $v$ such that $\Spos(u) \not= \Spos(v)$.
 
-\item $\sig F\subseteq E$ is the subset of all arcs $f = (u, v)$ in $E$ that connect a maximal repeat $u$ and a non-maximal repeat $v$, that is, $\sig F = \sete{ (\underline u, \underline v) \in E \mid u \in \MR(S), v \not\in \MR(S) }$.  
-%% $\sig E(S) = \sig E(S) \cup \sig F(S)$ is the subset of $E$, where
-  
-\item $\Delta(S) = \set{ \underline v \mid f = (\underline u, \underline v) \in \sig F }$ is the set of the destinations of all arcs in $\sig F$.
-%% $\sig V(S) = \sig V(S) \cup \Delta(S)$ is the subset of $V$, where 
-\end{itemize}
-
-By construction,
-%% it follows that $\sig V(S)\subseteq \sig V(S) \subseteq V(S)$ and $\sig E(S)\subseteq \sig E(S) \subseteq E(S)$. Moreover,
-$\sig V(S)$ contains the shortest maximal repeat $\eps$. The DAG $\LPT(S)$ is called the longest common prefix tree of $S$ in the literature.  
-
-\begin{definition}[Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}, Inenaga \textit{et al.}~\cite{inenaga:iwoca2024computing:maw}]
-  We define the extended longest common prefix tree of $S$ to be the rooted DAG $\LPT(S) = (\sig V(S), \sig E(S), \eps)$, where 
-  $\sig V(S) = \sig V(S) \cup \Delta(S) \subseteq V$ is the node set, $\sig E(S) = \sig E(S) \cup \sig F(S) \subseteq E$ is the arc set, and $\eps \in \sig V(S)$ is the root. 
+\begin{definition}\rm 
+  We define the \textit{search tree} $\sig L(S) = (\MR(S), \sig P, \eps)$ for $\MR(S)$ to be a digraph, where the node set is $\MR(S)$, the set of reversed arcs is given by the function $\sig P$, and the root is $\eps$. 
 \end{definition}
 
-Blumer \textit{et al.}~\cite{blumer1987complete} showed the properties of the CDAWG $G$ of $S$, which is the minimum state DFA of $\Suf$ with path-compression. We define the \textit{end-equivalence relation} $\equiv_{epos}$ over $\Fac$ by $x \equiv_{epos} y \iff\Epos(x) = \Epos(y)$.
-%%%
-Each node $\underline u$ of $G$ with $u \in \Fac$ represents an equivalence class, denoted by $[\rext{u}]^S_{epos} \subseteq \Fac$, of factors of $S$ with respect to $\equiv^S_{epos}$. That is, $\underline u := [\rext{u}]^S_{epos} = \sete{ v \in \Fac \mid u \equiv_{epos} v}$.
-%% Then, each node $\underline u$ of $G$ represents the equivalence class $[\rext{u}]^S_{epos} \subseteq \Fac$ of factors of $S$ with a representative $u \in \Fac$ w.r.t.~$\equiv^S_{epos}$, namely, $\underline u := [\rext{u}]^S_{epos} = \sete{ v \in \Fac \mid u \equiv_{epos} v}$.
-%%%
-%% Usually, the longest element, denoted by $\Value(\underline u)$ is used as the representative of $\underline u = [\rext{u}]^S_{epos}$.
-The representative of $\underline u = [\rext{u}]^S_{epos}$ is the longest element, which we denote by $\Value(\underline u)$. 
-Each member $v$ of the equivalence class $[\rext{u}]^S_{epos}$ is the string label of a path from the root to node $\underline u$. 
-All arcs in the CDAWG $G$ can be classified as either primary or non-primary. An arc $f = (\underline u, \underline v)$ is said to be \textit{primary} if it is included in the longest path from the root to node $\underline v$, and \textit{non-primary} (or secondary) otherwise.
-Note that only a subset of arcs of $\Stree(S)$ can be included in $\CDAWG(S)$ in general. 
+We can easily show that $\sig P$ satisfies the following properties: 
+\begin{enumerate*}[(i)]
+\item $\sig P(v)$ is always defined if $v \not= \eps$, 
+\item $|\sig P(v)| < |v|$, and 
+\item $|\sig P(v)| \ge 0$. 
+\end{enumerate*}
+Recall that $\eps$ is the unique shortest member of $\MR(S)$ (since $|\Sigma(S)|\ge 2$). Then, we can show the following property.
 
-\begin{lemma}[Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}]\label{lem:lpt:edge:classification}
-  The arc subsets $\sig E$ and $\sig F$ of $\LPT$ correspond to the sets of all primary arcs and all non-primary arcs in $G = \CDAWG(S)$. That is, for all pair of factors $u, v\in \Fac$, the arc $f = (\underline u, \underline v)$ in $\sig E$ and the corresponding arc $f' = ([\rext{u}]^S_L, [\rext{v}]^S_L)$ satisfies the conditions (1) and (2) below: 
-\begin{enumerate}[(1)]  
-\item $f \in \sig E\cup \sig F$ if and only if $f$ is an arc of $G$. 
-\item Moreover, (i) $f \in \sig E$ if and only if $f'$ is a primary arc of $G$, while (ii) $f \in \sig F$ if and only if $f'$ is a non-primary arc of $G$.
-\end{enumerate}
+\begin{lemma}\label{lem:searchtree:parent:four}
+$\sig P(v)$ is a maximal repeat in $\MR(S)$ if $v\not=\eps$. 
 \end{lemma}
 
-%% \begin{proof} TBD. 
-%% \end{proof}
+\begin{lemma}\label{lem:maxrep:searchtree}
+  $\sig L(S)$ is a rooted tree spanning all maximal repeats in $\MR(S)$. 
+\end{lemma}
 
-From \cref{lem:lpt:edge:classification}, we refer to the arcs $f$ of $\LPT(S)$ as \textit{primary} if $f \in \sig E$ and as \textit{non-primary} if $f \in \sig F$ without confusion. Then, we can identify $\LPT(S)$ and $G = \CDAWG(S)$, where we can obtain the former from the latter by replacing each secondary arc $f = (\underline u, \underline v)$ by a new arc $f' = (\underline u, \underline {v_f})$ with a new end point $\underline{v_f}$ and the associated string label $v_f = \Value(\underline u)\cdot \lab(f) \in \Sigma^+$. 
+\begin{proof}
+From the above conditions, the digraph $\sig L(S)$ is connected, acyclic, and rooted at $\eps$, and it contains $\MR(S)$. Thus, the claim holds. 
+\qed\end{proof}
 
-\subsection{Simulating a traversal of $\LPT(S)$}
-%%%%
-Since the node set of $\LPT(S)$ equals the set $\MR(S)$ as its nodes, we can enumerate all maximal repeats in $\MR(S)$ by a top-down traversal of $\LPT(S)$ using backtracking starting from the representation $\tau_\eps \in \RR$ for the root $\eps$, and expanding the current representation $\tau \in \RR$ for a maximal repeat $u \in \MR(S)$ into the set of its children $Children(\tau) \subseteq \RR$.
-Below, we will inductively construct a spanning tree over the set $\MR(S)$ by induction on the length of a string as follows.
+Based on \cref{lem:maxrep:searchtree}, we give a high-level description of our algorithm that traverses the search tree $\sig L(S)$ by DFS as follows:
 
-In the base case, we can easily see that the empty string $\eps$ is the shortest member of $\MR(S)$ due to the assumption $|\Sigma|\ge 2$. Then, it is easy to see that the triple for $\eps$ is given by $\pair{1..n, 0}$. 
+\begin{definition}[high-level description of the search procedure for $\sig L(S)$]\label{lem:maxrep:algo:highlevel}
+\begin{itemize}
+\item[] \textbf{Procedure}  Enumeration of all members of $\MR(S)$: 
+\begin{itemize}
+\item Initially, we start from the root $\eps$. 
+\item At each iteration with a visited maximal repeat $u \in \MR(S)$, we first print $u$ as an answer, and then we generate all children $v \in \MR(S)$ such that $\sig P(v) = u$ holds. For each child $v \in \MR(S)$, we recursively enumerate the descendants.
+\item When there is no children found, we backtrack the parent. 
+\end{itemize}
+\end{itemize}
+\end{definition}
 
-In the induction case, we try to generate the triple for a maximal repeat $v\in \MR(S)$ from the triple for a shorter maximal repeat $u\in \MR(S)$.
-%% Then, the parent $u$ of a maximal repeat $v \in \MR(S)$ is the maximal repeat $u \in \MR(S)$ such that
-For any arc $f = (\underline u, \underline v) \in \E\cup\F$ in $\LPT(S)$, we say that $u$ is the \textit{parent} of $v$, and $v$ is a \textit{child} of $u$. 
-Generation of the set $Children(\tau)$ can be done as follows.
+The remaining thing is how to generate all children $v \in \MR(S)$ such that $\sig P(v) = u$ holds.
+This can be done as follows. 
 
-%% Note that a factor $v$ of $S$ is left-branching only if its SA-range $i..j$ have width two or more, i.e., $|i..j| \ge 2$. 
+\begin{lemma}[generation of children]\label{lem:maxrep:howto:child}
+  Let $u \in \MR(S)$ be any maximal repeat of a string $S$. For any non-empty string $v \in \Sigma^+$, $v \in \MR(S)$ and $\sig P(v) = u$ if and only if 
+  \begin{enumerate}[(i)]
+  \item $v = \rext{(ub)}$, i.e., $v$ is the right-closure of some $b\in \Sigma$, and 
+  \item $|\LC(v)| \ge 2$, i.e., $v$ is left-branching in $S$. 
+  \end{enumerate}
+\end{lemma}
 
-\begin{lemma}\label{lem:maxrep:howto:child}
-  Let $\LPT(S) = (\sig V, \sig E, \eps)$
-  For any maximal repeat $u \in \Sigma^*$ in $\MR(S)$ and any non-empty string $v \in \Sigma^+$, the following conditions (1) and (2) are equivalent: 
-\begin{enumerate*}[(1)]
-\item $v \in \sig V$ and $u$ is the parent of $v$;  
-\item
-  \begin{enumerate*}[(i)]
-  \item $v = \rext{(ua)}$ for a character $a\in \Sigma$, and 
-  \item $v$ is a left-branching factor of $S$. 
-    %% \item $|i..j| \ge 2$ with
-    %% the SA-range $i..j$ of $v$. 
-  \end{enumerate*}
+In \cref{lem:maxrep:howto:child} above, we can replace the condition $b \in \Sigma$ with a more strict condition $b \in \RC(u)$ for efficiency.
+From \cref{lem:maxrep:searchtree} and \cref{lem:maxrep:howto:child}, we can show the correctness of the high-level procedure. 
+
+\begin{lemma}[correctness]\label{lem:maxrep:howto:child}
+  The high-level procedure in \cref{lem:maxrep:algo:highlevel} correctly enumerates all maximal repeats in $\MR(S)$ without duplicates. 
+\end{lemma}
+
+Finally, we observe the connection of the search tree $\sig L(S)$ and a subgraph of the suffix tree of $S$, called the extended longest prefix tree of $S$, denoted $\LPT(S)$, proposed by Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}. Inenaga \textit{et al.}~\cite{inenaga:iwoca2024computing:maw} studied the 
+
+\begin{definition}
+The extended longest common prefix tree of $S$ (\LPTrm-tree, for short) is the subgraph $P = (V(P)\cup \Delta(P), E(P)\cup F(P), \eps)$ of the suffix tree $T$ of $S$ that consists of 
+\begin{enumerate}
+\item $V(P) = \MR(S) \subseteq V(T)$,  
+\item $E(P) = \sete{ (u, v) \in E(T) \mid u, v \in \MR(S) } \subseteq E(T)$,  
+\item $F(P) = \sete{ (u, v) \in E(T) \mid u \in \MR(S), v \not\in \MR(S) } \subseteq E(T)$, and  
+\item $\Delta(P) = \set{ v \in V(T) \mid f = (u, v) \in F } \subseteq V(T)$,  
+\end{enumerate}
+where we assume that $|\Sigma(S)|\ge 2$ and $V(T) = \set{ \rext{u} \mid u \in \Fac } \subseteq \Fac$. 
+\end{definition}
+
+Recall that every internal node in the suffix tree of $S$ is right-branching, and the left-branching property is closed under prefixes. Thus, we see that the subgraph $\LPT(S)$ is connected, and well-defined. 
+We remark that the node set $V(P)\cup\Delta(P)$ contains all maximal repeats, and some non-maximal repeats obtained as children of maximal repeats.
+
+\begin{lemma}[characterization of $\LPT(S)$]\label{lem:lpt:character}
+The search tree $\sig L(S)$ coincides the extended longest common prefix tree $\LPT(S)$. 
+\end{lemma}
+
+\begin{proof}
+  We observe that $V(T)$ consists of all right-branching factors and all suffixes of $S$; Furthermore, the arc set is given by $E(T) = \sete{ (\rext{u}, \beta, \rext{(ub)}) \mid u, \beta \in \Sigma^*, b \in \Sigma, \rext{(ub)} = \rext{u}\!\cdot \beta }$
+  %% (see \cite{crochemore2007algorithms:on:strings,inenaga2005online}). 
+%% (see Crochemore \textit{et al.}~\cite{crochemore2007algorithms:on:strings}, or Inenaga \textit{et al.}~\cite{inenaga2005online}). 
+From \cref{lem:maxrep:howto:child}, we can show that the inverse of parent relation coincides the arc set $E(T)$ above. Thus, the lemma is proved. 
+\qed
+\end{proof}
+
+From \cref{lem:lpt:character}, we will refer to the search $\sig L(S)$ as the \LPTrm-tree of $S$, denote by $\LPT(S)$ in what follows. 
+
+
+\subsection{Working with Suffix and LCP Arrays}
+\label{sec:constant:size:rep}
+
+In this subsection, we show how to implement the high-level procedure in \cref{lem:maxrep:algo:highlevel} on a string $S$ and its index $\sig I = (SA, ISA, LCP_{RMQ})$.
+
+\mysubsubsection{Constant-size Representation of factors}
+\label{sec:constant:size:rep}
+We represent any factor of $S$, including maximal repeats, in a constant-sized encoding so that it can be operated in constant time. 
+A triple $\tau = (i, j, \ell) \in [1..n]^3$ of integers, denoted $\pair{i..j, \ell}$, is a \textit{rich representation} (or a \textit{triple}, for short) of a factor $u \in \Fac$ if
+\begin{enumerate*}[(i)]
+\item $SA[i..j] = \Spos(u)$, and 
+\item $\ell = |u|$.
 \end{enumerate*}
+We can recover the original factor $u$ from the triple $\tau = \pair{i..j, \ell}$ using $SA$ and $S$ by $u = S[SA[k]..SA[k]+\ell-1]$ for arbitrary $k \in i..j$. Then, we write $\repl(u) := \pair{i..j, \ell}$ and $\fact(\tau) := u$. 
+
+\subsubsection{Generation of children.}
+For child generation, we only need to perform the right-character computation, the right-closure computation, and the left-branching property test on rich representations from~\cref{lem:maxrep:howto:child} of \cref{sec:enum:maxrep}.
+
+\begin{lemma}\label{lem:gen:children:charact}
+  The factor $u$ encoded by a triple $\pair{i..j, \ell}$ is right-branching if and only if $\ell = RMQ_{LCP}(i+1, j)$ (*). 
+\end{lemma}
+
+If the triple $\pair{i..j, \ell}$ satisfies the condition (*) of \cref{lem:gen:children:charact}, we call the range $i..j$ an \textit{$\ell$-range}.
+Here, we slightly abuse notation and refer to a triple $\pair{i..j, \ell}$ as \textit{right-branching} if its factor $u = \fact(u)$ is right-branching. From \cref{lem:maxrep:howto:child}, we define by 
+\begin{align}
+  RBchildren(\tau)
+  &= \left\{ \pi \in \REPL
+    \:\middle|\: 
+    \begin{array}{l}
+    u = \fact(\tau), 
+    \pi = \repl(v)
+    \\
+    v = \rext{(ub)},
+    b \in \RC(u),
+    \end{array}
+    \right\}
+\end{align}
+the set of the triples for all right-branching children of $\tau$. 
+Then, we use the following lemma, by Abouelhoda, Kurtz, and Ohlebusch~\cite{abouelhoda2004replacing}. 
+
+\begin{lemma}[Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing}]\label{lem:child:ranges}
+  Let $\pi = [i..j]$ be any $\ell$-range.
+  If $h_1 < h_2 < \dots < h_m$ are the $\ell$-indexes in ascending order and let $h_0 = i$ and $h_{m+1} = j$, then the child ranges of $\pi$ are
+  $[h_0..h_1-1], 
+   [h_1..h_2-1], 
+   \ldots,
+   [h_m..h_{m+1}]$.  
+\end{lemma}
+
+%% Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing} presented an algorithm for generating all child triples using an extra array $\op{childtab}[1..n]$ of cells with three integer fields $\op{up}, \op{down}$, $\op{nextIndex} \in [n]$ in addition to $\SA$ and $\LCP$. 
+%% Instead of the $\op{childtab}$ array, we present another method using $\SA$ and the RMQ structure on $\LCP$ (denoted $RMQ_{\LCP}$) as follows.%
+%% %%
+To find $\ell$-range children of \cref{lem:child:ranges}, we use the implementation of the $O(1)$-amortized time colored range query on $LCP_{RMQ}$, proposed by Muthukrishnan~\cite{muthukrishnan2002efficient}%
+%%%%
+\footnote{
+Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing} presented an algorithm for generating all child triples using 
+$\SA$, $\LCP$, and $\op{childtab}$ arrays in total space $O(n)$. 
+%% of cells with three integer fields $\op{up}, \op{down}$, $\op{nextIndex} \in [n]$
+}
+%%%%
+(see also the textbook by Ohlebusch~\cite{ohlebusch2013bookbioinfo}).
+
+\begin{lemma}[Muthukrishnan~\cite{muthukrishnan2002efficient} and Ohlebusch~\cite{ohlebusch2013bookbioinfo}]\label{lem:genchildren}
+  There exists an algorithm that can enumerate the set $Children(\tau)$ of all right-branching child ranges of an $\ell$-range $\tau$ in $O(occ)$ time and $O(\sigma)$ working space using the $RMQ_{LCP}$ structure of $O(n)$ words, 
+where $occ = |Children(\tau)|$ is the number of the child renges to output.  
 \end{lemma}
 
 %%%%%%%%%%%%%%%%%%%
 {
 %% \setlength{\interspacetitleruled}{0pt}%
 \setlength{\algotitleheightrule}{0pt}%
-\begin{algorithm}[h]
+\begin{algorithm}[t]
   \caption{
     \textbf{Procedure} $\GenChildren(\pair{i..j, \ell_*}, Children)$.  
   }\label{algo:genchildren}
@@ -560,62 +569,26 @@ Generation of the set $Children(\tau)$ can be done as follows.
 }
 %%%%%%%%%%%%%%%%%
 
-\subsection{Generation of the set of child triples}
-%%%% 
-An SA-range $i..j$ is called an \textit{$\ell$-range} if the lcp of all suffixes starting  with positions in $SAi..j$ equals~$\ell$, i.e.,
-\begin{align}
-  \ell
-  &= lcp(\set{ S[p..n] \mid p = SA[k], k \in i..j } ) 
-\\&= \min\sete{ LCP[k] \mid k \in [L+1..R] },   
-\end{align}
-where $LCP[k] = lcp(S[p..n], SA[q..n]])$ with $p = SA[k]$ and $q = SA[k-1]$. 
-Then, an index $k \in i+1..j$ such that $LCP[k] = \ell$ is called a \textit{$\ell$-index}. 
-Cosider the suffix tree $\sig T$ of a string $S$.
-%% We say that a triple $\tau = (i..j, \ell)$ is a child of triple $\tau_0 = ([L_0..R_0], \ell_0)$
-For two triples $\tau_i$ for factors $u_i$ for every $i = 1,2$, we say that $\tau_1$ is the parent (resp.~a child) of $\tau_2$ if and only if $u_1$ is the parent (resp.~a child) of $u_2$.
+For completeness, we show in \cref{algo:genchildren} the procedure $\GenChildren$ of \cref{lem:genchildren} for computing the set $Children(\tau)$ of a triple $\tau$ for a right-brancing factor.  
 
-We remark that any SA-range $i..j$ without a length component $\ell$ implicitly represents a right-maximal factor of $S$. More precisely, we observe that a triple $\pi = \pair{i..j, \ell}$ represents a right-maximal factor of $S$ if and only if $i..j$ is an $\ell$-range. We always assume that a parent $\pi$ satisfies this condition. 
-For generating the set $Children(\tau)$ of all child triples of a given parent tripel $\tau$, we use the following lemma, shown by . Abouelhoda, Kurtz, and Ohlebusch~\cite{abouelhoda2004replacing}. 
+%% \begin{align}
+%%   Children(\pi)
+%%   &= \sete{ (c, \tau_c) \mid c \in \LC(u), \tau_c = \pair{i..j, \ell} \in Children(\pi)}, 
+%% \end{align}
+%% invoked with a parent triple $\pi = \pair{i..j, \ell_*}$ with $\ell_*$-range for a maximal repeat $u$ and the pointer $Children$ to the empty set $\emptyset$,
+%% where $\tau_c$ is the triple for a maximal repeat $\rext{(uc)}$ with a branching character $c \in \LC(u)$.
 
-\begin{lemma}[Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing}]\label{lem:child:ranges}
-  Let $\pi = [i_0..j_0]$ be any $\ell$-range.
-  If $m_1 < m_2 < \dots < m_k$ are the $\ell$-indexes in ascending order, then the child ranges of $\pi$ are
-  $[i_0..m_1-1], 
-   [m_1..m_2-1], 
-   \ldots,
-   [m_k..j_0]$.  
-\end{lemma}
 
-Abouelhoda \textit{et al.}~\cite{abouelhoda2004replacing} presented an algorithm for generating all child triples using an extra array $\op{childtab}[1..n]$ of cells with three integer fields $\op{up}, \op{down}$, $\op{nextIndex} \in [n]$ in addition to $\SA$ and $\LCP$. 
-%%However, the method is not suitable to our purpose. 
+%% %%This definition is well-defined since the longest path is closed under prefix.
+%% Next, in the suffix tree $T$ of $S$, with a slight abuse of terminology, a (unique) path $\pi$ from the root to a node $\underline v$ is said to be \textit{primary} if its corresponding path in $G$ is primary. Again, a primary path is closed under prefix. Then, any arc $f = (\underline u, \underline v)$ in $T$ is said to be \textit{primary} if it is included in a primary path $\pi$ to $\underline v$, and \textit{non-primary} otherwise. 
+
+%% From the equivalence shown in \cref{remark:one:primary}, we introduce the primary arcs in the CDAWG $G$ and suffix tree $T$ of $S$. In $G = \CDAWG(S)$,  any arc $f = (\underline u, \underline v)$ is said to be \textit{primary} if it is included in the longest path from the root to node $\underline v$, and \textit{non-primary} (or secondary) otherwise.
+%% %%This definition is well-defined since the longest path is closed under prefix.
+%% Next, in the suffix tree $T$ of $S$, with a slight abuse of terminology, a (unique) path $\pi$ from the root to a node $\underline v$ is said to be \textit{primary} if its corresponding path in $G$ is primary. Again, a primary path is closed under prefix. Then, any arc $f = (\underline u, \underline v)$ in $T$ is said to be \textit{primary} if it is included in a primary path $\pi$ to $\underline v$, and \textit{non-primary} otherwise. 
+
+\mysubsection{Testing left-brancing property.}
 %%% 
-Instead of the $\op{childtab}$ array, we present another method using $\SA$ and the RMQ structure on $\LCP$ (denoted $RMQ_{\LCP}$) as follows.%
-%%%% 
-\myfootnote{We remark that the string $S$ in $\GenChildren$ can be omitted since it is used to get right-brancing characters, only for explanation, and not used by $\RecLPT$ of \cref{algo:rec}. }
-%%%% 
-%% generate the set $Children(\pi)$ of all child triples of a parent triple $\pi$. 
-As a key component,
-we use the implementation of the colored range query
-based on \cref{lem:child:ranges}, proposeby Muthukrishnan~\cite{muthukrishnan2002efficient} (see also the textbook by Ohlebusch~\cite{ohlebusch2013bookbioinfo}).
-
-\begin{lemma}[Muthukrishnan~\cite{muthukrishnan2002efficient} and Ohlebusch~\cite{ohlebusch2013bookbioinfo}]\label{lem:genchildren}
-  The set of all child ranges of an $\ell$-range $i..j$ can be enumerated in $O(occ)$ time in $O(\sigma)$ working space
-  using the $RMQ_{LCP}$ structure of $O(n)$ words, 
-where $occ$ is the number of the child renges to output.  
-\end{lemma}
-
-Based on \cref{lem:genchildren}, \cref{algo:genchildren} presents the procedure $\GenChildren$, which recusively generates the set of child triples
-\begin{align}
-  Children(\pi)
-  &= \sete{ (c, \tau_c) \mid c \in \LChar(u), \tau_c = \pair{i..j, \ell} \in Children(\pi)}, 
-\end{align}
-invoked with a parent triple $\pi = \pair{i..j, \ell_*}$ with $\ell_*$-range for a maximal repeat $u$ and the pointer $Children$ to the empty set $\emptyset$,
-where $\tau_c$ is the triple for a maximal repeat $\rext{(uc)}$ with a branching character $c \in \LChar(u)$.
-
-\subsection{Efficient test of the left-brancing condition}
-%%% 
-
-A repeat of $S$ is maximal if and only if it is both left- and right-branching in $S$. Since the method in \cref{sec:enum:maxrep} always generates the triple of a right-branching factors of $S$ by traversing a vertual tree top-down from the root to leaves, it is sufficient to filter it by testing whether it is left-branching in addition. Actually, we have the next lemma. 
+Since the method in \cref{sec:enum:maxrep} always generates the triple of a right-branching factors of $S$, it is sufficient to filter them by testing whether it is left-branching. We show the next lemma. 
 
 \begin{lemmarep}\label{lem:prune:leftbranch}
 Suppose that a triple $\pi$ is an ancestor of a triple $\tau$. If the factor $ub$ defined by $\tau$ is left-branching, the factor $u$ defined by $\pi$ is also left-branching. 
@@ -623,51 +596,105 @@ Suppose that a triple $\pi$ is an ancestor of a triple $\tau$. If the factor $ub
 
 \begin{proof}
   For any $v = ub$ with some $b \in \Sigma$, we can show that
-  $\LChar(ub) \subseteq \LChar(u)$, and thus that $|\LChar(ub)| \le |\LChar(u)|$. On the other hand $ub$ is right-brancing in $S$ if and only if $2\le |\LChar(ub)|$. It immediately follows that $2 \le |\LChar(u)|$ meaning that $u$ is right-brancing in $S$. This shows the lemma. 
-\end{proof}
+  $\LC(ub) \subseteq \LC(u)$, and thus that $|\LC(ub)| \le |\LC(u)|$. On the other hand $ub$ is right-brancing in $S$ if and only if $2\le |\LC(ub)|$. It immediately follows that $2 \le |\LC(u)|$ meaning that $u$ is right-brancing in $S$. This shows the lemma. 
+\qed\end{proof}
 
 \cref{lem:prune:leftbranch} implies the next rule: \textsc{Pruning rule} ``{Every non-left-branching triple is pruned.}''
-Since $\LChar(u)$ equals the set of all distinct characters in $BWT[i..j]$, we can decide whether $|LChar(u)| \ge 2$ for $\pair{i..j, \ell}$ using the Range Distinct Query (RDQ) on $BWT$. 
-This can be done with the Wavelet Tree in $O(log n)$ time per color as shown by Beller, Berger, and Ohlebusch~\cite{beller:berger:ohlebusch2012space:bbo}, or with the RMQ in $O(1)$ amortized time per color, as shown by Muthukrishnan~\cite{muthukrishnan2002efficient}.
+Since $\LC(u)$ equals the set of all distinct characters in $BWT[i..j]$, we can decide whether $|LChar(u)| \ge 2$ for $\pair{i..j, \ell}$ using the Range Distinct Query (RDQ) on $BWT$.
+%% This can be done with the Wavelet Tree in $O(log n)$ time per color as shown by Beller, Berger, and Ohlebusch~\cite{beller:berger:ohlebusch2012space:bbo}, or
+To test the left-branching property of a given triple, we can use 
+the method by Muthukrishnan~\cite{muthukrishnan2002efficient} based on the RMQ in $O(1)$ amortized time per color as follows. 
 
-We use an alternative method which replaces the use of $BWT$ with that of $SA, ISA$, and $S$ since $SA$ and $S$ are already used by the method in \cref{sec:enum:maxrep}. To do this, we employ the next lemma, where the equivalence between (a) and (c) is due to Narisawa \textit{et al.}~\cite[Lemma~10]{narisawa2007efficient}. 
-Let $LF(k) = ISA[SA[k]-1]$ be the LF-mapping~\cite{Ferragina05:FM} and 
-$BWT[i] = S[SA[i]-1]$ if $SA[i] > 1$ and $BWT[i]=\daller$ otherwise. 
+We define the LF-mapping~\cite{Ferragina05:FM} by: for all $i \in 1..n$,
+$LF(i) = ISA[SA[i]-1]$ if $SA[i] > 1$ and $LF(i) = ISA[n]$ if $SA[i]=1$. 
+The next lemma says that for testing the left-branching property, we can replace the range distinct query on $BWT$ with a combination of $SA, ISA$, and $S$. 
+%% We use an alternative method which replaces the use of $BWT$ with that of $SA, ISA$, and $S$ since $SA$ and $S$ are already used by the method in \cref{sec:enum:maxrep}. 
 
-\begin{lemma}
+\begin{lemmarep}[Narisawa \textit{et al.}~\cite{narisawa2007efficient}]
 \label{lem:leftmaximal:character}
-For any factor $u$ of $S$, conditions (a)--() are equivalent, where $\pair{i..j, \ell}$ is the triple for $u$:  
-\begin{enumerate}[(a)]
-\item $|\LChar(u)| = 1$. 
-\item (b.i) $BWT[i]= BWT[j]$ and (b.ii) $|i..j| = |LF(i)..LF(j)|$. 
-\item (c.i) $S[SA[i]-1] = S[SA[j]-1]$ and (c.ii) $j - i = \id{ISA}[SA[i]-1] - \id{ISA}[SA[j]-1]$, where $SA[i]-1$ is treated cyclically. 
-\end{enumerate}
-\end{lemma}
+For any factor $u$ of $S$ and its triple $\pair{i..j, \ell}$, 
+\begin{enumerate*}[(a)]
+\item $|\LC(u)| = 1$ if and only if 
+%% \item (b.i) $BWT[i]= BWT[j]$ and (b.ii) 
+\item (i) $S[SA[i]-1] = S[SA[j]-1]$ and (ii) $|i..j| = |LF(i)..LF(j)|$.
+%% \item (c.i) $S[SA[i]-1] = S[SA[j]-1]$ and (c.ii) $j - i = \id{ISA}[SA[i]-1] - \id{ISA}[SA[j]-1]$. 
+\end{enumerate*}
+where $SA[i]-1$ is treated cyclically. 
+\end{lemmarep}
 
 \begin{proof}
-The quivalence between (b) and (c) follows from the definions of $BWT$ and the LF-mapping. Therefore, we will show the equivalence between (a) and (b) in the following. 
+%%  The equivalence between (b) and (c) follows from the definions of $BWT$ and the LF-mapping.
+  We show the equivalence between (a) and (b) as follows.
+  Recall that $BWT[i] = S[SA[i]-1]$. 
 $(a)\Implies (b)$: 
 Since $i..j$ is a $SA$-interval of $u$, we have $SA[i..j]=Spos(u)$. If (a) holds, we have 
-$\LChar(u) = \set{a}$ for some $a\in \Sigma$, and it implies that $BWT[i..j]$ is also monotone filled with $a$ (*). 
+$\LC(u) = \set{a}$ for some $a\in \Sigma$, and it implies that $BWT[i..j]$ is also monotone filled with $a$ (*). 
 (b.i) This immediately implies (b.i) $BWT[i]=BTW[j] = a$. 
 (b.ii) When condition (*) holds, the LF-mapping preserves the width of interval, i.e., (b.ii) $|[LF(i)..LF(j)]| = |i..j|$. Therefore, this direction is proved. 
 %%% 
 $(b) \Implies (a)$: 
-Suppose (b.i) and (b.ii). To contradict, we assume that $|\LChar(u)|\ge 2$. This means that $BWT[i..j]$ contains two or more distinct characters (**). 
+Suppose (b.i) and (b.ii). To contradict, we assume that $|\LC(u)|\ge 2$. This means that $BWT[i..j]$ contains two or more distinct characters (**). 
 Consider the range $LF(i)..LF(j)$ obtained from $i..j$ by the LF-mapping. We assume w.o.l.g.~that $\delta = |j..i|\ge 2$. 
 From (b.i), we have $BWT[i] = BWT[j] = a$ for some $a \in \Sigma$. 
 We let $I_a = \set{\btw k1j \mid BWT[k] = a}$ be the maximum set of all indices of $BWT[i..j]$ with $a$. 
 Suppose that we transform $I_a$ into $LF(I_a) = [ LF(k) \mid k \in I_a]$. By the property of the LF-mapping, we see that $LF(I_a)$ occupies the consecutive subrange $LF(i)..LF(j)$ of $SA$ such that $|LF(i)..LF(j)| = |I_a|$, whose suffixes start with $a$. Since it folows from (**) that $|I_a| < |i..j|$, we have $|LF(i)..LF(j)| = |I_a|< |i..j|$, and it contradicts (b.ii). Thus, (a) holds by contradiction. This completes the proof. 
-\end{proof}
+\qed\end{proof}
 
 From the equivalence between (a) and (c) in \cref{lem:leftmaximal:character}, we obtain the implementation of a procedure to test the left-branching property of a factor by checking either (c.i) or (c.ii) fails. Since it is straightforward, we omit its detail. 
 
 \begin{lemma}\label{lem:test:leftbranch}
-There exists a procedure denoted  $\isLeftBranching[]$ that, given the triple $\tau = \pair{i..j, \ell}$ for any factor $u$ of $S$, decides  in constant time whether $|\LChar(u)|\ge 2$ holdsusing $SA, ISA$, and $S$. 
+There exists a procedure denoted  $\isLeftBranching[]$ that, given the triple $\tau = \pair{i..j, \ell}$ for any factor $u$ of $S$, decides  in constant time whether $|\LC(u)|\ge 2$ holdsusing $SA, ISA$, and $S$. 
 \end{lemma}
 
 
 
+%%%%%%%%%%%%%5
+\begin{algorithm}[t]
+  \caption{
+    A subprocedure $\RecLPT$ for constructing the extended LPT-tree $\LPT(S)$ of the string $S$ on an index $\sig I = (\SA, \ISA, \LCP, S)$.
+    %% for enumerating the set $\MR(S)$ of all maximal reepeats of the string $S$ prefixed by the word $u := \getfactor(i..j, \ell)$. 
+}\label{algo:rec}
+%%%\medskip
+  \KwInput{
+    A triple $\pi = \pair{i..j, \ell} \in \RR$ and a rooted tree $T = (\sig V(T), \sig E(T), \eps)$. 
+  }
+  \KwOutput{
+    A subgraph $T = (\sig V(T), \sig E(T), \eps)$ of $\LPT(S)$. 
+  }
+  \textbf{procedure} \RecLPT$(\pi, T)$\;
+  \Begin{
+      \Comment{Pre-condition: $\pi = \pair{i..j, \ell}$ represents a maximal repeat $u$ in $\MR(S)$.}
+      %% $Children \gets \emptyset$\; 
+      $Children \gets \GenChildren(i..j, \ell, \op{undef})$\Comment*{See \cref{lem:genchildren}}
+      \label{line:recmr:for:begin}
+      \For {each child $(c, \tau_c = \pair{i_c..j_c, \ell_c})$ in $Children$}{
+             \Comment{Post-condition:
+               $c \in \RC(u)$ is a branching character and 
+               $\tau_c$ represents
+               an $c$-child $\rext{uc} \in \MR(S)$ of $u$. 
+             }
+             $\sig V(T) \gets \sig V(T) \cup\set{ \tau_c }$
+             \Comment*{Adding a node to $\sig V(T) = \MR(S)\cup\Delta(S)$}
+             $\pair{p, q} \gets \pair{SA[k] + \ell, SA[k] + \ell_c - 1}$ for arbitrary $k \in i_c..j_c$\; 
+             $f = (\pi, \pair{p, q}, \tau_c)$\Comment*{arc $f$with $\lab(f) = S[p..q]$} 
+             $\sig E(T) \gets \sig E(T) \cup\set{ f }$
+             \Comment*{Adding an arc to $\sig E(T) = \sig E\cup\sig F$}
+             \uIf (\comblk{See \cref{lem:leftmaximal:character}}) {$\isLeftBranching(i_c..j_c, \ell_c)$}{
+               $\RecLPT(\tau_c, T)$
+               \Comment*{A node $\tau_c \in \sig M$ for a maximal repeat}
+               \label{line:recmr:for:end}
+             } %% If
+             \Else{
+               $\rhd$ do not recurse
+               \Comment*{A dammy leaf $\tau_c \in \Delta$ and $(\pi, \tau_c) \in \sig F$, resp.}
+             } %% Else
+       } %% for 
+    }
+\end{algorithm}
+%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%
 \subsection{Analysis}
 
 We show the correctness and computational complexity of the procedure $\RecLPT$ in \cref{algo:rec:cdawg} as follows. 
@@ -685,7 +712,8 @@ We show the correctness and computational complexity of the procedure $\RecLPT$ 
 \cref{lem:leftmaximal:character},
 and the construction of $\LPT(S)$,
 the correctness of the recursive procedure $\RecLPT$ follows.
-For the time complexity, we observe that the algorithm traverses each arc and nodes exactly once from \cref{lem:maxrep:howto:child}. Since at each iteration, $\GenChildren$ and $\isLeftBranching$ require at most $O(e_R)$ total time, the algorithm runs in $O(e_R(S))$ total time. Space use of all components other than the stack usage is $O(\sigma)$. To bound the usage of the call stack of $\RecLPT$, we can apply the heavy path decomposition of the suffix tree by Belazzougui \textit{et al.}~\cite{belazzougui2020linear} to obtain $O(\sigma \log n)$ memory usage for the stack. This completes the proof. 
+For the time complexity, we observe that the algorithm traverses each arc and nodes exactly once from \cref{lem:maxrep:howto:child}. Since at each iteration, $\GenChildren$ and $\isLeftBranching$ require at most $O(e_R)$ total time, the algorithm runs in $O(e_R(S))$ total time. Space use of all components other than the stack usage is $O(\sigma)$. To bound the usage of the call stack of $\RecLPT$, we can apply the heavy path decomposition of the suffix tree by Belazzougui \textit{et al.}~\cite{belazzougui2020linear} to obtain $O(\sigma \log n)$ memory usage for the stack. This completes the proof.
+\qed
 \end{proofsketch}
 
 \begin{proof}
@@ -699,7 +727,7 @@ From \cref{lem:prune:leftbranch}, we see that if it eventually reaches a non-max
 For the time complexity, it follows from \cref{lem:maxrep:howto:child} that the algorithm traverses each arc and nodes exactly once. At each iteration, $\GenChildren$ requires $O(e_R)$ total time. In addition, $\isLeftBranching$ requires constant time per call and it can be called at most $|\sig E(S)| \le e_R$ times in total. Combining the above arguments, the algorithm runs in $O(e_R(S))$ total time.
 For the space complexity, we can easily observe that the memory usage of all lines but Line 3 and the stack is bouned by constant. Line 3 generates at most $\sigma$ children, and uses $O(\sigma)$ space. 
 To upperbound the space usage by $O(\sigma\log n)$, we use the technique by Belazzougui \textit{et al.}~\cite{belazzougui2020linear} as follows. At Line~4 in the begging of the for-loop, we choose the chidren $\tau_c = \pair{i_c..j_c, \ell_c}$ in the descreasing order of the width of the SA-range, $j_c - i_c + 1$. By applying heavy path decomposition to the call tree, it follows that there are at most $O(\log n)$ non-empty records in the call-stack. Since each occupies at most $O(\sigma)$ children, the stack uses $O(\sigma \log n)$ memory. 
-\end{proof}
+\qed\end{proof}
 
 %% execution example
 In \cref{fig:run:example}, we show an example run of Algorithm $\RecLPT$ for a string $S[0..10] = \mathtt{\#aabaababb\$}$. The black and red trees, respectively, indicate the suffix and the Weiner trees of $S$. Each circle indicates a node with the string label and the triple. A gray node corresponds a maximal repeat. 
@@ -770,6 +798,10 @@ In this section, we show how to transform the \LPTrm-tree $T$ of a string $S$ in
 In the following, firstly, we briefly review the CDAWG $G$ of a string $S$ according to Crochemore and V\'erin~\cite{crochemore:verin1997direct}. Next, we explain a straightforward algorithm for solving the task in $O(n^2)$ time. After explaining the preprocessing and the working structure that our algorithm uses, we present our algorithm. 
 
 \subsection{Classes of factors and the CDAWG}
+
+Blumer \textit{et al.}~\cite{blumer1987complete} showed that the CDAWG of $S$ is the minimum state DFA of $\Suf$ with path-compression.
+%%the properties of the CDAWG $G$ of $S$, 
+
 \mysubsubsection{Classes of factors}
 The \textit{syntactic congruence relation associated to end-positions} over $\Fac$, denoted by $\EQe$, is defined, for all $u, v \in \Fac$ by 
 \begin{math}
@@ -802,12 +834,12 @@ An input to our algorithm is the \LPTrm tree $T = (V(T), E(T), root(T))$ of $S$ 
 We assume that to each node $u$ of $T$, the following information is associated:
 \begin{itemize}
 \item $\dep(u)\ge 0$: The string depth of $u$, i.e., $\dep(u) = |\str_T(u)|$.
-\item $\islb(u) \in \set{\tt true, false}$: The flag indicating whether $u$ is right-branching in $S$, i.e., $|\LChar(u)|\ge 2$. 
+\item $\islb(u) \in \set{\tt true, false}$: The flag indicating whether $u$ is right-branching in $S$, i.e., $|\LC(u)|\ge 2$. 
 \item $\parent(u) \in V(T)\cup\set{\op{undef}}$: The parent of $u$ if it exists, and $\op{undef}$ otherwise. 
 \end{itemize}
 
 The output is the CDAWG $G$ of $S$, which is obtained from a copy of the input tree $T$ by modifying its structure, and associated with 
-the following structures computed during the computation: 
+the following structures constructed during the computation: 
 \begin{itemize}
 \item $C: V(T) \to \pow{V(T)}$: A table representing the collection of all and only congruence classes of $V(T)$ supporting the following operations:
   For any clas $C = C(u)$ with $u$,  $C.\op{get}()$ returns the representative of the class $C(u)$, and $C.\op{append}(u)$ adds any $v$ into $C$. We do not need the operation $\op{unify}$.%
@@ -843,7 +875,7 @@ Our algorithm constructs the CDAWG of $S$ from its \LPTrm-tree, based on an idea
 
 %%%%%%%%%%%%%%%%%%
 \section*{Old Transforming \LPTrm-tree to CDAWG}
-\label{sec:lpt:to:cdawg}
+\label{sec:lpt:to:cdawg:old}
 %%%
 In this section, we present the second algorithm $\RecCDAWG$ for transforming the \LPTrm-tree $G = (\sig V(G), \sig E(G), root_G)$ for a string $S$ into its CDAWG.
 We show the main result of this section.  
@@ -880,7 +912,7 @@ In the following subsections, we first explain its subroutines. Finally, we pres
 $B \gets \emptyset$, $\id{suf} \gets \emptyset$, and $wlink \gets \emptyset$\;
 Compute the table $\ldep$ by DFS of $T$\; 
 \For{each $u \in V(G)$}{
-  $\op{isLB}(u)=|\LChar(\Value(u))|$\Comment*{from the triple of $u$} 
+  $\op{isLB}(u)=|\LC(\Value(u))|$\Comment*{from the triple of $u$} 
   $EQ(u) = \set{u}$\Comment*{the singleton class}
 }
 \For{each $f = (u, \alpha, w) \in E(G)$}{
@@ -934,7 +966,7 @@ Compute the table $\ldep$ by DFS of $T$\;
 %%   if and only if
 %%   $|\Epos(u)| \ge 2$.
 %%   Since $\beta \succeq^\idrm{suf} \alpha$, we have $|\Epos(\alpha)| \ge |\Epos(\beta)| \ge 2$. 
-%% \end{proof}
+%% \qed\end{proof}
 
 \subsection{Preprocessing $\op{ldep}(u)$ and $\sdep(u)$ in $O(e_R)$ total time}
 \label{sec:compute:cdawg:preprocess}
@@ -969,7 +1001,7 @@ Then, we have
 From \cref{lem:ldep:sdep:rec}, the total computation can be done in $O(e_R(S)+e_L(S))$ time and $O(\mu(S))$ working space on the CDAWG of $S$. 
 We remark that \cref{lem:ldep:sdep:rec} holds even for a partial CDAWG $G$ whenever the current node $u$ has been merged to all of its equivalent nodes and all ancestors have been processed so far.
 
-  We assume that the Boolean flag $\op{isLB}(v) \iffdef |\LChar(\Value(v))|\ge 2$ is attached to each explicit node $v$ in $T$. This can be  computed from the triple for $\Value(v)$ by $\isLeftBranching(i..j, \ell)$ of \cref{lem:leftmaximal:character} in the procedure $\RecLPT$. 
+  We assume that the Boolean flag $\op{isLB}(v) \iffdef |\LC(\Value(v))|\ge 2$ is attached to each explicit node $v$ in $T$. This can be  computed from the triple for $\Value(v)$ by $\isLeftBranching(i..j, \ell)$ of \cref{lem:leftmaximal:character} in the procedure $\RecLPT$. 
 
 
 
@@ -1021,7 +1053,8 @@ The procedure $\FindNonEquivLocus(u, \alpha; G, \sdep, \ldep)$ that computes the
 %%%%%%%%%%%%%%%%%%
 \end{toappendix}
 
-\subsection{Analysis}
+\section{Analysis}
+\label{sec:analysis}
 %% \subsection{The proof of \cref{lem:main:lpt:to:cdawg}}
 
 Consider the psuedo code of the procedure $\RecCDAWG$ in \cref{algo:rec:cdawg}. To prove its correctness, we define  
@@ -1048,11 +1081,12 @@ Consider the psuedo code of the procedure $\RecCDAWG$ in \cref{algo:rec:cdawg}. 
   can be found by $\FindNonEquivLocus$ from \cref{lem:find:ne:locus}. 
   There are two cases (a) and (b) to maintain the current $\eqepos[\preceq w]$:
 \begin{enumerate*}[(a)]
-\item The case that $\beta \eqepos[\preceq w] \beta'$ holds, and $|\LChar(\beta')| = \op{isLB}(v) \ge 2$, detected at Line 10. Then, two equivalence classes must be merged into a new class. 
+\item The case that $\beta \eqepos[\preceq w] \beta'$ holds, and $|\LC(\beta')| = \op{isLB}(v) \ge 2$, detected at Line 10. Then, two equivalence classes must be merged into a new class. 
   %% the equivalence classes $[w]^{\prec w}_{\equiv}$ and $[v]^{\prec w}_{\equiv}$ of $\beta$ and $\beta'$, respectively, must be merged into the new class $[w]^{\preceq w}_{\equiv}$. This is done by the code for Lines 11--13. 
-\item The case that $\beta \not\eqepos[\preceq w] \beta'$ holds, and $|\LChar(\beta')| = \op{isLB}(v) = 1$, detected at Line 14. Then, the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
+\item The case that $\beta \not\eqepos[\preceq w] \beta'$ holds, and $|\LC(\beta')| = \op{isLB}(v) = 1$, detected at Line 14. Then, the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
 \end{enumerate*}
-Therefore, Lines~12--19 correctly update the equivalence class $EQ(w)$ for $[w]^{\prec w}_{\equiv}$, $\id{suf}$, and $\id{wlink}$. If \cref{algo:rec:cdawg} exits the while-loop, the resulting DAG $G$ with $EQ, \id{suf}$, and $\id{wlink}$ becomes $\CDAWG(S)$. Hence, the result is proved. 
+Therefore, Lines~12--19 correctly update the equivalence class $EQ(w)$ for $[w]^{\prec w}_{\equiv}$, $\id{suf}$, and $\id{wlink}$. If \cref{algo:rec:cdawg} exits the while-loop, the resulting DAG $G$ with $EQ, \id{suf}$, and $\id{wlink}$ becomes $\CDAWG(S)$. Hence, the result is proved.
+\qed
 \end{proofsketch}
 
 \begin{proof}
@@ -1090,16 +1124,16 @@ From \cref{lem:find:ne:locus}, we can find the locus $v$ by calling $\FindNonEqu
 Let $\beta$ and $\beta'$ be the string labels of $w$ and $v$, respectively. Then, we can show that $\beta'$ is the longest suffix of $\beta$ such that $\Epos(\beta) \not= \Epos(\beta')$.
 There are two cases (a) and (b) below on the current equivalence relation $\eqepos[\preceq w]$ instead of $\eqepos[\prec w]$. 
 \begin{enumerate}[(a)]
-\item If $\beta \eqepos[\preceq w] \beta'$ holds, since $\beta \succsuf \beta'$, we can show that this condition is equivalent to $|\LChar(\beta')| = \op{isLB}(v) \ge 2$, which can be correctly detected at Line 10. 
+\item If $\beta \eqepos[\preceq w] \beta'$ holds, since $\beta \succsuf \beta'$, we can show that this condition is equivalent to $|\LC(\beta')| = \op{isLB}(v) \ge 2$, which can be correctly detected at Line 10. 
   the equivalence classes $[w]^{\prec w}_{\equiv}$ and $[v]^{\prec w}_{\equiv}$ of $\beta$ and $\beta'$, respectively, must be merged into the new class $[w]^{\preceq w}_{\equiv}$. This is done by the code for Lines 11--13. 
   
-\item Otherwise, $\beta \not\eqepos[\preceq w] \beta'$ holds. By the same argument as (a), this condition is equivalent to $|\LChar(\beta')| = \op{isLB}(v) = 1$, which can be correctly detected at Lines 10 and 14.
+\item Otherwise, $\beta \not\eqepos[\preceq w] \beta'$ holds. By the same argument as (a), this condition is equivalent to $|\LC(\beta')| = \op{isLB}(v) = 1$, which can be correctly detected at Lines 10 and 14.
   the equivalence classes $[w]^{\prec w}_{\equiv} = [w]^{\preceq w}_{\equiv}$ and $[v]^{\prec w}_{\equiv} = [v]^{\preceq w}_{\equiv}$  of $\beta$ and $\beta'$, respectively, must remain separated, and the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
   This is correct because $[v]^{\prec w}_{\equiv}$ is the predecessor of $[w]^{\prec w}_{\equiv}$ w.r.t.~the suffix relation $\succsuf$ on their values.
 \end{enumerate}
 
 Combining the above arguments, at the end of the while-loop, we have correctly maintained the equivalence relation $\eqepos[\preceq w]$ and the associated equivalence clases on the updated domain $V\rk{\preceq w}(T) = V\rk{\prec w}(T) \cup \set{w}$.
-\end{proof}
+\qed\end{proof}
 
 Combining the above discussion, we give the proof for main results. 
 
@@ -1112,11 +1146,11 @@ Combining the above discussion, we give the proof for main results.
 
 \begin{proof}
 Let us denote by $\mu = \mu(S), e_R = e_R(S)$, and $e_L = e_L(S)$, where $\mu \le \min\{e_R, e_L\}$.
-In the initialization for the tables $EQ$, $\ldep$, $B$ for Lines 2--8 can be done in $O(e_R)$ total time. The precomputation of the table $\op{isLB}$ at Lines 7--8 can be done in $O(e_L)$ total time by computing $\LChar(\tau)$ with the associated triple $\tau$ stored in $u$. 
+In the initialization for the tables $EQ$, $\ldep$, $B$ for Lines 2--8 can be done in $O(e_R)$ total time. The precomputation of the table $\op{isLB}$ at Lines 7--8 can be done in $O(e_L)$ total time by computing $\LC(\tau)$ with the associated triple $\tau$ stored in $u$. 
 In each iteration of the while-loop, $\op{deletemin}$ on the priority queue requires $O(\mu \log \mu)$ total time over all of $\mu$ nodes using $O(\mu)$ space on the standard heap.
 From \cref{lem:find:ne:locus}, the call of $\FindNonEquivLocus$ at Line~9 requires $O(e_R + e_L)$ total time. Redirection of all incoming arcs of $v$ into $w$ at Line 13 can be done in $O(e_R)$ since $v$ has exactly once suffix link since it is equivalent to $w$, and thus it is not left-branching.
 Additions of the suffix and Weiner links for Lines 18--19 can be executed at most the number of suffix links, and are bouned in $O(e_L)$ time.
-\end{proof}
+\qed\end{proof}
 
 \begin{trivlist}\item[]
   \textbf{Proof of \cref{lem:main:lpt:to:cdawg}:}
@@ -1232,7 +1266,7 @@ Additions of the suffix and Weiner links for Lines 18--19 can be executed at mos
 %%   \textit{Claim~1.} Consider $a u \in L(G)$ for some $a \in \Sigma$ and $u \in \Sigma^*$. If $u \not\in L(G)$, then there exists some factorization $u = pq$ with some $p, q \in \Sigma^*$ such that prefix $p$ is equivalent to $ap$, i.e., $\Epos(ap) = \Epos(p)$. (End of Claim~1)
 
 %% In Claim~1, the prefix $p$ is not left-brancing since we have a left-extension $ap$ of $p$ with the same end-positions. Therefore, the traversal from the initial node $v$ to $u = pq$ terminates at the locus of $p$ when the mergi of $\loc p$ into $\loc {ap}$ happened. 
-%% \end{proof}
+%% \qed\end{proof}
 
 
 
@@ -1253,8 +1287,8 @@ Additions of the suffix and Weiner links for Lines 18--19 can be executed at mos
 %% \begin{proof}
 %%   By symmetry, the lemma follows from the proof of \cref{lem:prune:leftbranch}. 
 %%   %% If $v = au$ for some $a \in \Sigma$, we can easily show that
-%%   %% $\RChar(au) \subseteq \RChar(u)$, and thus that $|\RChar(au)| \le |\RChar(u)|$. On the other hand $au$ is right-brancing in $S$ if and only if $2\le |\RChar(au)|$. It immediately follows that $2 \le |\RChar(u)|$ meaning that $u$ is right-brancing in $S$. This shows the lemma. 
-%% \end{proof}
+%%   %% $\RC(au) \subseteq \RC(u)$, and thus that $|\RC(au)| \le |\RC(u)|$. On the other hand $au$ is right-brancing in $S$ if and only if $2\le |\RC(au)|$. It immediately follows that $2 \le |\RC(u)|$ meaning that $u$ is right-brancing in $S$. This shows the lemma. 
+%% \qed\end{proof}
 
 %% Recall that $\sig V$ is the set of nodes for all maximal repeats in $\MR(S)$ and $\eps \in \sig V$. 
 %% We let $\sig W$ to be the set of all Weiner links $g = (\underline u, \underline{au})$ that connect elements of $\sig V$ with a character $a \in \Sigma$, that is, $\set{u, au} \subseteq \MR(S)$.
