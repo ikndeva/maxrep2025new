@@ -30,12 +30,6 @@ To achieve the above results, we devise two novel methods that may be of indepen
 
 
 
-%% %%%%%%%%%%%5
-%% In this paper, we consider the problem of transforming the suffix array $\SA$ of a string $S$ of length $n$ to its CDAWG $G$ in time and working space sensitive to the size $e_R(S)$ and $e_L(S)$ of $G$, by extending the classic problem of transforming the suffix array of $S$ to its suffix tree in the context of repetition-aware text indexes.
-%% As a main result, we present a simple and efficient algorithm for solving this problem in $O(e_R(S) + e_L(S) + \mu(S)\log \mu(S))$ time and space making $O(e_R(S) + e_L(S))$ probes to an index structure $\sig I$ consisting of $\SA$, $\ISA$, and $\LCP$ arrays of $O(n)$ size, where $\LCP$ is augmented by the RMQ structure.
-%%   As applications, we obtain $O(e\cdot \polylog n)$ time and space algorithm for constructing the CDAWG of a string $S$ from the r-index of size $O(r\cdot \polylog(n))$
-%%   For obtaining the result, we newly devised an efficient method for enumerating all maximal repeats in $O(e_R(S) + e_L(S))$ time and $O(\sigma\log n)$ working space on $\sig I$ in addtion to the space for $\sig I$, and a method for computing the suffix links from the CDAWG of $S$ without suffix links (or its \LPTrm-tree, the extended longest prefix tree) in in $O(e_R(S) + e_L(S))$ time and space, which can be of independent interests.
-%% 
 
 
 %%%%% body %%%%%%%%%%%%%%%%%%%%%%%%
@@ -92,22 +86,29 @@ How to build the CDAWG $G$ of a string $S$ from the suffix array with auxiliary 
 \vspace{-0.25\baselineskip}
 
 
-As a read-only input, we assume an index structure $\sig I$ consisting of the following structures preprocessed from $S$ beforehand, and given to an algorithm:
+As read-only inputs, we assume an index structure $\sig I$ consisting of the following structures (Manber and Myers~\cite{manber:myers1993suffixarrays}) preprocessed from $S$ beforehand: 
 \begin{itemize}
-\item the suffix array $SA$,
-\item the inverse suffix array $ISA$,
-\item the longest common prefix array $LCP$, 
+\item the suffix array $\SA$,
+\item the inverse suffix array $\ISA$,
+\item the longest common prefix array $\LCP$ augmented by the range-minima query (RMQ) structure (denoted by $\LCP_{RMQ}$).%
+\footnote{
+The \textit{RMQ query on LCP} asks, given any ssubrange $i..j \subseteq 1..n$, to return the minimum of the LCP-values $\set{LCP[k] \mid 1\le k\le j}$ within $i..j$.
+}
 \end{itemize}
-where the LCP array is augmented by the data structure supporting  
-the range-minima query (RMQ) on $LCP$: Given any ssubrange $i..j \subseteq 1..n$, returns the minimum of the LCP-values $\set{LCP[k] \mid 1\le k\le j}$ within $i..j$.
 
 
 \cref{fig:example:problem} shows an example of input and output of the problem.
-All of the above structures occupy $O(n)$ words of space, and can be constructed in $O(n)$ time from a string $S$ over an integer alphabet in preprocessing (for details, see the textbook or survey article by Navarro~\cite{navarro2016cds:book,navarro2021indexing:ii}).
 In an application senario in, e.g., a human genome repository, the structure $\sig I$ will be constructed once, reside on memory using $O(n)$ space, and be used many times for the generation of the CDAWG in $O({e_R(S) + e_L(S)})$ time and working space per execution, and other purposes, such as the standard string search.
+For the preprocessing, all of the above structures occupy $O(n)$ words of space, and can be constructed in $O(n)$ time from a string $S$ over an integer alphabet in preprocessing (for details, see the textbook or survey article by Navarro~\cite{navarro2016cds:book,navarro2021indexing:ii}).
 
-Finally, we use as measures of repetitiveness the numbers of all maximal repeats, all right- and all left-extensions of maximal repeats, respectively, denote by $\mu(S)$, $e_R(S)$, and $e_L(S)$.
-We remark that although the parameters $e_R(S)$ and $e_L(S)$ can be $\Theta(n)$ in the worst case, they can be logarithmically smaller than the string length $n$ for some classes of highly-repetitive strings, such as Fibonacci and Thue-Morse words. 
+Finally, we introduce a class of the repetitiveness measures for a string $S$ according to Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}. $\mu(S)$, $e_R(S)$, and $e_L(S)$ are the numbers of all maximal repeats, all right- and all left-extensions of maximal repeats, respectively.
+%% Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} showed that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$ from above, that is, $\max\{z(S), r(S)\} \le e_R$, where $z(S)$ and $r(S)$ are the numbers of \textit{phrases of the Lemple-Ziv parse} of $S$ and \textit{equi-letter runs of the Burrows-Wheeler transform} of a string~$S$. 
+Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}
+It was shown that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$, namely, the size of \textit{Lemple-Ziv parse} and the number of \textit{runs of BWT} of $S$. 
+Moreover, in practice, these parameters can often be much smaller for real-world strings, ranging from about $1/10$ to $1/100$ of the input length $n = |S|$~\cite{navarro2021indexing:ii}. Furthermore, they are shown to be logarithmic to $n$ for the classes of Fibonacci and Thue-Morse words~\cite{radoszewski:rytter2012structure:cdawg:thuemorse}.
+
+%% We remark that these parameters $e_R(S)$ and $e_L(S)$ can be $\Theta(n)$ in the worst case, while they can be logarithmically smaller than $n = |S|$ for some classes of strings, e.g., Fibonacci and Thue-Morse words.
+
 
 
 \subsection{Results}
@@ -115,30 +116,34 @@ We remark that although the parameters $e_R(S)$ and $e_L(S)$ can be $\Theta(n)$ 
 Under the problem setting explained above, we then show the main result of this paper. 
 
 \begin{theorem}[main result]\label{thm:main:index:cdawg}
-  Let
-  $\Sigma$ be an integer alphabet of size $\sigma \ge 2$, 
-  $S$ be any string of length $n$ over $\Sigma$, and
-  $\sig I = (\SA, \ISA, \LCP)$ be the text index of $O(n)$ total size, where $\LCP$ is augmented with the RMQ structure. Then, there exists an algorithm that can transform the index $\sig I$ and the read-only copy of $S$ into the CDAWG $G$ of $S$
-  in $O(e_R(S) + e_L(S) + \mu(S)\log\mu(S))$ time
-  using
-  $O(O(e_R(S) + e_L(S))$ working space,
+  Let $S$ be any string of length $n$ over an integer alphabet $\Sigma$ of size $\sigma \ge 2$, and
+  $\sig I = (\SA, \ISA, \LCP_{RMQ})$ be the afoementioned index structure of $O(n)$ total size. 
+  There exists an algorithm that can transform $\sig I$ and
+  $S$ into the CDAWG of $S$
+  in $O(e_R(S) + e_L(S))$ time
+  %% in $O(e_R(S) + e_L(S) + \mu(S)\log\mu(S))$ time
+  and 
+  $O(O(e_R(S) + e_L(S))$ words of working space,
   %% $O(\max\{O(e_R(S) + e_L(S), \sigma\log n\})$ working space,
-  where the algorithm probes at most $O(e_R(S) + e_L(S))$ cells of the index $\sig I$ and the string $S$. 
+  %% where the algorithm probes
+  probing at most $O(e_R(S) + e_L(S))$ cells of $\sig I$ and $S$. 
 \end{theorem}
 
+From \cref{thm:main:index:cdawg} above, the proposed algorithm improves the time and space complexity $\Theta(n)$ of the straightforward algorithms via suffix tree construction to asymptotic time and space complexity $O(e_R(S)+e_L(S)$ for classes of repetitive texts with $\max\set{e_R(S), e_L(S)} = o(n)$.
+%%
 Since our algorithm uses a subprocedure for computing the set $\MR(S)$ of all distinct maximal repeats of a string $S$, we have the next corollary.
 
 
 \begin{corollary}\label{cor:main:index:maxrep}
-  We can enumerate the set $\MR(S)$ of all distinct maximal repeats a string $S$ of length $n$ over an integer alphabet $\Sigma$ in $O(e_R(S)+e_L(S) + \mu(S)\log \mu(S))$ time and $O(\sigma \log n)$ working space using $O(e_R(S) + e_L(S))$ probes to the afoementioned text index $\sig I$ and the string $S$. 
-  %% the afoementioned text index $\sig I = (\SA, \ISA, \LCP)$ and the read-only$S$ of $O(n)$ total size. 
+  Under the same assumption to \cref{thm:main:index:cdawg}, 
+  the set $\MR(S)$ of all distinct maximal repeats of a string $S$ can be enumerated in $O(e_R(S)+e_L(S))$ time and $O(\sigma \log n)$ working space using $O(e_R(S) + e_L(S))$ probes to $\sig I$ and $S$, where $n = |S|$ is the length of $S$. 
 \end{corollary}
 
 \mysubsubsection{Application to compressed text indexes}
-From \cref{thm:main:index:cdawg} above, we observe that the proposed construction algorithm for the CDAWG of a string $S$ has the asymptotic time and space complexities, which are smaller than the time and space complexity $\Theta(n)$ of the straightforward construction algorithms via its suffix tree using smaller space complexity $O(e_R(S)+e_L(S) + \mu(S)\log \mu(S))$.
+%%%
+Recently, repetition-aware indexes have attracted much attention. A recent compressed index, called \textit{r-index}, proposed by Gagie, Navarro, and Prezza~\cite{gagie:navarro:prezza2020fully}, as well as its latest version~\cite{nishimoto2022optimaltime:rlbwt:construction}, that occuppies $O(r(S)\polylog(n))$ space with supporting the similar functionality of the afoementioned classic array index $\sig I$ and $S$. 
+Since our algorithm makes read-only probes to a limited number of cells of $\sig I$ and $S$, the next theorem immediately follows from \cref{thm:main:index:cdawg} above. 
 
-
-Since our algorithm probes at most $O(e_R(S) + e_L(S))$ cells of the index $\sig I$ of $S$ and a copy of $S$, it can also be applied to any compressed indexes whenever it offers the same functionality to $\sig I$. For example, if we apply \cref{thm:main:index:cdawg} to the compressed index (namely, the \textit{r-index}) proposed by Gagie, Navarro, and Prezza~\cite{gagie:navarro:prezza2020fully}, we obtain the next corollary. In what follows, let $r(S)$ be the number of equi-character runs in the BWT of~$S$. 
 
 \begin{theorem}\label{thm:compressed:index:cdawg}
 There exists an algorithm that can transform the r-index $\sig R$ of a string $S$ of length $n$ over an integer alphabet into the CDAWG $G$ of $S$
@@ -195,29 +200,6 @@ Recently, Cleary and Dood~\cite{cleary2023constructing} proposed an algorithm fo
 
 The relationship between the size of the CDAWG and the parameter ${e_R(S) + e_L(S)}$ was first studied by Raffinot~\cite{raffinot2001maximal}, and the use of ${e_R(S) + e_L(S)}$ as a compression parameter was proposed by Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite}.
 
-%% In summary, to the best of our knowledge, however, it remains an open question whether the CDAWG can be computed from the SA and LCP arrays in output-sensitive manner.
-%% Specifically, it is not known if this can be done using $O({e_R(S) + e_L(S)})$ or less time and working space --- in addition to the $O(n)$-size read-only inputs --- for repetitive string with right-extension parameter ${e_R(S) + e_L(S)} \le n$.
-%% On the other hand, the proposed algorithm in this paper shows that it is possible to perform translation from the SA and LCP arrays into the CDAWG in output-sensitive time and space by a novel combination of known techniques.  
-
-
-%% \section{Related work}
-%% %%% 
-%% It is well-known that the problem of transforming the suffix array of a string $S$ into its suffix tree $T$ can be solved in $O(n)$ time and space. This is achieved using the suffix array (SA) and the longest common prefix array (LCP)  with an auxiliary stack of size $\idrm{height}(T)$.
-%% This transformation can be performed by simulating either
-%% a bottom-up traversal of the suffix tree, as shown by Kasai \textit{et al.}~\cite{kasai:lee2001lcp:linear} and Crochemore \textit{et al.}~\cite{crochemore2021book125problems:chap:satostree}, or
-%% a top-down traversal as demonstrated by Abouelhoda, Kurtz, and Ohlebusch~\cite{abouelhoda2004replacing}.
-
-%% Besides this, most closely related work is recent development of $O(n)$-time transformation algorithms for enumeration of \textit{maximal repeats} of a string $S$ using the \textit{Burrows-Wheeler transform} (BWT), 
-%% %%augmented with the \textit{Wavelet tree}.
-%% which simulate a top-down traversal of the tree of the reversed suffix links, called the \textit{Weiner tree}~\cite{beller:berger2012space:efficient:bbo,nishimoto:cpm2021enum}. 
-%% Since the set of maximal repeats corresponds the node set of the CDAWG of the string, they can be expected to be used as a building block to solve the CDAWG construction problem, too. The latest of them, proposed by Nishimoto and Tabei~\cite{nishimoto:cpm2021enum}, runs in $\Theta(n)$-time and $O(r\,\idrm{polylog}(n))$-space based on the r-index~\cite{gagie:navarro:prezza2020fully}.  
-
-%% Recently, Cleary and Dood~\cite{cleary2023constructing} proposed an algorithm for constructing the CDAWG of a string in the form of a grammar using the SA-intervals of maximal repeats of the string. However, they did not mention how to compute such SA-intervals in $O({e_R(S) + e_L(S)})$ time and space. 
-
-%% In summary, to the best of our knowledge, however, it remains an open question whether the CDAWG can be computed from the SA and LCP arrays in output-sensitive manner.
-%% Specifically, it is not known if this can be done using $O({e_R(S) + e_L(S)})$ or less time and working space --- in addition to the $O(n)$-size read-only inputs --- for repetitive string with right-extension parameter ${e_R(S) + e_L(S)} \le n$.
-%% On the other hand, the proposed algorithm in this paper shows that it is possible to perform translation from the SA and LCP arrays into the CDAWG in output-sensitive time and space by a novel combination of known techniques.  
-
 
 %%%%
 \section{Preliminaries}
@@ -242,7 +224,7 @@ In what follows, we denote by $\Fac$ and $\Suf$ the \textit{sets of all factors}
 A \textit{maximal repeat} of a string $S$ is a maximal factor $u$ of $S$ that cannot be extended rightward or leftward without losing its occurrences in $S$. A \textit{right-extension} (resp.~a \textit{left-extension}) of a maximal repeat $u$ of $S$ is a string $ua$ (resp.~$au$) that is also a factor of $S$, namely, $ua \in \Fac$ (resp.~$ua \in \Fac$), with some character $b \in \Sigma$. Then, the character $c$ is called a right-branching (resp.~a left-branching) character of $u$. We denote the set of right- (resp.~left) branching characters of $u$ by $\RChar(u) = \sete{ c \in \Sigma \mid uc \in \Fac }$ (resp.~$\LChar(u) = \sete{ c \in \Sigma \mid cu \in \Fac }$). 
 
 The parameters $\mu = \mu(S)$, $e_R = e_R(S)$, and $e_L = e_L(S)$ of a string $S$ are defined to be the numbers of the maximal repeats, their right-extensions, and left-extensions of $S$, respectively. It is known that $\mu(S) \le \max\{e_R(S), e_L(S)\} \le 2n - 2$ for any string $S$ of length $n$ (Blumer \textit{et al.}~\cite{blumer1987complete}).
-Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} showed that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$ from above, that is, $\max\{z(S), r(S)\} \le e_R$, where $z(S)$ and $r(S)$ are the numbers of \textit{phrases of the Lemple-Ziv parse} of $S$ and \textit{equi-letter runs of the Burrows-Wheeler transform} of a string~$S$. 
+%% Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015composite} showed that the parameter $e_R(S)$ upperbounds popular compression parameters $z(S)$ and $r(S)$ from above, that is, $\max\{z(S), r(S)\} \le e_R$, where $z(S)$ and $r(S)$ are the numbers of \textit{phrases of the Lemple-Ziv parse} of $S$ and \textit{equi-letter runs of the Burrows-Wheeler transform} of a string~$S$. 
 
 \subsection{Indexing structures for a string}
 %%% 
@@ -300,7 +282,7 @@ In \cref{algo:main}, we show the top-level structure of our algorithm for transf
   \caption{Transforming $SA$ and $S$ into its CDAWG $G$.
     %% Transforming the suffix array of a string $S$ with auxiliary structures with length $n$ into the CDAWG $G$ of the string.
   }\label{algo:main}
-\KwPreproc{Construct an index $\sig I = (\SA, \ISA, \LCP)$ from $SA$ and $S$.}  
+\KwPreproc{Construct an index $\sig I = (\SA, \ISA, \LCP_{RMQ})$ from $SA$ and $S$.}  
 \KwRuntime{Perform the following steps on request}
 \Begin{
     $T \gets \RecLPT(\pair{1..n, 0}, \sig I, S)$
@@ -1301,6 +1283,30 @@ Additions of the suffix and Weiner links for Lines 18--19 can be executed at mos
 %% and the construction of $\LPT(S)$, 
 %% the recursive procedure $\RecLPT$ in \cref{algo:rec} correctly construct all nodes and edges of $\LPT(S) = (\sig V(S), \sig E(S), \eps)$ by generating all maximal repeats by starting with the root $\eps$, and by following all arcs $(u, v)$ in $\E(S)$ defined with the right-closure $v = \rext{(ub)}$ of a right-extension $ub$ with a branching character $b$ using a depth-first traversal of $\LPT(S)$.
 %% From \cref{lem:prune:leftbranch}, we see that if it eventually reaches a non-maximal node in $\Delta(S)$, it correctly stops the search and backtracks. Each arc is added to the arc set whenever it is traversed. Since each node $\underline v$ in $\E(S)\cup \F(S)$ can be reached through exactly one incoming arc, the procedure correctly find all arcs.
+
+%% In summary, to the best of our knowledge, however, it remains an open question whether the CDAWG can be computed from the SA and LCP arrays in output-sensitive manner.
+%% Specifically, it is not known if this can be done using $O({e_R(S) + e_L(S)})$ or less time and working space --- in addition to the $O(n)$-size read-only inputs --- for repetitive string with right-extension parameter ${e_R(S) + e_L(S)} \le n$.
+%% On the other hand, the proposed algorithm in this paper shows that it is possible to perform translation from the SA and LCP arrays into the CDAWG in output-sensitive time and space by a novel combination of known techniques.  
+
+
+%% \section{Related work}
+%% %%% 
+%% It is well-known that the problem of transforming the suffix array of a string $S$ into its suffix tree $T$ can be solved in $O(n)$ time and space. This is achieved using the suffix array (SA) and the longest common prefix array (LCP)  with an auxiliary stack of size $\idrm{height}(T)$.
+%% This transformation can be performed by simulating either
+%% a bottom-up traversal of the suffix tree, as shown by Kasai \textit{et al.}~\cite{kasai:lee2001lcp:linear} and Crochemore \textit{et al.}~\cite{crochemore2021book125problems:chap:satostree}, or
+%% a top-down traversal as demonstrated by Abouelhoda, Kurtz, and Ohlebusch~\cite{abouelhoda2004replacing}.
+
+%% Besides this, most closely related work is recent development of $O(n)$-time transformation algorithms for enumeration of \textit{maximal repeats} of a string $S$ using the \textit{Burrows-Wheeler transform} (BWT), 
+%% %%augmented with the \textit{Wavelet tree}.
+%% which simulate a top-down traversal of the tree of the reversed suffix links, called the \textit{Weiner tree}~\cite{beller:berger2012space:efficient:bbo,nishimoto:cpm2021enum}. 
+%% Since the set of maximal repeats corresponds the node set of the CDAWG of the string, they can be expected to be used as a building block to solve the CDAWG construction problem, too. The latest of them, proposed by Nishimoto and Tabei~\cite{nishimoto:cpm2021enum}, runs in $\Theta(n)$-time and $O(r\,\idrm{polylog}(n))$-space based on the r-index~\cite{gagie:navarro:prezza2020fully}.  
+
+%% Recently, Cleary and Dood~\cite{cleary2023constructing} proposed an algorithm for constructing the CDAWG of a string in the form of a grammar using the SA-intervals of maximal repeats of the string. However, they did not mention how to compute such SA-intervals in $O({e_R(S) + e_L(S)})$ time and space. 
+
+%% In summary, to the best of our knowledge, however, it remains an open question whether the CDAWG can be computed from the SA and LCP arrays in output-sensitive manner.
+%% Specifically, it is not known if this can be done using $O({e_R(S) + e_L(S)})$ or less time and working space --- in addition to the $O(n)$-size read-only inputs --- for repetitive string with right-extension parameter ${e_R(S) + e_L(S)} \le n$.
+%% On the other hand, the proposed algorithm in this paper shows that it is possible to perform translation from the SA and LCP arrays into the CDAWG in output-sensitive time and space by a novel combination of known techniques.  
+
 
 
 %%%% 
