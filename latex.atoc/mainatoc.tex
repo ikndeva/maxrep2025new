@@ -1,0 +1,71 @@
+\documentclass{article}
+%% \documentclass[dvipdfmx,a4paper]{article}
+
+
+%%% macros
+%%\input{narrowermargin} %% lncs contents with narrower margins
+%%% begin: papersize with narrower margins
+%% \usepackage[papersize={50mm,50mm}]{geometry}
+\input{mymarginnarrower}
+%% \input{myarith}
+%%% end: papersize
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm} %%proof environment
+%%% auto labeling
+\usepackage{mathtools}
+\mathtoolsset{showonlyrefs=true}
+%%% end: auto labeling
+\usepackage{enumerate}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\graphicspath{
+  {fig/}
+  {fig/new/}
+}%%画像のパス．末尾は'/'で終わること
+%%%% algo
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\input{myalgo2e}
+%%%
+%% \usepackage{natbib}
+%\setcitestyle{numbers,super}
+%%%
+\usepackage{tikz}
+\usetikzlibrary{calc}
+%\usetikzlibrary{intersections,calc,arrows.meta}
+
+%%% macro private
+\input{config}
+\input{macros}
+\input{notation}
+%\input{latex/macros2}
+
+%%% 
+\title{
+Converting Suffix Array into Compact Directed Acyclic Word Graph
+%% Technical Notes: Generating Text Indexing Arrays Based on the Compact Directed Acyclic Word Graphs
+}
+\author{
+Anonyous Authors
+}
+\date{Anonyous Institute}
+%% \author{
+%% %%   Hiroki Arimura\\
+%% %% Hokkaido University
+%% }
+%% \date{\today}
+%%%% end macros
+
+\begin{document}
+\maketitle
+
+%%%%%%%%%%%%%%%%%%
+\input{body}
+%%%%%%%%%%%%%%%%%%
+
+% ---- Bibliography ----
+\newpage
+\bibliographystyle{plain}
+\bibliography{ref}
+%% \bibliography{bib/ref,ref}
+\end{document}
+

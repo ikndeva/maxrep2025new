@@ -2,15 +2,24 @@
 
 
 %%%% new atoc 
-\newcommand{\Sub}{\idsf{Sub}}
+\newcommand{\Fac}[1][(S)]{\idsf{Fac}{#1}}
+\newcommand{\Suf}[1][(S)]{\idsf{Suf}{#1}}
+\newcommand{\Pref}[1][(S)]{\idsf{Pref}{#1}}
 %% \newcommand{\Suf}{\idsf{Suf}}
 %% \newcommand{\Pref}{\idsf{Pref}}
 \newcommand{\LPF}{\idrm{LPF}}
+%%
+\newcommand{\dep}{\idrm{dep}}
+\renewcommand{\suf}{\idrm{suf}}
+\newcommand{\parent}{\idrm{parent}}
+\newcommand{\islb}{\idrm{isLB}}
+
 
 \newcommand{\SA}{\idrm{SA}}
 \newcommand{\ISA}{\idrm{ISA}}
 \newcommand{\LCP}{\idrm{LCP}}
 \newcommand{\BWT}{\idrm{BWT}}
+
 
 %%%%
 
@@ -33,7 +42,7 @@
 %%%
 %% \newcommand{\rk}[1]{^{(#1)}} %%alias 
 \newcommand{\idx}[3]{_{#1=#2}^{#3}} %%alias
-%% \newcommand{\btw}[3]{{#2}\le {#1}\le {#3}} %%alias
+\newcommand{\btw}[3]{{#2}\le {#1}\le {#3}} %%alias
 %% \newcommand{\Suf}{\idrm{Suf}}
 %% \newcommand{\Fac}{\idrm{Fac}}
 
@@ -43,19 +52,23 @@
 \newcommand{\src}{\idtt{src}}
 \newcommand{\dst}{\idtt{dst}}
 \newcommand{\str}{\idtt{str}}
-\newcommand{\Spos}[1][S]{\idtt{Spos}_{#1}}
-\newcommand{\Epos}[1][S]{\idtt{Epos}_{#1}}
-\newcommand{\eqspos}[1][S]{\equiv^{#1}_{spos}}
-\newcommand{\eqepos}[1][S]{\equiv^{#1}_{epos}}
-\newcommand{\EQCspos}[1]{[{#1}]_{\eqspos}}
-\newcommand{\EQCepos}[1]{[{#1}]_{\eqepos}}
+\newcommand{\Spos}[1][S]{\idrm{Spos}_{#1}}
+\newcommand{\Epos}[1][S]{\idrm{Epos}_{#1}}
+\newcommand{\EQe}[1][S]{\equiv^{#1}_{epos}}
+\newcommand{\CLSe}[2][S]{C({#2})^{#1}_\idrm{epos}}
+%%%
+\newcommand{\EQs}[1][S]{\equiv^{#1}_{spos}} %not used 
+\newcommand{\CLSs}[1]{[{#1}]_{\eqspos}} %not used 
+\newcommand{\eqspos}[1][S]{\EQs[#1]} %obsollute
+\newcommand{\EQCspos}[1]{\CLSs{#1}} %obsollute
+\newcommand{\eqepos}[1][S]{\EQe[#1]} %obsollute
+\newcommand{\EQCepos}[1]{\CLSe{#1}} %obsollute
 %% \newcommand{\In}[1][G]{E^\idrm{in}_{#1}}
 %% \newcommand{\Out}[1][G]{E^\idrm{out}_{#1}}
 \newcommand{\In}[1][G]{\idrm{In}_{#1}}
 \newcommand{\Out}[1][G]{\idrm{Out}_{#1}}
 \newcommand{\ldep}{\op{ldep}}
 \newcommand{\sdep}{\op{sdep}}
-\renewcommand{\suf}{\id{suf}}
 \newcommand{\wlink}{\id{wlink}}
 \newcommand{\succeqsuf}{\succeq^\idrm{suf}}
 \newcommand{\succsuf}{\succ^\idrm{suf}}
@@ -103,3 +116,6 @@
 
 \newcommand{\mysubsubsection}[1]{\textbf{#1}.\hspace{0.125em}}%% camera
 \newcommand{\myfootnote}[1]{\hspace{-0.125em}\footnote{#1}}
+%% \newcommand{\nofbox}[1]{#1}
+
+%%% 
