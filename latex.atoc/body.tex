@@ -3,13 +3,7 @@
   In this paper, we consider the problem of transforming the Suffix Array ($\SA$) of a string $S$ of length $n$ into its Compact Directed Acyclic Word Graph (CDAWG) $G$.
   %% We aim to achieve this transformation using time and working space bounds sensitive to the size of $G$, the numbers of maximal repeats, right- and left-extensions, denoted by $\mu(S)$, $e_R(S)$ and $e_L(S)$, respectively.
   This work extends the classic problem of transforming the Suffix Array of $S$ into its suffix tree in the context of output-sensitive computation on repetition-aware text indexes
-  Our main result is a simple and efficient algorithm that solves this problem in
-  $O(e_R(S) + e_L(S))$ time and
-  %% $O(e_R(S) + e_L(S) + \mu(S)\log \mu(S))$ time and
-  $O(e_R(S) + e_L(S))$ space.
-  This requires $O(e_R(S) + e_L(S))$ probes to an index structure $\sig I$ consisting of the $\SA$ and $\ISA$ arrays,
-  and a Range Minimum Query (RMQ) structure on and $\LCP$ array
-  (of $O(n)$ size).
+  Our main result is a simple and efficient algorithm that solves this problem in  $O(e_R(S) + e_L(S))$ time and space, which probes at most $O(e_R(S) + e_L(S))$ cells of an index structure $\sig I$ consisting of the $\SA$, $\ISA$ (inverse suffix), and $LCP$ (longest common prefix) arrays of $O(n)$ size, where $LCP$ is augmented and the Range Minimum Query (RMQ) structure. 
   %% and $\LCP$ arrays (of $O(n)$ size), where the $\LCP$ array is augmented with a Range Minimum Query (RMQ) structure.
 As an application, we demonstrate that this leads to an $O(e\cdot\polylog(n))$ time and space algorithm for constructing the CDAWG of S directly from the \textit{r-index}, proposed by Gagie, Navarro, and Prezza (J.~ACM, 67:1, 2020), which has a size of $O(r\cdot\polylog(n))$.
 To achieve the above results, we devise two novel methods that may be of independent interest:
@@ -66,10 +60,10 @@ Belazzougui \textit{et al.}~\cite{belazzougui:nunial:gagie:prezza:raffinot2015co
 \nofbox{\includegraphics[height=.95\textwidth]{fig2a.pdf}}
 \end{minipage}
 %% \vspace{.5\baselineskip}
-\caption{An Example of an input and an output of the transformation problem with a string $S[1..10] = aabaababb\daller$ of length $n = 10$ over an alphabet $\Sigma = \set{a, b, \daller}$ (top).
+\caption{An example of an input and an output of the transformation problem with a string $S[1..10] = aabaababb\daller$ of length $n = 10$ over an alphabet $\Sigma = \set{a, b, \daller}$ (top).
   An input is the index $\sig I$ of arrays $SA, LCP, BWT, ISA$ and $S$ (left). An output is the CDAWG $G$ of $S$ (right).
-  In $G$, black thick, black thin, and red dashed arrows, respectively, indicate solid and non-solid edges, and suffix links.
-  A range with a string correspond to a node of $G$ and its representative. 
+  Each range with a string label to the right of the index $\sig I$ correspond to an internal node of the CDAWG and its representative string. 
+  In the graph $G$, thick and thin black, and dashed red arrows, respectively, indicate solid and non-solid edges, and suffix links.
   %% We observe that branching nodes $1, 3,14,12$, and $6$ of $G$ correspond to maximal repeats of $S$, namely, $\eps$, $a$, $b$, $ab$, and $aaba$. 
 }\label{fig:example:problem}
 \end{figure}
@@ -195,7 +189,10 @@ From the corollary, our method can be an alternative to the repetition-aware alg
 %% \vspace{.5\baselineskip}
 \caption{An example of an intemediate structure, called the \LPTrm-tree, $T$ of a string $S = aabaababb\daller$ in \cref{fig:example:problem}.
 Circles and boxes indicate branching nodes and leaves. Black thick, black thin, and red dashed arrows, respectively, indicate solid and non-solid edges, and suffix links.
-  A collection of nodes connected by double dotted arrows indicates a congruence class w.r.t.~the end-positions, which will be merged into a node in the CDAWG. 
+Collections of nodes connected by blue dotted double arrows indicate
+classes of factors, namely, $\set{3\rk 1, \dots, 3\rk 3}$ and $\set{4\rk 1, \dots, 4\rk 6}$. 
+%congruence classes w.r.t.~the end-positions.
+We see that addtion of these suffix links and merge of classes of factors into new nodes in $T$ leads to the CDAWG $G$ of $S$ shown in \cref{fig:example:problem}. 
   %% Sets of nodes connected by double dotted arrows, namely, $\set{3\rk 1, 3\rk 2, 3\rk 3}$ and $\set{4\rk 1, \dots, 4\rk 6}$ form a congruence class of $\eqepos$ w.r.t.~end-positions, and is merged into a node in the CDAWG of $S$. 
 }\label{fig:example:lpttree}
 \end{figure}
@@ -268,19 +265,17 @@ The parameters $\mu(S)$, $e_R(S)$, and $e_L(S)$ of a string $S$ are defined to b
 \subsection{Indexing structures for a string}
 %%% 
 For the lack of space, we assume that the reader has the basic knowledge of the suffix tree, denoted $\Stree(S)$, and the CDAWG, denoted $\CDAWG(S)$, of a string $S$. 
-They are represented by a path-compacted automaton $G$, that is, an edge-labeled DAG $G = (V(G), E(G), root(G))$ with a node set $V(G)$, an arc set $E(G)$, and the distinguished node $root(G)$. 
-Each $f = (u, \alpha, v) \in E(G)$ represents an arc from $\src(f)=u$ to $\dst(f)=v$ in $V(G)$ with a string label $\lab(f)=\alpha \in \Sigma^+$. 
-We assume 
-%that $G$ is \textit{deterministic} meaning 
-that (*) the labels of all outgoing edges $f_1, f_2 \in \Out(u)$ of a node $u$ start with mutually distinct (branching) characters. 
-%Let $G = (V(G), E(G), root(G))$ be a edge-labeled DAG representing either a suffix tree or the CDAWG of $S$. 
-For a path $\pi = (f_1, \dots, f_k)$ from the root to a node $v$ in $G$, we denote its string label by $\beta = \str(\pi) = \lab(f_1)\dots \lab(f_k) \in \Sigma^*$. 
-By property (*), 
-%Since $G$ is deterministic, 
-any factor $s$ of $S$ determines the rooted path $\pi$ of $G$ such that $\str(\pi) = s$, whose target $v$ is called the \textit{locus} of $s$. 
+Throughout, they are uniformly represented by a path-compacted automaton $G$, that is, an edge-labeled DAG $G = (V, E, root)$ with a node set $V$, an arc set $E\subseteq V\by \Sigma^+\by V$, and $root \in V$. 
+A labeled arc $f$ from node $\src(f)=u$ to node $\dst(f)=v$ with a string label $\lab(f)=\alpha$ is encoded by a triple $f = (u, \alpha, v) \in E$.  
+We assume that $G$ is \textit{deterministic} (*), namely, the labels of all outgoing edges $f_1, f_2 \in \Out(u)$ of node $u$ start with mutually distinct (branching) characters.
+Every factor $u$ of $S$ is represented by a rooted path$\pi$
+%% $\pi = (f_1, \dots, f_k)$
+to a point on either a node or an edge, called the \textit{locus} of $u$, as its string label $\str(\pi) = \lab(f_1)\cdots \lab(f_k)$ spelled out by $\pi$.
+Since $G$ is deterministic (*), the locus of $u$ is unique, we will identify a factor $u$ with its locus if no confusion arises. 
+In what follows, we write $V(G), E(G), root(G)$ for $V, E, root$ of $G$. 
 
 %%% 
-We also assume the knowledge of the \textit{suffix array} (SA) and its \textit{inverse array} (ISA), \textit{longest common prefix array} (LCP), and the \textit{Burrows-Wheeler transform} (BWT) of a string $S$ with length $n$. See appendix for their definition. 
+We also assume the knowledge of the \textit{suffix array} (SA) and its \textit{inverse array} (ISA), \textit{longest common prefix array} (LCP), and the \textit{Burrows-Wheeler transform} (BWT) of a string $S$ with length $n$. See appendix for their definitions. 
 
 \begin{toappendix}
 The \textit{suffix array} (SA) and its \textit{inverse array} (ISA), \textit{longest common prefix array} (LCP), and the \textit{Burrows-Wheeler transform} (BWT) of a string $S$ with length $n$ are defined as follows. 
@@ -446,11 +441,16 @@ Recall that every internal node in the suffix tree of $S$ is right-branching, an
 We remark that the node set $V(P)\cup\Delta(P)$ contains all maximal repeats, and some non-maximal repeats obtained as children of maximal repeats.
 
 \begin{lemma}[characterization of $\LPT(S)$]\label{lem:lpt:character}
-The search tree $\sig L(S)$ coincides the extended longest common prefix tree $\LPT(S)$. 
+The search tree $\sig L(S)$ coincides the extended longest common prefix tree $P = \LPT(S)$. 
 \end{lemma}
 
-\begin{proof}
-  We observe that $V(T)$ consists of all right-branching factors and all suffixes of $S$; Furthermore, the arc set is given by $E(T) = \sete{ (\rext{u}, \beta, \rext{(ub)}) \mid u, \beta \in \Sigma^*, b \in \Sigma, \rext{(ub)} = \rext{u}\!\cdot \beta }$
+\begin{proof} [TBD]
+  Recall that $P$ is a subgraph of $T = \Stree(S)$. 
+  We observe that the node set $V(T)$ of $T$ consists of all right-branching factors and all suffixes of $S$. Thus, $V(P)\subseteq V(T)$ holds.
+  The arc set $E(T)$ of the suffix tree is given by
+  $E(T) = \sete{ (\rext{u}, \beta, \rext{(ub)}) \mid u, \beta \in \Sigma^*, u \in \MR(S), b \in \Sigma, \rext{(ub)} = \rext{u}\!\cdot \beta }$~\cite{crochemore2007algorithms:on:strings,inenaga2005online}.
+  %% Since all nodes and arcs of $P$ are generated from maximal repeats in $\MR(S)$ by right-closure, 
+  From \cref{lem:maxrep:searchtree}, it follows that $\sig L(S)$ is a connected subgraph of $\Stree(S)$. 
   %% (see \cite{crochemore2007algorithms:on:strings,inenaga2005online}). 
 %% (see Crochemore \textit{et al.}~\cite{crochemore2007algorithms:on:strings}, or Inenaga \textit{et al.}~\cite{inenaga2005online}). 
 From \cref{lem:maxrep:howto:child}, we can show that the inverse of parent relation coincides the arc set $E(T)$ above. Thus, the lemma is proved. 
@@ -465,17 +465,17 @@ From \cref{lem:lpt:character}, we will refer to the search $\sig L(S)$ as the \L
 
 In this subsection, we show how to implement the high-level procedure in \cref{lem:maxrep:algo:highlevel} on a string $S$ and its index $\sig I = (SA, ISA, LCP_{RMQ})$.
 
-\mysubsubsection{Constant-size Representation of factors}
+\mysubsubsection{Constant-size representation of factors}
 \label{sec:constant:size:rep}
-We represent any factor of $S$, including maximal repeats, in a constant-sized encoding so that it can be operated in constant time. 
-A triple $\tau = (i, j, \ell) \in [1..n]^3$ of integers, denoted $\pair{i..j, \ell}$, is a \textit{rich representation} (or a \textit{triple}, for short) of a factor $u \in \Fac$ if
+We represent any factor $u$ of $S$, including maximal repeats, in a constant-sized encoding $\tau = \repl(u)$ on $SA$ arrays as follows, so that it can be operated in constant time. 
+Precisely, the \textit{rich representation} (or the \textit{triple}, for short) of a factor $u \in \Fac$ is the triple $\tau = (i, j, \ell) \in [1..n]^3$ of integers, denoted $\pair{i..j, \ell}$, such that 
 \begin{enumerate*}[(i)]
 \item $SA[i..j] = \Spos(u)$, and 
 \item $\ell = |u|$.
 \end{enumerate*}
-We can recover the original factor $u$ from the triple $\tau = \pair{i..j, \ell}$ using $SA$ and $S$ by $u = S[SA[k]..SA[k]+\ell-1]$ for arbitrary $k \in i..j$. Then, we write $\repl(u) := \pair{i..j, \ell}$ and $\fact(\tau) := u$. 
+We can recover the original factor $u$ from $\tau$ based on $SA$ and $S$ by $u = S[SA[k]..SA[k]+\ell-1]$ for arbitrary chosen rank $k \in i..j$. Then, we write $\repl(u) := \pair{i..j, \ell}$ and $\fact(\tau) := u$. 
 
-\subsubsection{Generation of children.}
+\mysubsubsection{Generation of children}
 For child generation, we only need to perform the right-character computation, the right-closure computation, and the left-branching property test on rich representations from~\cref{lem:maxrep:howto:child} of \cref{sec:enum:maxrep}.
 
 \begin{lemma}\label{lem:gen:children:charact}
@@ -701,8 +701,11 @@ We show the correctness and computational complexity of the procedure $\RecLPT$ 
 
 \begin{lemmarep}[correctness and time complexity]\label{lem:main:from:lpt:to:cdawg:correct:time}
   Let $T$ be the $\LPT(S)$ of a string $S$ of length $n$. 
-  The procedure $\RecLPT$ in \cref{algo:rec:cdawg} computes $T = \LPT(S)$ from the static index $\sig I = (\SA, \ISA, LCP)$ and the read-only copy of $S$
-  in $O(e_R(S) + e_L(S))$ time using $O(\max\{e_R(S), e_L(S), \sigma\log n\})$ space. 
+  The procedure $\RecLPT$ in \cref{algo:rec:cdawg} computes $T = \LPT(S)$ from the static index $\sig I = (\SA, \ISA, LCP_{RMQ})$ and the read-only copy of $S$
+  in $O(e_R(S))$ time
+  using $O(e_R(S) + \sigma\log n)$ working space. 
+  %% in $O(e_R(S) + e_L(S))$ time
+  %% using $O(\max\{e_R(S), e_L(S), \sigma\log n\})$ space. 
 \end{lemmarep}
 
 \begin{proofsketch}
@@ -710,9 +713,11 @@ We show the correctness and computational complexity of the procedure $\RecLPT$ 
 \cref{lem:maxrep:howto:child},
 \cref{lem:genchildren},
 \cref{lem:leftmaximal:character},
-and the construction of $\LPT(S)$,
-the correctness of the recursive procedure $\RecLPT$ follows.
-For the time complexity, we observe that the algorithm traverses each arc and nodes exactly once from \cref{lem:maxrep:howto:child}. Since at each iteration, $\GenChildren$ and $\isLeftBranching$ require at most $O(e_R)$ total time, the algorithm runs in $O(e_R(S))$ total time. Space use of all components other than the stack usage is $O(\sigma)$. To bound the usage of the call stack of $\RecLPT$, we can apply the heavy path decomposition of the suffix tree by Belazzougui \textit{et al.}~\cite{belazzougui2020linear} to obtain $O(\sigma \log n)$ memory usage for the stack. This completes the proof.
+and the construction of $\LPT(S)$, the correctness follows.
+For the time complexity, it follows from \cref{lem:maxrep:howto:child} that $\RecLPT$ traverses each arc and nodes of $\LPT(S)$ exactly once.
+Since calls of $\GenChildren$ and $\isLeftBranching$ require at most $O(e_R)$ total time, it runs in $O(e_R(S))$ total time.
+For space, the it requires $O(e_R)$ space to hold $O(e_R)$ nodes and arcs of $\LPT(S)$. Besides, it uses the space for the call stack of $\RecLPT$, on which each cell occupies $O(\sigma)$ space for branching.
+By applying the heavy path decomposition of the suffix tree by Belazzougui \textit{et al.}~\cite{belazzougui2020linear}, we obtain $O(\sigma \log n)$ memory usage for the stack. This completes the proof.
 \qed
 \end{proofsketch}
 
@@ -730,8 +735,7 @@ To upperbound the space usage by $O(\sigma\log n)$, we use the technique by Bela
 \qed\end{proof}
 
 %% execution example
-In \cref{fig:run:example}, we show an example run of Algorithm $\RecLPT$ for a string $S[0..10] = \mathtt{\#aabaababb\$}$. The black and red trees, respectively, indicate the suffix and the Weiner trees of $S$. Each circle indicates a node with the string label and the triple. A gray node corresponds a maximal repeat. 
-We observe that the algorithm $\RecLPT$ only traverses the suffix tree starting from the root, and enumerates all maximal repeats, by visiting all and only the gray nodes. 
+In \cref{fig:run:example}, we show an example run of the algorithm $\RecLPT$ for a string $S[0..10] = \mathtt{\#aabaababb\$}$ of \cref{fig:example:problem}. It performs the DFS of $\LPT(S)$ over nodes (circles and boxes associated with their triples) and traversing arcs (black arrows). It checks the number of suffix links (red reversed arrows) to test the left-branching property.  We see that $\RecLPT$ enumerates all maximal repeats, by visiting all maximal repeats (gray nodes) of $MR(S)$. 
 
 %%%%%%
 \begin{figure}[t]
@@ -799,24 +803,22 @@ In the following, firstly, we briefly review the CDAWG $G$ of a string $S$ accor
 
 \subsection{Classes of factors and the CDAWG}
 
-Blumer \textit{et al.}~\cite{blumer1987complete} showed that the CDAWG of $S$ is the minimum state DFA of $\Suf$ with path-compression.
-%%the properties of the CDAWG $G$ of $S$, 
-
-\mysubsubsection{Classes of factors}
-The \textit{syntactic congruence relation associated to end-positions} over $\Fac$, denoted by $\EQe$, is defined, for all $u, v \in \Fac$ by 
+Blumer \textit{et al.}~\cite{blumer1987complete} defined the CDAWG of $S$ as the minimum state DFA of $\Suf$ with path-compression, and gave a characterization of their nodes and edges by the syntactic congruence classes as follows. 
+%% \mysubsubsection{Classes of factors}
+Given a string $S$ over $\Sigma$ with $|\Sigma|\ge 2$, its \textit{syntactic congruence relation}, denoted by $\EQe$, \textit{associated to end-positions} over $\Fac$ is defined by: for all $u, v \in \Fac$, 
 \begin{math}
   u \EQe v \iffdef \Epos(u) = \Epos(v). 
 \end{math}
-Then, the universe of all factors, $\Fac$, is partitioned into the congruence classes $\CLSe{u}$, called \textit{classes of factors}, defined by 
+Then, the universe of all factors, $\Fac$, is partitioned into a set of congruence classes, $\CLSe{u}$ with all $u \in \Fac$, called \textit{classes of factors} defined by 
 $C(u) = \CLSe{u} := \sete{ v \in \Fac \mid \Epos(u) = \Epos(v) }$
 for a factor $u$ of $S$. We call the class of factor $C = C(u)$ \textit{strict} if $u$ is right-branching in $S$, i.e., $\rext{u} = u$. 
 The \textit{representative} of $C$ is the longest string in $C$, and is denoted by $value(C)$. 
 
-\mysubsubsection{Representing the CDAWG by classes of factors}
-Now, we can describe the CDAWG $G = (V(G), E(G), root(G))$ of $S$ in terms of congruence classes as follows~\cite{crochemore:verin1997direct}.  
-Each node of $G$ corresponds to a \textit{strict} class of factor $C$, that is,  $C = C(u)$ with some right-branching factor $u \in \Fac$. The node $C$ represents all factors of $S$ that have the same set of end positions in $S$ as the string labels of all paths from the root to $C$. The root is $C(\eps)$, and there exists an arc $f = (C(u), \alpha, C(v))$ in $E(G)$ if $v = \rext{(ub)}$ and $u\alpha = v$ with some $b \in \Sigma$, called a \textit{branching character}, and $\alpha \in \Sigma^*$. By definition, the string label $\alpha$ starts with the  $b$, i.e., $\alpha[1] = b$.  
+Next, we describe \textbf{how to represent the CDAWG  of $S$, $G = (V(G), E(G),$ $root(G))$, in terms of classes of factors} according to~\cite{crochemore:verin1997direct}. 
+%%Now, we can describe the CDAWG  in terms of congruence classes as follows.  
+Each node of $G$ corresponds to a \textit{strict} class of factor $C$ such that $C = C(u)$ with some right-branching factor $u \in \Fac$. The node $C$ represents all factors of $S$ that have the same set of end positions in $S$ as the string labels of all paths from the root to $C$. The root is $C(\eps)$. There exists an arc $f = (C(u), \alpha, C(v))$ in $E(G)$ if and only if $v = \rext{(ub)}$ and $u\alpha = v$ with some $b \in \Sigma$, called a \textit{branching character}, and $\alpha \in \Sigma^*$. By definition, the string label $\alpha$ starts with the  $b$, i.e., $\alpha[1] = b$.  
 
-\mysubsubsection{Suffix links of the CDAWG}
+Finally, we explain the \textbf{suffix links of the CDAWG}, which will play important role in our algorithm. 
 For any node $u$ in $V(G)$, $G$ has a suffix link $v = \suf(u)$ whose target $v$ is the locus of the longest suffix of $u$ such that $\Epos(v) \not= \Epos(u)$. In other words, the suffix link connects distint classes of factors $C(\alpha v)$ and $C(v)$ by removing a nonempty prefix $\alpha$ of $u = \alpha v$ such that $u = \alpha v$. In what follows, we do not distinguish a class $C(u)$ and its member $u \in C(u)$ if no confusion arises.
 For technical reason, we define the string label of a suffix link $\suf(C(\alpha v)) = C(v)$ to be the prefix $\alpha$ satisfying the above condition.%
 %%%
@@ -838,21 +840,24 @@ We assume that to each node $u$ of $T$, the following information is associated:
 \item $\parent(u) \in V(T)\cup\set{\op{undef}}$: The parent of $u$ if it exists, and $\op{undef}$ otherwise. 
 \end{itemize}
 
-The output is the CDAWG $G$ of $S$, which is obtained from a copy of the input tree $T$ by modifying its structure, and associated with 
-the following structures constructed during the computation: 
+The output CDAWG $G$ of $S$ is obtained from a copy of the input tree $T$ by incrementally computing the following structures during the computation: 
 \begin{itemize}
-\item $C: V(T) \to \pow{V(T)}$: A table representing the collection of all and only congruence classes of $V(T)$ supporting the following operations:
-  For any clas $C = C(u)$ with $u$,  $C.\op{get}()$ returns the representative of the class $C(u)$, and $C.\op{append}(u)$ adds any $v$ into $C$. We do not need the operation $\op{unify}$.%
-%%%  
-\footnote{Since the congruence classes form a spanning tree over all factors, the structure is implemented simply by a singley-linked linearly list $L$ of nodes. It linearly grows from the head to the tail by appending a new element to the tail. An extension is that all elments of $L$ has an additional pointer to the head of $L$, as the representave, so that operations are performed in constant time.
-}
-%%%  
+\item A mapping $C: V(T) \to \pow{V(T)}$ representing the collections of all congruence classes supporting the operations:
+\begin{enumerate}[(i)]
+\item $C.\op{get}()$ returns the representative of the class $C(u)$;
+\item $C.\op{append}(u)$ adds any $v$ into $C$. 
+\end{enumerate}
+where $C = C(u)$ is any classs of factor with $u \in \Fac$.
   
-\item $\suf: V(T)\setminus{root(T)} \to V(T)$: A table representing the suffix link $\suf(v) = u$ in the CDAWG $G$. 
+\item A mapping $\suf: V(T)\setminus{root(T)} \to V(T)$ representing the suffix link $\suf(v) = u$ in $G$. 
 \end{itemize}
 
 We remark that since $|V(T)|$ and the size of $T$ are upperbounded by $O(e_R(S) + e_L(S))$, so is the above representation of the CDAWG. 
-
+Moreover, the structure $C$ does not need the operation $\op{unify}$ since the congruence classes form a set of linear chains over a spanning tree over all factors.%
+%%%  
+\footnote{The structure $C$ is implemented simply by a singley-linked linearly list $L$ of nodes. It linearly grows from the head to the tail by appending a new element to the tail. An extension is that all elments of $L$ has an additional pointer to the head of $L$, as the representave, so that operations are performed in constant time.
+}
+%%%
 
 %%%%%%
 \begin{figure}[t]
@@ -867,11 +872,22 @@ We remark that since $|V(T)|$ and the size of $T$ are upperbounded by $O(e_R(S) 
 \end{figure}
 %%%%%%
 
-\newpage
 \subsection{Link-and-Merge Algorithm}
 \label{sec:algo:link:merge}
 
-Our algorithm constructs the CDAWG of $S$ from its \LPTrm-tree, based on an idea similar to McCreight's suffix tree construction algorithm~\cite{mccreight1976space} as well as Crochemore and V\'erin's CDAWG construction algorithm from a string $S$~\cite{crochemore:verin1997direct}.
+Our algorithm, \textsf{Link-and-Merge}, constructs the CDAWG of $S$ from its \LPTrm-tree $P$
+%by the BFS of $P$
+by a similar idea to Crochemore and V\'erin's CDAWG construction algorithm from a string $S$~\cite{crochemore:verin1997direct}. 
+%McCreight's suffix tree construction algorithm~\cite{mccreight1976space}.
+It is based on the following observation. 
+
+\begin{lemma}
+For any (real) node $u$ in $\CDAWG(S)$ has a suffix link from it to the locus $v$ of the longest suffix  of $u$ such that $\Epos(u) \not= \Epos(v)$.
+\end{lemma}
+
+Then, we call the node $v$ the target of the suffix link from $u$. 
+Specifically, our algorithm visits the current node $u$, computes the target $v$ of (uncomputed) its suffix links, and makes one of the following operations with two classes of factors $C(u)$ and $C(v)$: (i) linking them with a suffix link, or (ii) merging them into a class of factors.
+As a difference, our algorithm visits nodes of $\LPT(S)$ in BFS-order unlike the algorithm by~\cite{crochemore:verin1997direct} traverses a partial $\CDAWG$ in text order. In the traversal, we use the skip-and-count technique similar to one in McCreight's suffix tree construction algorithm~\cite{mccreight1976space}.
 
 \begin{definition}[high-level description of the procedure for computing suffix links and classes of factors from $\sig L$]\label{lem:maxrep:algo:highlevel}
 \begin{enumerate}[(1)]
