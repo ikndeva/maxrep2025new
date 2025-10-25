@@ -885,9 +885,20 @@ It is based on the following observation.
 For any (real) node $u$ in $\CDAWG(S)$ has a suffix link from it to the locus $v$ of the longest suffix  of $u$ such that $\Epos(u) \not= \Epos(v)$.
 \end{lemma}
 
-Then, we call the node $v$ the target of the suffix link from $u$. 
-Specifically, our algorithm visits the current node $u$, computes the target $v$ of (uncomputed) its suffix links, and makes one of the following operations with two classes of factors $C(u)$ and $C(v)$: (i) linking them with a suffix link, or (ii) merging them into a class of factors.
-As a difference, our algorithm visits nodes of $\LPT(S)$ in BFS-order unlike the algorithm by~\cite{crochemore:verin1997direct} traverses a partial $\CDAWG$ in text order. In the traversal, we use the skip-and-count technique similar to one in McCreight's suffix tree construction algorithm~\cite{mccreight1976space}.
+Then, we call the node $v$ the \textit{target} of the suffix link from $u$. 
+Specifically, at each iteraton with the current node $u$ during BFS of $\LPT(S)$, our algorithm computes the target $v$ of its (uncomputed) suffix link, and makes one of the following operations with two classes of factors $C(u)$ and $C(v)$:
+\begin{enumerate}[(i)]
+\item linking them with a suffix link, or
+\item merging them into a class of factors.
+\end{enumerate}
+
+This is decided by the following lemma. 
+
+\begin{lemma}
+  Let $v$ be the target of any (real) node $u$ of $\CDAWG(S)$. Then, if $u$ is a real node, then so is $v$. Moreover, their classes of factors, $C(u)$ and $C(v)$, satisfy that $C(u) \not= C(v)$ if and only if $v$ is left-branching, i.e., $|\LC(v)|\ge 2$. 
+\end{lemma}
+
+Unlike~\cite{crochemore:verin1997direct}, our algorithm visits nodes of $\LPT(S)$ in BFS-order since only a partially constructed $\CDAWG$ is available in our case. To find the target node $v$, we use the skip-and-count technique similar to one in McCreight's suffix tree construction algorithm~\cite{mccreight1976space}.
 
 \begin{definition}[high-level description of the procedure for computing suffix links and classes of factors from $\sig L$]\label{lem:maxrep:algo:highlevel}
 \begin{enumerate}[(1)]
