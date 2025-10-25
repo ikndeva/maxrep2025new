@@ -867,485 +867,69 @@ We remark that since $|V(T)|$ and the size of $T$ are upperbounded by $O(e_R(S) 
 \end{figure}
 %%%%%%
 
-\subsection{The Algorithm}
+\newpage
+\subsection{Link-and-Merge Algorithm}
+\label{sec:algo:link:merge}
 
-Our algorithm constructs the CDAWG of $S$ from its \LPTrm-tree, based on an idea similar to McCreight's suffix tree construction algorithm~\cite{mccreight1976space} as well as Crochemore and V\'erin's CDAWG construction algorithm from a string $S$~\cite{crochemore:verin1997direct}. 
+Our algorithm constructs the CDAWG of $S$ from its \LPTrm-tree, based on an idea similar to McCreight's suffix tree construction algorithm~\cite{mccreight1976space} as well as Crochemore and V\'erin's CDAWG construction algorithm from a string $S$~\cite{crochemore:verin1997direct}.
 
-
-
-%%%%%%%%%%%%%%%%%%
-\section*{Old Transforming \LPTrm-tree to CDAWG}
-\label{sec:lpt:to:cdawg:old}
-%%%
-In this section, we present the second algorithm $\RecCDAWG$ for transforming the \LPTrm-tree $G = (\sig V(G), \sig E(G), root_G)$ for a string $S$ into its CDAWG.
-We show the main result of this section.  
-
-\begin{lemma}\label{lem:main:lpt:to:cdawg}
-  Let $S$ be any string of length $n$ over $\Sigma$. 
-  We can transform the \LPTrm-tree $T$ of $S$ without suffix links into its CDAWG $G$ with suffix links in $O(e_R(S) + e_L(S))$ time and working space, where $e_R(S)$ and $e_L(S)$ are the numbers of right- and left-extensions of maximal repeats in $S$, and an algorithm is allowed to access the read-only copy of the string $S$. 
-\end{lemma}
-
-In the above theorem, we remark that the sizes of an input $T$ and the output $G$ are both $O(e_R(S) + e_L(S))$. 
-
-In \cref{algo:rec:cdawg}, we present the psuedo code of $\RecCDAWG$. 
-This algorithm performd the breadth-first search of $T$ from the root to leaves using $\sdep(v)$ as the weight of each node $v$. Then, it gradually transforming an input $T = \LPT(S)$ into a partial DAG obtained from $G = \CDAWG(S)$ by merging equivalent nodes into equivalence classes, and adding suffix links between inequivalent nodes. In the following, we will refer to an itermediate DAG $G'$ as a \textit{partial CDAWG} of $S$. When the merging process is done, the resulting partial DAG $G'$ becomes $\CDAWG(S)$.
-
-
-In the following subsections, we first explain its subroutines. Finally, we present the proof of \cref{lem:main:lpt:to:cdawg} by analyzing the correctness and time complexity of \cref{algo:rec:cdawg}. 
-
-%% \subsection{Outline of the algorithm}
-%% \label{sub:outline:recdawg}
-%%%
-%% In \cref{algo:rec:cdawg}, we present the psuedo code of $\RecCDAWG$. 
-%% This algorithm performd the breadth-first search of $T$ from the root to leaves using $\sdep(v)$ as the weight of each node $v$. Then, it gradually transforming an input $T = \LPT(S)$ into a partial DAG obtained from $G = \CDAWG(S)$ by merging equivalent nodes into equivalence classes, and adding suffix links between inequivalent nodes. In the following, we will refer to an itermediate DAG $G'$ as a \textit{partial CDAWG} of $S$. When the merging process is done, the resulting partial DAG $G'$ becomes $\CDAWG(S)$.
-
-
-%%%%%%%%%%%%%%%%%%
-\begin{algorithm}[p]
-  \caption{The procedure $\RecCDAWG$ for transforming the \LPTrm-tree $T = (V(T), E(T), root(G))$ of a string $S$ into its CDAWG $G$. 
-  }\label{algo:rec:cdawg}
-%%%%%%
-  %%%
-\KwWork{$B\subseteq V(G)\times \nat$: a priority queue of nodes $u$ with $\ldep(u)$ as their weights. $EQ: V(G) \to \pow{V(G)}$: a union-find structure that maps each vertex $u$ to its equivalence class $EQ(u) \in \pow{V(G)}$ with operation $\op{unify}(u, v)$. Tables $\ldep, \sdep: V(G) \to \nat$ that assigns to each node $u$ the string depths of the longest and shortest members in $EQ(u)$ in $T$, respectively. }  
-\Begin{ 
-\Comment{Initialization}
-$B \gets \emptyset$, $\id{suf} \gets \emptyset$, and $wlink \gets \emptyset$\;
-Compute the table $\ldep$ by DFS of $T$\; 
-\For{each $u \in V(G)$}{
-  $\op{isLB}(u)=|\LC(\Value(u))|$\Comment*{from the triple of $u$} 
-  $EQ(u) = \set{u}$\Comment*{the singleton class}
-}
-\For{each $f = (u, \alpha, w) \in E(G)$}{
-  $B.\op{insert}(f, \ldep(w))$
-  \Comment*{Insert $f$ with weight $\ldep(w)\ge 0$}
-}
-\medskip
-\While{ $B \not= \emptyset$}{
-  \Comment{Extracting an arc with minimum weight $\ldep(w)$}
-  $f = (u, \alpha, w) \gets B.\op{deletemin}()$\;
-  \Comment{Finding the locus $v$ of the longest suffix $\beta'$ of the string label $\beta = \Value(u)\cdot\alpha$ such that $\beta' \not\in EQ(\beta)$. }
-  $(u', (g_1, \dots, g_k), v) \gets \FindNonEquivLocus(u, \alpha; G, \sdep, \ldep)$\; 
-    \label{step:algo2:skip:and:count}
-    \Comment{Maintaining links and equivalence class of $v$}
-    \uIf (\comblk{Merging two equivalence classes})
-         {$\op{isLB}(v) = 1$}
-         %% {$|\wlink(v)| = 0$}
-         {
-      \Comment{$v$ has no incoming suffix links.}
-      $EQ.\op{unify}(w, u)$
-       \Comment*{Merging $EQ(w)$ and $EQ(v)$}
-      Re-direct all incoming arcs of $v$ into $w$\;
-      $\sdep(w) \gets \min\{\sdep(w), \sdep(v)\}$\; 
-    }
-    \Else (\comblk{Adding suffix and Weiner links between equivalence classes})
-    {
-      $a = \alpha[\id{offset}]$\Comment*{$\op{shortest}(EQ(w)) = a\cdot \Value(EQ(v))$}
-      $\id{suf}(w) \gets v$\Comment*{an incoming suffix link to $v$}
-      $\wlink(v, a) = v$\Comment*{an explicit W-link from $v$}
-      %% Add , namely, , and  with character $a$, namely, , where  is the first character of the shortest emember of $EQ(w)$, that is, . \; 
-    }
-} %% While
-\Return the CDAWG $G = (V(T), E(T), root(G), \id{suf}, \wlink)$ of $S$\; 
-}%Begin
-%%%%%%
-\end{algorithm}
-%%%%%%%%%%%%%%%%%%
-
-
-
-
-%% We show a few technical lemmas below. Let $G'$ be a partial CDAWG obtained from $\LPT(S)$ by merging a subset of equivalent nodes with respect to the equivalence relation $\eqepos$ on $\Fac$. 
-
-%% \begin{lemmarep}\label{lem:trans:cdawg:one}
-%% Let $\alpha, \beta \in \Fac$ be any factors of $S$ such that $\alpha$ is a suffix of $\beta$, i.e. $\beta \succeq^\idrm{suf} \alpha$. In $\CDAWG(S)$, if the locus of $\beta$ is an explicit node of $G'$, then so is the locus of $\alpha$. 
-%% \end{lemmarep}
-
-%% \begin{proof}
-%%   Recall that a locus $\loc u$ is an explicit node in
-%%   $\CDAWG(S)$
-%%   if and only if
-%%   $|\Epos(u)| \ge 2$.
-%%   Since $\beta \succeq^\idrm{suf} \alpha$, we have $|\Epos(\alpha)| \ge |\Epos(\beta)| \ge 2$. 
-%% \qed\end{proof}
-
-\subsection{Preprocessing $\op{ldep}(u)$ and $\sdep(u)$ in $O(e_R)$ total time}
-\label{sec:compute:cdawg:preprocess}
-
-During the computation, we incrementally compute the the pair $(\op{ldep}(u), \sdep(u))$ of quantities on the \LPTrm-tree, defined as follows. 
- %% and $\op{shortdep}(u)$ of the longest and shortest paths from the root to $u$ are already computed, where
-\begin{itemize}
-\item $\op{ldep}(u)$ is the \textit{largest string depth}, defined to be the length of the longest paths from the root to $u$,
-that is, $\ldep(u) = \max \sete{ |\str(\pi)| : \pi \in Path(root, u) }$
-
-\item $\sdep(u)$ is \textit{the smallest string depth}, defined to be the length of the longest paths from the root to $u$, that is, $\sdep(u) = \min \sete{ |\str(\pi)| : \pi \in Path(root, u) }$. 
-\end{itemize}
-
-Clearly, $\ldep(u) = |\Value(u)|$.
-The fields for the above information require $O(\mu(S))$ space. 
-Then, the computation of the the pair $(\op{ldep}(u), \sdep(u))$ is done by the following recurrences. 
-\begin{lemma}\label{lem:ldep:sdep:rec}
-Let $G$ be the CDAWG  of a string $S$ and $u$ be any of its explicit node. 
-\begin{enumerate}
-\item If $u$ is the root of $G$, $\ldep(u) = \sdep(u) = 0$. 
-  
-\item Otherwise, $u$ is an explicit node with one or more incoming arcs $f_1, \dots, f_k$ such that $\dst(f_i) = u$ for all $\btw i1k$ and $k\ge 1$.
-Then, we have 
-  \begin{itemize}
-  \item $\ldep(u) = \max{}\idx i1k \{\: \ldep(\src(f_i)) + |\lab(f_i)|  \:\}$
-  \item $\sdep(u) = \min{}\idx i1k \{\: \sdep(\src(f_i)) + |\lab(f_i)|  \:\}$
-  \end{itemize}
-  where $f_i = (\src(f_i), \lab(f_i), \dst(f_i)) = (v_i, \alpha_i, u) \in V(G)\by\Sigma^+\by V(G)$. 
+\begin{definition}[high-level description of the procedure for computing suffix links and classes of factors from $\sig L$]\label{lem:maxrep:algo:highlevel}
+\begin{enumerate}[(1)]
+\item[] \hspace{-.75\leftmargini}\textbf{Procedure} Link-and-Merge: Computing the CDAWG $G$ of a string $S$ from its \LPTrm-tree $T$.
+\item For each node $u$ in $V(T)$, insert $u$ with weight $\dep(u)$, i.e., $(u, \dep(u))$, into the priority queue $B$.
+\item While $B \not= \emptyset$, do the following steps: 
+\begin{enumerate}[(a)]
+\item Extract a node $u$ from $B$ with the minimum weight $\dep(u)$, and delete it from $B$. 
+\item Find the locus $v$ of the longest suffix  of $u$ such that $\Epos(u) \not= \Epos(v)$.
+\item Either merge $C(u)$ and $C(v)$ or commect them by putting a suffix link from  $C(u)$ and $C(v)$, depending on whether $C(u) = C(v)$. 
 \end{enumerate}
-\end{lemma}
+\end{enumerate}
+\end{definition}
 
-From \cref{lem:ldep:sdep:rec}, the total computation can be done in $O(e_R(S)+e_L(S))$ time and $O(\mu(S))$ working space on the CDAWG of $S$. 
-We remark that \cref{lem:ldep:sdep:rec} holds even for a partial CDAWG $G$ whenever the current node $u$ has been merged to all of its equivalent nodes and all ancestors have been processed so far.
-
-  We assume that the Boolean flag $\op{isLB}(v) \iffdef |\LC(\Value(v))|\ge 2$ is attached to each explicit node $v$ in $T$. This can be  computed from the triple for $\Value(v)$ by $\isLeftBranching(i..j, \ell)$ of \cref{lem:leftmaximal:character} in the procedure $\RecLPT$. 
+In Step (1-c), we check whether $C(u) = C(v)$ holds or not. 
 
 
-
-%%%%%%%%%
-\subsection{Computation of the locus of the longest non-equivalent prefix of the representative string}
-\label{sec:compute:cdawg:equiv:classes}
-%%
-In the CDAWG of $S$, there exists a suffix link between the representatives $\beta$ and $\beta'$ of two equivalence classes such that $|\beta| > |\beta'|$ if and only if $\beta'$ is the longest suffix of $\beta$ that does not belong to the equivalence class of $\beta$.
-Therefore, it is sufficient to find the locus $v$ of such $\beta'$ from the locus $w$ of $\beta$. Then, we have the next lemma. 
-
-
-\begin{lemma}\label{lem:find:ne:locus}
-  %%\textit{Claim}~2.
-  During the computation of a partial CDAWG of $S$ from $\LPT(S)$, 
-  the computation of the target $v$ and the arcs $g_1, \dots, g_k$ can be done in $O(e_R(S)+e_L(S))$ total time over all arcs $f$ using the procedure  $\FindNonEquivLocus$ in \cref{algo:find:ne:locus}. 
-\end{lemma}
-
-
-\begin{toappendix}
-In \cref{algo:find:ne:locus}, we show the procedure $\FindNonEquivLocus(u, \alpha; G, \sdep, \ldep)$ that computes the locus $v$ of the longest suffix $\beta'$ of the string label $\beta = \Value(u)\cdot\alpha$ such that $\beta' \not\in EQ(\beta)$, and the associated path $(g_1, \dots, g_k)$ from a node $u'$ to $v$.
-See \cref{fig:three:suffix:link} for the explanation of the procedure.
 
 %%%%%%%%%%%%%%%%%%
 \begin{algorithm}[t]
-  \caption{
-The procedure $\FindNonEquivLocus(u, \alpha; G, \sdep, \ldep)$ that computes the locus $v$ of the longest suffix $\beta'$ of the string label $\beta = \Value(u)\cdot\alpha$ such that $\beta' \not\in EQ(\beta)$, and the associated path $(g_1, \dots, g_k)$ from a node $u'$ to $v$. 
-  }\label{algo:find:ne:locus}
+  \caption{A procedure $\idsf{RecSuf}$ that implementes the procedure Link-and-Merge for computing the CDAWG $G = (V(G), E(G), \suf, \eps)$ of a string $S$  from the \LPTrm-tree $T = (V(T), E(T), \eps)$ of $S$ in $O(e_L(S) + e_R(S))$ time and space, where a variable $C: V(T)\to \pow{V(T)}$ is a mapping that assigns a class of factors to each node of $T$. 
+  }\label{algo:rec:cdawg}
   %%%%%%
-  \Comment{Computing the initial node $u'$ and a suffix $\alpha'$ of $\alpha$}
-  \uIf{$u = root(G)$}{
-    $(u', \id{offset})\gets (root(G), 1)$\; 
+  $\suf \gets \emptyset$; 
+  $C \gets \emptyset$\;
+  Create the virtual parent $m$ of $root$, called the master root,  with outgoing edges $Out(m) = \set{ f = (m, b, root) }_{b \in \Sigma}$ and the suffix link $\suf(root) \gets m$\;
+  %% \iFor{$b \in \Sigma$}{
+  %%   $Out(m) \gets (m, b, root)$\;
+  %% }
+  %% $\suf(root) \gets m$\;
+  \For{$u \in V(T)$}{
+    $\idsf{RecSuf}(u)$\; 
   }
-  \Else{
-    $(u', \id{offset})\gets (\id{suf}(u), \ldep(u) - \sdep(u) + 1)$\; 
-  }
-  $\alpha' \gets \alpha[\id{offset}..|\alpha|]$\; 
-  %%%
-  %%At stage $i=0$, we initialize the target length by
-  \Comment{Finding a path $(g_1, \dots, g_k)$ with skip-and-count}
-  $\ell_* \gets |\alpha|$; $\ell \gets 0$; $v_0 \gets v$; $i \gets 0$\;     
-  \While{$\ell < \ell_*$}{
-    $b_i \gets \alpha[\ell + 1] \in \Sigma$\Comment*{a branching character}
-    $g_i = (v_{i-1}, \beta_i, v_i) \gets \Out(v_{i-1}, b_i)$\; 
-    $\wlink(v_i, a) \gets f$\Comment*{Adding a new implicit W-link}
-    $\ell \gets \ell + |\beta_i|$; $i \gets i+1$\; 
-  }
-  \Return $(u', (g_1, \dots, g_k), v)$, where $k = i-1$\; 
+  \medskip
+  \textbf{Procedure} $\idsf{RecSuf}(u: \idrm{node})$\; 
+  \Begin{
+      \uIf{ $\suf(u) \not= \op{undef}$ }{
+        $v \gets \suf(u)$\; 
+      }
+      \Else{
+        $p \gets parent(u)$\;
+        $q \gets \idsf{RecSuf}(p)$\; 
+        $v\gets$ Find the locus $v$ of the longest suffix of $u$ such that $\Epos(u) \not= \Epos(v)$, by skip-and-count from $q$ with string label $\gamma = \lab(g)$ of incoming edge $g = \pair{p, parent(u)}$ of $u$\;
+        %% $v\gets \idsf{SkipAndCount}(\gamma)$, where $\gamma = \lab(\pair{p, parent(u)})$\;
+        \uIf (\comblk{Case: $C(u) \not= C(v)$}) { $v$ is left-branching }{
+          $\suf(u) \gets v$\; 
+          \Return $\suf(u)$\; 
+        }
+        \Else (\comblk{Case: $C(u) = C(v)$}) {
+          $C(v).\op{append}(u)$\;
+          Redirect all incoming edges of $u$ to $v$\; 
+        }
+      }
+      \Return $v$\; 
+    }
 \end{algorithm}
-%%%%%%%%%%%%%%%%%%
-\end{toappendix}
 
-\section{Analysis}
-\label{sec:analysis}
-%% \subsection{The proof of \cref{lem:main:lpt:to:cdawg}}
-
-Consider the psuedo code of the procedure $\RecCDAWG$ in \cref{algo:rec:cdawg}. To prove its correctness, we define  
-  $\eqepos[\preceq w]$ and $[u]^{\prec w}_{\equiv}$ to be the restriction of
-  the equivalence relation $\eqepos[]$ and class $\eqepos[\prec w]$
-  onto the subset of nodes $v$ such that $\ldep(v) \le \ldep(w)$.
-  Similarly, we use subscript $\cdot^{\prec w}$ for the version of $\ldep(v) < \ldep(w)$.
-
-
-\begin{lemmarep}[correctness]\label{lem:cdawg:correctness}
-  Let $T$ be the $\LPT(S)$ of a string $S$ of length $n$. 
-  We assume that the Boolean flag $\op{isLB}(v)$ is attached to each explicit node $v$ in $T$. Then, \cref{algo:rec:cdawg} correctly computes $\CDAWG(S)$ from $T$ and $S$. 
-\end{lemmarep}
-
-\begin{proofsketch}
-  The proof is done by induction on the iteration of the while-loop of \cref{algo:rec:cdawg} and target $w$ of a new arc $f = (u, \alpha, w)$ extracted from queue $B$ at Line 10. 
-  We let $v$ be the deepest node in $V\rk{\prec w}(T)$ such that
-  $\beta \not\eqepos[\prec w] \beta'$
-  %$[v]^{\prec w}_{\equiv} \not= [w]^{\prec w}_{\equiv}$
-  and $\beta \succeqsuf \beta'$ (*)
-  with $\beta = \Value(w)$ and $\beta' = \Value(v)$ 
-  in the beginning of the while-loop. This (*) means that the equivalence classes of $w$ and $v$ are different. 
-  Such a $v$ always exists for $v = root(T)$, and 
-  can be found by $\FindNonEquivLocus$ from \cref{lem:find:ne:locus}. 
-  There are two cases (a) and (b) to maintain the current $\eqepos[\preceq w]$:
-\begin{enumerate*}[(a)]
-\item The case that $\beta \eqepos[\preceq w] \beta'$ holds, and $|\LC(\beta')| = \op{isLB}(v) \ge 2$, detected at Line 10. Then, two equivalence classes must be merged into a new class. 
-  %% the equivalence classes $[w]^{\prec w}_{\equiv}$ and $[v]^{\prec w}_{\equiv}$ of $\beta$ and $\beta'$, respectively, must be merged into the new class $[w]^{\preceq w}_{\equiv}$. This is done by the code for Lines 11--13. 
-\item The case that $\beta \not\eqepos[\preceq w] \beta'$ holds, and $|\LC(\beta')| = \op{isLB}(v) = 1$, detected at Line 14. Then, the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
-\end{enumerate*}
-Therefore, Lines~12--19 correctly update the equivalence class $EQ(w)$ for $[w]^{\prec w}_{\equiv}$, $\id{suf}$, and $\id{wlink}$. If \cref{algo:rec:cdawg} exits the while-loop, the resulting DAG $G$ with $EQ, \id{suf}$, and $\id{wlink}$ becomes $\CDAWG(S)$. Hence, the result is proved.
-\qed
-\end{proofsketch}
-
-\begin{proof}
-Suppose that initialization of Lines 2--6 are done. 
-We introduce some notion as follows.
-Consider any iteration of the while-loop for Lines 7--17 of \cref{algo:rec:cdawg}.
-Let $w$ be any explicit node in $V(T)$.
-\begin{itemize}
-\item We define the total order $\preceq$ on $V(G)$ as $u \preceq v \iffdef \ldep(u) \le \ldep(v)$, and its strict version $\prec$. 
-\item For any explicit node $w$, we denote $V\rk{\preceq w}(T) := \sete{ v \in V(T) \mid \ldep(v) \le \ldep(w) }$ be the subset of all nodes $v$ with $\ldep(v) \le \ldep(w)$.
-  
-\item We let $\eqepos[\preceq w]$ be the subrelation of $\eqepos$ restricted to $V\rk{\preceq w}(T)$, namely, $(\eqepos[\preceq w]) = \sete{ (u,v) \in (\eqepos) \mid u, v \in V\rk{\preceq w}(T)}$, and $[u]^{\preceq w}_{\equiv}$ be the associated equivalence class with representative $u$.
-
-\item Similarly, we let $\eqepos[\prec w]$ and $[u]^{\prec w}_{\equiv}$ as the subrelation and equivalence class with $\prec w$ instead of $\preceq$, respectively. 
-\end{itemize}
-
-At the timing where a new arc $f = (u, \alpha, w)$ with weight $\ldep(w)$ is extracted from $B$, we remark that $\eqepos[\prec w]$ and $\eqepos[\preceq w]$ correspond the node subsets $V\rk{\preceq w}\setminus\set{w}$ and $V\rk{\preceq w}(T)$, respectively. We will show the following claim.
-
-\textit{Claim~1}: At any iteration of the while-loop for Lines 7--17 of \cref{algo:rec:cdawg}, suppose that a new arc $f = (u, \alpha, w)$ with weight $\ldep(w)$ is extracted from the priority queue $B$. Then, in the end of the iteration at Line 17, the following conditions hold:  
-\begin{enumerate}
-  \item For all explicit nodes $w'$ in $V\rk{\preceq w}(T)$ with $\ldep(w') \le \ldep(w)$, $EQ(w') = [w']^{\preceq w}_{\equiv}$ holds and $w'$ has an outgoing suffix link.
-  \item For all explicit nodes $w'$ with $\ldep(w') < \ldep(w)$, $w'$ has a soft-Weiner link $\wlink(w', a) = g$ for some character $a$ and an arc $g$ if the string $a\cdot\Value(w')$ is a factor of $S$. 
-\end{enumerate}
-
-
-Consider condition (1). Let $f = (u, \alpha, w)$ be the new arc with weight $\ldep(w)$ is extracted from $B$ in the beginning of the while-loop.
-We will show the claim that at the end of the while-loop, the equivalence relation $\eqepos[\preceq w]$ and the associated equivalence classes are correctly maitained on the updated domain $V\rk{\preceq w}(T) = V\rk{\prec w}(T) \cup \set{w}$. 
-
-Suppose first that there exists another node $v$ in $V\rk{\prec w}(T)$ such that $[v]^{\prec w}_{\equiv} \not= [w]^{\prec w}_{\equiv}$ and $\Value(w) \succeqsuf \Value(v)$ (*) in the beginning of the while-loop. Note that we use $\prec w$ instead of $\preceq w$. Then, we see that $\ldep(v) < \ldep(w)$ othewise they must be identical. 
-Among such $v$'s, we choose the deepest $v$ with largest $\ldep(v)$ in $V\rk{\preceq w}(T)$ with property (*).
-From \cref{lem:find:ne:locus}, we can find the locus $v$ by calling $\FindNonEquivLocus$ with arguments $u$ and $\alpha$ at Line~9 of \cref{algo:rec:cdawg}. 
-%%we can find such a node $v$ with the string label $\beta' = \Value(v)$ by using the procedure $\FindNonEquivLocus$. 
-
-
-Let $\beta$ and $\beta'$ be the string labels of $w$ and $v$, respectively. Then, we can show that $\beta'$ is the longest suffix of $\beta$ such that $\Epos(\beta) \not= \Epos(\beta')$.
-There are two cases (a) and (b) below on the current equivalence relation $\eqepos[\preceq w]$ instead of $\eqepos[\prec w]$. 
-\begin{enumerate}[(a)]
-\item If $\beta \eqepos[\preceq w] \beta'$ holds, since $\beta \succsuf \beta'$, we can show that this condition is equivalent to $|\LC(\beta')| = \op{isLB}(v) \ge 2$, which can be correctly detected at Line 10. 
-  the equivalence classes $[w]^{\prec w}_{\equiv}$ and $[v]^{\prec w}_{\equiv}$ of $\beta$ and $\beta'$, respectively, must be merged into the new class $[w]^{\preceq w}_{\equiv}$. This is done by the code for Lines 11--13. 
-  
-\item Otherwise, $\beta \not\eqepos[\preceq w] \beta'$ holds. By the same argument as (a), this condition is equivalent to $|\LC(\beta')| = \op{isLB}(v) = 1$, which can be correctly detected at Lines 10 and 14.
-  the equivalence classes $[w]^{\prec w}_{\equiv} = [w]^{\preceq w}_{\equiv}$ and $[v]^{\prec w}_{\equiv} = [v]^{\preceq w}_{\equiv}$  of $\beta$ and $\beta'$, respectively, must remain separated, and the suffix link from $w$ to $v$ must be added, where $\id{offset} = |\beta| - |\beta'|$ and $a = \alpha[\id{offset}]$. 
-  This is correct because $[v]^{\prec w}_{\equiv}$ is the predecessor of $[w]^{\prec w}_{\equiv}$ w.r.t.~the suffix relation $\succsuf$ on their values.
-\end{enumerate}
-
-Combining the above arguments, at the end of the while-loop, we have correctly maintained the equivalence relation $\eqepos[\preceq w]$ and the associated equivalence clases on the updated domain $V\rk{\preceq w}(T) = V\rk{\prec w}(T) \cup \set{w}$.
-\qed\end{proof}
-
-Combining the above discussion, we give the proof for main results. 
-
-%% Next, we consider the time complexity. 
-
-\begin{lemmarep}[time and space complexity]\label{lem:cdawg:complexity}
-  Given $\LPT(S)$ of a string of length $n$, 
-  \cref{algo:rec:cdawg} runs in $O(e_R(S) + e_L(S) + \mu(S)\log \mu(S))$ time and $O(e_L + e_R)$ space. 
-\end{lemmarep}
-
-\begin{proof}
-Let us denote by $\mu = \mu(S), e_R = e_R(S)$, and $e_L = e_L(S)$, where $\mu \le \min\{e_R, e_L\}$.
-In the initialization for the tables $EQ$, $\ldep$, $B$ for Lines 2--8 can be done in $O(e_R)$ total time. The precomputation of the table $\op{isLB}$ at Lines 7--8 can be done in $O(e_L)$ total time by computing $\LC(\tau)$ with the associated triple $\tau$ stored in $u$. 
-In each iteration of the while-loop, $\op{deletemin}$ on the priority queue requires $O(\mu \log \mu)$ total time over all of $\mu$ nodes using $O(\mu)$ space on the standard heap.
-From \cref{lem:find:ne:locus}, the call of $\FindNonEquivLocus$ at Line~9 requires $O(e_R + e_L)$ total time. Redirection of all incoming arcs of $v$ into $w$ at Line 13 can be done in $O(e_R)$ since $v$ has exactly once suffix link since it is equivalent to $w$, and thus it is not left-branching.
-Additions of the suffix and Weiner links for Lines 18--19 can be executed at most the number of suffix links, and are bouned in $O(e_L)$ time.
-\qed\end{proof}
-
-\begin{trivlist}\item[]
-  \textbf{Proof of \cref{lem:main:lpt:to:cdawg}:}
-  From \cref{lem:cdawg:correctness} and \cref{lem:cdawg:complexity}. 
-\qed   
-\end{trivlist}
-
-\begin{trivlist}\item[]
-  \textbf{Proof for \cref{thm:main:index:cdawg}}.
-  From 
-  \cref{lem:main:from:lpt:to:cdawg:correct:time}
-  and
-  \cref{lem:main:lpt:to:cdawg}. 
-\qed
-\end{trivlist}
-
-
-
-%% In \cref{algo:rec:cdawg}, we present the psuedo code of $\RecCDAWG$, which gradually transforms $T = \LPT(S)$ to $G = \CDAWG(S)$ by performing breadth-first search of $T$ from the root to leaves. 
-%% During BFS, it adds suffix links between inequivalent nodes and merges equivalent nodes into equivalence classes. 
-%% %% Our algorithm incrementaly computes suffix links and equivalence classes by
-%% %% performing depth-first search from the root to leaves in the \LPTrm-tree. 
-%% We will refer to an itermediate DAG $G'$ obtained form the \LPTrm-tree after merging a subset of equivalent nodes as a \textit{partial CDAWG} of $S$. When the merging process is done, the resulting partial DAG $G'$ becomes $\CDAWG(S)$.
-
-%% Below, we show the details of \cref{step:algo2:skip:and:count} in the above algorithm. The traversal can be done in $O(k)$ time using constant time per arc, by the skip-and-count technique as follows (see \cref{fig:three:suffix:link}).e
-
-%% %%%%
-%% \begin{enumerate}
-%%   \item  
-%%     Select the triple $(v, \id{offset}, \alpha')$ of the initial node $v \in V(G)$, a positive integer $\id{offset} \in \nat$, and a prefix $\alpha'$ of $\alpha$ as follows. Let $u = \src(f)$ be the source of arc $f$: 
-%%     \begin{enumerate}[(i)]
-%%     \item If $u$ is the root, we let $v := root(G)$, and $\id{offset} := 1$. 
-%%     \item Otherwise, $u$ is an explicit node other than the root, with the suffix link $\id{suf}(u)$. Moreover, the pair $(\ldep(u), \sdep(u))$ has been computed. Then, we let $v$ to be the target of the suffix link, $v := \id{suf}(u)$, and let $\id{offset} := \ldep(u) - \sdep(u) + 1$. 
-%%     \end{enumerate}
-%%     Finally, we shrink the label of $\alpha$ by $\id{offset}$ character length, that is, $\alpha' := \alpha[1+\id{offset}..|\alpha|]$.
-%%     The intended meaning of $\alpha'$ is the longest suffix of the representative $\Value(u)$ that do not belong to the equivalence class of $u$.
-%% \end{enumerate}
-%% %%%%
-
-
-
-%% %%%%%%%%%
-%% \subsection{$O(e_R)$-time Computation of the Equivalence Classes}
-%% \label{sec:compute:cdawg:equiv:classes}
-%% %%% 
-%% %%Then, the algorithm computes the suffix link of explicit nodes, and all inplicit W-links into all type-2 nodes (loti) by breadth-first traversal of the \LPTrm-tree. We make the following inductive assumption. 
-%% %We first performs the base case, and then induction cases. Finally, return the revised graph $G = (\sig V, \sig E, root, \wlink, \id{suf})$.
-
-%% In \cref{line:recdag:one}, by induction hypothesis, $w$ is an explicit node whose target $w$ has the smallest string depth $\ell = \ldep(w)$ among the targets of all unprocessed arcs in $B$. This implies the next claim. \; 
-%% \begin{enumerate}[(1)]
-%%   \item 
-%%     \begin{itemize}
-%%     \item \textit{Claim}~1. All node in $V(T)$ with string length strictly less than $\ell$ are already processed as follows. If $u$ is not the root, it has a suffix link $\id{suf}(u)$ to another explicit node. Furthermore, it is already merged into the equivalence class $EQ(u')$ of a smaller string depth $\ldep(u')$ equivalent to $u$, i.e., $u \eqepos u'$. 
-%%     \end{itemize}
-%% \end{enumerate}
-
-
-
-%% %%%%%%
-%% \mysubsubsection{The base case. We perform the following initialization.}
-%% %%%
- 
-%% \begin{itemize}
-%% \item We let $B \gets E(G)$, $suf \gets \emptyset$, and $wlink \gets \emptyset$.
-  
-%% \item For all nodes $u$ in $V(G)$, we let $EQ(u)$ be the singleton class, i.e., $EQ(u) = \set{u}$. 
-%% %% \item Insert all outgoing arcs $f \in \Out(root(G))$ of the root into $B$ with weight $w = \ldep(\dst(f))$.
-%% \end{itemize}
-
-%% \mysubsubsection{The induction case.}
-%% %%%
-%% As induction hypothesis, we assume that whenever an edge $f \in \sig E(G)$ is extracted from the queue $B$, its source $u = \src(f)$ satisfies that: either (i) the source $u$ is the root of $G$, or (ii) $u$ has the suffix link $v = \id{suf}(u)$ with some $v \in \sig V(G)$.
-%% Then, we process all arcs in $\sig E(G)$ by executing the following steps while $B \not= \emptyset$: 
-%% \begin{enumerate}[(1)]
-%%   \item 
-%%     Firstly, we extract from the priority queue $B$ a new edge $f = (u, \alpha, w)$ with the minimum weight $\ldep(w)$.
-%%     By induction hypothesis, $w$ is an explicit node whose target $w$ has the smallest string depth $\ell = \ldep(w)$ among the targets of all unprocessed arcs in $B$. This implies the next claim. 
-%%     \begin{itemize}
-%%     \item \textit{Claim}~1. All node in $V(T)$ with string length strictly less than $\ell$ are already processed as follows. If $u$ is not the root, it has a suffix link $\id{suf}(u)$ to another explicit node. Furthermore, it is already merged into the equivalence class $EQ(u')$ of a smaller string depth $\ldep(u')$ equivalent to $u$, i.e., $u \eqepos u'$. 
-%%     \end{itemize}
-%%     Let $\beta = \Value(u)\cdot \alpha$ the string label of the longest path from the root to $w$ through the arc $f$. Then, if $w$ is an explicit node, then so is $v$ since 
-%%     Note that we do not explicitly compute the string label $\beta$.
-
-%%   \item 
-%%     Next, we let $\beta'$ be the longest suffix of $\beta$ such that $\beta'$ is not included in the equivalence class $EQ(\beta)$ of $\beta$. Then, we can quickly find the locus $v$ of $\beta'$ by traversing the list of consecutive arcs arcs $g_1, \dots, g_k$ spelling the string label $\lab(g_1)$ $\cdots$ $\lab(g_k) = \beta'$ along the unique path from the root to the locus $v$ of the prefix $\beta'$. 
-%%     \label{step:algo2:skip:and:count}
-%%     \begin{itemize}
-%%     \item \textit{Claim}~2. The computation of the target $v$ and the arcs $g_1, \dots, g_k$ can be done in $O(e_R(S)+e_L(S))$ total time over all arcs $f$ as shown later.
-%%     \end{itemize}
-
-%%   \item Finally, we maintain the suffix link and equivalence class of $v$ as follows.
-%% By induction hypothesis, we know that the node $v$ is already processed since $\ldep(v) < \ldep(w)$. Then, there are two cases below on the number of suffix links incoming to the target $v$ (this can be checked by $|\wlink(v)|$). 
-%%    \begin{enumerate}[(a)]
-%%    \item In the case that $|\wlink(v)| = 0$, namely, $v$ has no incoming suffix links. Then, we merge $v$ into the target $w$ of arc $f$ by re-directing all incoming arcs of $v$ into $w$. Moreover, we update the length $\sdep(w)$ of the shortest path to $w$ with $\min\{\sdep(w), \sdep(v)\}$. 
-
-%%    \item Otherwise, add an incoming suffix link to $v$, namely, $suf(w) = v$, and an explicit W-link from $v$ with character $a$, namely, $\wlink(v, a) = t$, where $a = \alpha[\id{offset}]$ is the first character of the shortest emember of $EQ(w)$, that is, $\op{shortest}(EQ(w)) = a\cdot \Value(EQ(v))$. 
-
-%%    %% \item Finally, in both cases, we add all arcs $f'$ outgoing from $v$ into $B$ with the weight $\ldep(\dst(f'))$.
-%%    \end{enumerate}
-%%   \end{enumerate}
-%% %%%%%%
-
-
-%% %Computation of suffix and Weiner links 
-%% %%%%%%
-
-%% \begin{remark} In (2) (iii) (b), This search for a $b_i$-arc always succeeds. 
-%% \end{remark}
-
-%% \begin{proof}
-%%   We can show the next claim by construction of $\LPT(S)$. 
-  
-%%   \textit{Claim~1.} Consider $a u \in L(G)$ for some $a \in \Sigma$ and $u \in \Sigma^*$. If $u \not\in L(G)$, then there exists some factorization $u = pq$ with some $p, q \in \Sigma^*$ such that prefix $p$ is equivalent to $ap$, i.e., $\Epos(ap) = \Epos(p)$. (End of Claim~1)
-
-%% In Claim~1, the prefix $p$ is not left-brancing since we have a left-extension $ap$ of $p$ with the same end-positions. Therefore, the traversal from the initial node $v$ to $u = pq$ terminates at the locus of $p$ when the mergi of $\loc p$ into $\loc {ap}$ happened. 
-%% \qed\end{proof}
-
-
-
-
-
-%% Consider the extended LPT tree of $S$, $\LPT(S) = (\sig V(S), \sig E(S), \eps)$. We introduce the set $\sig W(S)$ of Weiner-links as follows. 
-%% For any node $\underline u \in \sig V(S)$ with string labels $u$, and any character $a \in \Sigma$, if $v = au$ is a factor of $S$, $au \in \Fac$, we put the (either soft or hard) Weiner link $g = (\underline u, \underline v)$ from $\underline u$ to the locus $\underline v$ of $v$ with character label $\lab(g) = a$ in $\LPT(S)$. Then, we say that $u$ is the parent of $v$, and $v$ is a child of $u$ w.r.t.~$\sig W(S)$. 
-%% Moreover, the link $g$ is \textit{hard} if $\underline v$ is a real (right branching) node, and \textit{soft} otherwise (that is, $\underline v$ is a locus on an arc).
-%% %% 
-%% We can easily show that the total number of hard and soft Weiner links are upperbounded by the number $e_L$ of left-extensions of maximal repeats of $S$. 
-
-%% Without loss of generality, we identify the triples and the nodes of $\LPT(S)$. Based on the above definition of $\sig W(S)$ and its parent-child relation, we show the next lemma, which is the dual of \cref{lem:prune:leftbranch}. 
-
-%% \begin{lemma}\label{lem:prune:rightbranch}
-%% Suppose that a triple $\pi$ is the parent of a triple $\tau$ with respect to the Weiner links in $\sig W(S)$. If the factor $au$ defined by $\tau$ is right-branching, the factor $u$ defined by $\pi$ is also right-branching. 
-%% \end{lemma}
-
-%% \begin{proof}
-%%   By symmetry, the lemma follows from the proof of \cref{lem:prune:leftbranch}. 
-%%   %% If $v = au$ for some $a \in \Sigma$, we can easily show that
-%%   %% $\RC(au) \subseteq \RC(u)$, and thus that $|\RC(au)| \le |\RC(u)|$. On the other hand $au$ is right-brancing in $S$ if and only if $2\le |\RC(au)|$. It immediately follows that $2 \le |\RC(u)|$ meaning that $u$ is right-brancing in $S$. This shows the lemma. 
-%% \qed\end{proof}
-
-%% Recall that $\sig V$ is the set of nodes for all maximal repeats in $\MR(S)$ and $\eps \in \sig V$. 
-%% We let $\sig W$ to be the set of all Weiner links $g = (\underline u, \underline{au})$ that connect elements of $\sig V$ with a character $a \in \Sigma$, that is, $\set{u, au} \subseteq \MR(S)$.
-
-%% Now, we define the \textit{Weiner-link counterpart} of $\LPT(S)$, denoted by $\LPT[-](S) = (\sig V_-, \sig W_-, \eps)$ as follows.
-%% \begin{itemize}
-%% \item $\sig F_- = \sete{ g = (\underline u, \underline au) \mid u\in\MR(S), u\not\in \MR(S) }$ is the set of all Weiner links $g = (\underline u, \underline au)$ that connect maximal nodes of $\sig V$ to non-maximal nodes. 
-%%   %%, that is, $u\in\MR(S)$ and $u\not\in \MR(S)$.
-%% \item Let $\sig V_- = \sig V \cup \Delta_-$, 
-%%   where $\Delta_- = \sete{\underline{au} \not\in\sig V \mid g = (\underline u, \underline{au}) \in \sig F_-}$ be the set of non-maximal nodes reachable from $\sig V$ by arcs of $\sig F_-$.
-  
-%% \item $\sig W_+$ be the union of $\sig W$ and $\sig F_-$. 
-%% \end{itemize}
-
-%% Then, the extend LPT tree w.r.t.~Weiner links in $\sig W$ is the rooted tree $\LPT[-](S) = (\sig V_-, \sig W_-, \eps)$. 
-
-
-%% \subsection{Putting it all together}
-%% %%%
-
-%% Suppose that an index $\sig I = (\SA, \ISA, \LCP, S)$ is preprocessed from $SA$ and $S$ in \cref{algo:main}. 
-%% Consider the recursive procedure $\RecLPT$ in \cref{algo:rec}, which is equipped with subprocedure $\GenChildren$ in \cref{algo:genchildren} and the procedure $\isLeftBranching(i..j, \ell)$ in \cref{lem:leftmaximal:character}. 
-
-%% \subsection{$O({e_R(S) + e_L(S)})$-worst-case time solution over a constant alphabet}
-
-%% From
-%% \cref{lem:maxrep:howto:child},
-%% \cref{lem:genchildren},
-%% \cref{lem:leftmaximal:character},
-%% and the construction of $\LPT(S)$, 
-%% the recursive procedure $\RecLPT$ in \cref{algo:rec} correctly construct all nodes and edges of $\LPT(S) = (\sig V(S), \sig E(S), \eps)$ by generating all maximal repeats by starting with the root $\eps$, and by following all arcs $(u, v)$ in $\E(S)$ defined with the right-closure $v = \rext{(ub)}$ of a right-extension $ub$ with a branching character $b$ using a depth-first traversal of $\LPT(S)$.
-%% From \cref{lem:prune:leftbranch}, we see that if it eventually reaches a non-maximal node in $\Delta(S)$, it correctly stops the search and backtracks. Each arc is added to the arc set whenever it is traversed. Since each node $\underline v$ in $\E(S)\cup \F(S)$ can be reached through exactly one incoming arc, the procedure correctly find all arcs.
-
-%% In summary, to the best of our knowledge, however, it remains an open question whether the CDAWG can be computed from the SA and LCP arrays in output-sensitive manner.
-%% Specifically, it is not known if this can be done using $O({e_R(S) + e_L(S)})$ or less time and working space --- in addition to the $O(n)$-size read-only inputs --- for repetitive string with right-extension parameter ${e_R(S) + e_L(S)} \le n$.
-%% On the other hand, the proposed algorithm in this paper shows that it is possible to perform translation from the SA and LCP arrays into the CDAWG in output-sensitive time and space by a novel combination of known techniques.  
-
-
-%% \section{Related work}
-%% %%% 
-%% It is well-known that the problem of transforming the suffix array of a string $S$ into its suffix tree $T$ can be solved in $O(n)$ time and space. This is achieved using the suffix array (SA) and the longest common prefix array (LCP)  with an auxiliary stack of size $\idrm{height}(T)$.
-%% This transformation can be performed by simulating either
-%% a bottom-up traversal of the suffix tree, as shown by Kasai \textit{et al.}~\cite{kasai:lee2001lcp:linear} and Crochemore \textit{et al.}~\cite{crochemore2021book125problems:chap:satostree}, or
-%% a top-down traversal as demonstrated by Abouelhoda, Kurtz, and Ohlebusch~\cite{abouelhoda2004replacing}.
-
-%% Besides this, most closely related work is recent development of $O(n)$-time transformation algorithms for enumeration of \textit{maximal repeats} of a string $S$ using the \textit{Burrows-Wheeler transform} (BWT), 
-%% %%augmented with the \textit{Wavelet tree}.
-%% which simulate a top-down traversal of the tree of the reversed suffix links, called the \textit{Weiner tree}~\cite{beller:berger2012space:efficient:bbo,nishimoto:cpm2021enum}. 
-%% Since the set of maximal repeats corresponds the node set of the CDAWG of the string, they can be expected to be used as a building block to solve the CDAWG construction problem, too. The latest of them, proposed by Nishimoto and Tabei~\cite{nishimoto:cpm2021enum}, runs in $\Theta(n)$-time and $O(r\,\idrm{polylog}(n))$-space based on the r-index~\cite{gagie:navarro:prezza2020fully}.  
-
-%% Recently, Cleary and Dood~\cite{cleary2023constructing} proposed an algorithm for constructing the CDAWG of a string in the form of a grammar using the SA-intervals of maximal repeats of the string. However, they did not mention how to compute such SA-intervals in $O({e_R(S) + e_L(S)})$ time and space. 
-
-%% In summary, to the best of our knowledge, however, it remains an open question whether the CDAWG can be computed from the SA and LCP arrays in output-sensitive manner.
-%% Specifically, it is not known if this can be done using $O({e_R(S) + e_L(S)})$ or less time and working space --- in addition to the $O(n)$-size read-only inputs --- for repetitive string with right-extension parameter ${e_R(S) + e_L(S)} \le n$.
-%% On the other hand, the proposed algorithm in this paper shows that it is possible to perform translation from the SA and LCP arrays into the CDAWG in output-sensitive time and space by a novel combination of known techniques.  
-
-
+%%\input{secfour}
 
 %%%% 
 \section{Conclusion}
